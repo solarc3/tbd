@@ -18,4 +18,5 @@
 - Cómo grupo, decidimos que este podría ser fácilmente un atributo de esta tabla, además solo se utiliza para una sentencia puntual.
 
 ## Tabla `tienda_emp`
-- asd
+- Se eliminó la tabla puesto que no aportaba en la realización de las sentencias.
+- Además, nos hizo más sentido que una tienda tuviera varios empleados, pero que un empleado solo perteneciera a una tienda a la vez.
