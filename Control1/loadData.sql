@@ -72,7 +72,7 @@ INSERT INTO venta (id_tienda, fecha_venta, tipo_doc) VALUES
 (4, '2023-10-18', 'Boleta'), (5, '2023-10-31', 'Boleta'), (6, '2023-11-08', 'Factura'), (1, '2023-12-13', 'Boleta'), (2, '2024-01-17', 'Factura'),
 (3, '2024-02-07', 'Boleta'), (4, '2024-03-19', 'Factura'), (5, '2024-04-10', 'Boleta'), (6, '2024-05-14', 'Factura'), (1, '2024-06-12', 'Boleta'),
 (2, '2024-07-17', 'Factura'), (3, '2024-08-07', 'Boleta'), (4, '2024-09-11', 'Factura'), (5, '2024-09-01', 'Boleta'), (6, '2024-10-16', 'Boleta'),
-(1, '2024-11-06', 'Factura'), (2, '2024-12-11', 'Boleta'), (3, '2025-01-15', 'Factura'), (4, '2025-01-15', 'Factura'), (5, '2025-02-05', 'Boleta'); -- Este genera id_venta 95
+(1, '2024-11-06', 'Factura'), (2, '2024-12-11', 'Boleta'), (3, '2025-01-15', 'Factura'), (4, '2025-01-15', 'Factura'), (5, '2025-02-05', 'Boleta');
 
 INSERT INTO detalle_venta (id_venta, id_producto, id_vendedor, cantidad, precio_neto) VALUES
 (1, 3, 1, 1, 89990), (2, 1, 2, 1, 899990), (3, 4, 3, 1, 49990), (4, 2, 4, 1, 699990), (5, 6, 5, 10, 7990),

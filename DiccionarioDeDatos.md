@@ -35,7 +35,7 @@
 - `id_empleado` (**serial**): Identificador único de cada usuario.
 - `nombre` (**varchar**): El nombre registrado del empleado.
 - `cargo` (**varchar**): Corresponde al cargo que se le asigna en la tienda.
-- `sueldo` (**float**): El salario total correspondiente a un solo cliente, cómo es una relación 1 a 1, conviene dejarlo cómo atributo.
+- `sueldo` (**float**): El salario total correspondiente a un solo cliente, cómo es una relación 1 a 1, conviene dejarlo cómo atributo. Entonces, se asume que el sueldo de cada empleado es constante.
 - `id_tienda` (**serial**): Llave foranea, una tienda tiene varios empleados y un empleado es asociado con una sola tienda.
 - `id_comuna` (**serial**): Llave foranea, una comuna tiene varios empleados y un empleado solo una comuna.
 
