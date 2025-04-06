@@ -1,5 +1,8 @@
 # Control 1
 
+## Modificaciones al MER
+
+Las modificaciones al mer se encuentran justificadas en [CambiosPropuestos.md](https://github.com/solarc3/tbd/blob/main/Control1/CambiosPropuestos.md) y el [Diagrama](https://github.com/solarc3/tbd/blob/main/Control1/Diagrama_MR_Grupo_1.png). 
 ## Ejecutar mediante consola `psql`
 ### Pasos a seguir
 - Ingresar a la consola de postgres mediante `psql`, cuidadando que estén bien puestas las variables de entoerno.
