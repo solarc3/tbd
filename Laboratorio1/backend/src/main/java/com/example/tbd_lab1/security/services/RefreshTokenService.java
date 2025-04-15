@@ -24,33 +24,24 @@ public class RefreshTokenService {
     public String createRefreshToken(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
         String refreshToken = jwtUtils.generateRefreshToken();
-        user.setRefreshToken(refreshToken);
-        user.setRefreshTokenExpiration(jwtUtils.getRefreshTokenExpiryTime());
-        userRepository.save(user);
+        long refreshTokenExpiryTime = jwtUtils.getRefreshTokenExpiryTime();
+
+        userRepository.updateRefreshToken(userId, refreshToken, refreshTokenExpiryTime);
 
         return refreshToken;
     }
 
     public String verifyExpiration(User user) {
-        if (user.getRefreshTokenExpiration() < System.currentTimeMillis()) {
-            user.setRefreshToken(null);
-            user.setRefreshTokenExpiration(null);
-            userRepository.save(user);
+        if (user.getRefreshTokenExpiration() == null || user.getRefreshTokenExpiration() < System.currentTimeMillis()) {
+            userRepository.clearRefreshToken(user.getId());
             throw new RuntimeException("Refresh token was expired. Please make a new signin request");
         }
-
         return user.getRefreshToken();
     }
 
-    @Transactional
     public void deleteByUserId(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        user.setRefreshToken(null);
-        user.setRefreshTokenExpiration(null);
-        userRepository.save(user);
+        // no usa transactional pq es una sola consulta
+        userRepository.clearRefreshToken(userId);
     }
 }
