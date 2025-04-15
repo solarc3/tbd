@@ -1,0 +1,44 @@
+name: Sync branches con main
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 3 * * *'  # 3 AM, corregido el formato del cron
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git config core.hooksPath git-hooks
+      - name: Fetch All Branches
+        run: git fetch --all
+
+      - name: Sync Branches
+        run: |
+          # Get all remote branches except main
+          for branch in $(git branch -r | grep -v 'main' | grep -v 'HEAD' | sed 's|origin/||'); do
+            echo "Updating $branch..."
+            git checkout $branch || continue
+          
+            # Try to merge main into the branch
+            if git merge origin/main --no-edit; then
+              echo "Successfully merged main into $branch"
+              git push origin $branch
+            else
+              echo "Merge conflict in $branch, skipping..."
+              git merge --abort
+            fi
+          done
