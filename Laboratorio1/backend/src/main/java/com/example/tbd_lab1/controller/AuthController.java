@@ -1,7 +1,7 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.*;
-import com.example.tbd_lab1.entities.User;
+import com.example.tbd_lab1.entities.UserEntity;
 import com.example.tbd_lab1.repositories.UserRepository;
 import com.example.tbd_lab1.security.JwtUtils;
 import com.example.tbd_lab1.security.services.RefreshTokenService;
@@ -76,13 +76,13 @@ public class AuthController {
         }
 
         // Create new user's account
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
             .username(signUpRequest.getUsername())
             .email(signUpRequest.getEmail())
             .password(encoder.encode(signUpRequest.getPassword()))
             .build();
 
-        userRepository.save(user);
+        userRepository.save(userEntity);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

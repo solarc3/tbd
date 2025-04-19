@@ -3,7 +3,7 @@ package com.example.tbd_lab1.security.services;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.example.tbd_lab1.entities.User;
+import com.example.tbd_lab1.entities.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,12 +31,12 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(UserEntity userEntity) {
         return UserDetailsImpl.builder()
-            .id(user.getId())
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .password(user.getPassword())
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .email(userEntity.getEmail())
+            .password(userEntity.getPassword())
             .authorities(Collections.emptyList())
             .build();
     }
