@@ -1,25 +1,9 @@
 import apiClient from '@/api/axios'
-
-// Request DTOs
-export interface LoginRequest {
-  username: string
-  password: string
-}
-export interface SignupRequest {
-  username: string
-  email: string
-  password: string
-}
-
-export interface User {
-  id: number
-  username: string
-  email: string
-}
+import type { LoginRequest, SignupRequest, User } from '@/api/models'
 
 class AuthService {
   async login(request: LoginRequest): Promise<User> {
-    const { data } = await apiClient.post('/auth/signin', request)
+    const { data } = await apiClient.post<User>('/auth/signin', request)
     return data
   }
 
@@ -33,7 +17,7 @@ class AuthService {
   }
 
   async me(): Promise<User> {
-    const { data } = await apiClient.get('/auth/me')
+    const { data } = await apiClient.get<User>('/auth/me')
     return data
   }
 }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import type { User } from '@/api/services/authService';
 import authService from '@/api/services/authService'
+import type { User } from '@/api/models'
 
 interface AuthState {
   user: User | null
@@ -16,9 +16,9 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
-    currentUser: state => state.user,
-    authenticated: state => state.isAuthenticated,
-    isLoading: state => state.loading,
+    currentUser: (state) => state.user,
+    authenticated: (state) => state.isAuthenticated,
+    isLoading: (state) => state.loading,
   },
 
   actions: {
