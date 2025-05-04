@@ -1,9 +1,9 @@
 <template>
-  <main>
+  <NuxtLayout>
     <NuxtPage/>
-  </main>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import Header from "~/components/layout/Header.vue";
+// Layout components are loaded automatically in layouts
 </script>

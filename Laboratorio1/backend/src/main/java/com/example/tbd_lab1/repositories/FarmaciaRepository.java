@@ -18,8 +18,8 @@ public class FarmaciaRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Optional<FarmaciaEntity> findById(int id) {
-        String sql = "SELECT * FROM farmacia WHERE id = ?";
+    public Optional<FarmaciaEntity> findById(Long id) {
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia WHERE id_farmacia = ?";
         try {
             FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class), id);
             return Optional.ofNullable(farmacia);

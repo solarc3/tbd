@@ -1,7 +1,22 @@
+-- Drop tables in the correct order to avoid foreign key constraint issues
+DROP TABLE IF EXISTS producto_pedido CASCADE;
+DROP TABLE IF EXISTS farmacia_repartidor CASCADE;
+DROP TABLE IF EXISTS calificacion CASCADE;
+DROP TABLE IF EXISTS producto_farmacia CASCADE;
+DROP TABLE IF EXISTS detalle_pedido CASCADE;
+DROP TABLE IF EXISTS pedido CASCADE;
+DROP TABLE IF EXISTS repartidor CASCADE;
+DROP TABLE IF EXISTS producto CASCADE;
+DROP TABLE IF EXISTS farmacia CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
+-- This will drop the enum type if it exists and isn't being used
+DROP TYPE IF EXISTS estado_pedido CASCADE;
+
+-- Create the enum type
 CREATE TYPE estado_pedido AS ENUM ('POR_CONFIRMAR', 'CONFIRMADO', 'ENTREGADO', 'CANCELADO');
 
+-- Create tables
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -50,17 +65,17 @@ CREATE TABLE producto_farmacia (
     stock_producto BIGINT NOT NULL
 );
 
+CREATE TABLE repartidor (
+    id_repartidor BIGSERIAL PRIMARY KEY,
+    nombre_repartidor VARCHAR(255),
+    fecha_contratacion DATE NOT NULL
+);
+
 CREATE TABLE calificacion (
     id_calificacion BIGSERIAL PRIMARY KEY,
     id_detalle_pedido BIGINT REFERENCES detalle_pedido(id_detalle_pedido) ON DELETE CASCADE,
     cliente_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     puntuacion FLOAT NOT NULL
-);
-
-CREATE TABLE repartidor (
-    id_repartidor BIGSERIAL PRIMARY KEY,
-    nombre_repartidor VARCHAR(255),
-    fecha_contratacion DATE NOT NULL
 );
 
 CREATE TABLE farmacia_repartidor (
@@ -75,12 +90,7 @@ CREATE TABLE producto_pedido (
     id_producto BIGINT REFERENCES producto(id_producto) ON DELETE CASCADE
 );
 
-CREATE TABLE producto_farmacia (
-     id_producto_farmacia BIGSERIAL PRIMARY KEY,
-     id_farmacia BIGINT REFERENCES farmacia(id_farmacia) ON DELETE CASCADE,
-     id_producto BIGINT REFERENCES producto(id_producto) ON DELETE CASCADE
-);
-
+-- Create indexes
 CREATE INDEX idx_pedido_cliente ON pedido(id_cliente);
 CREATE INDEX idx_pedido_farmacia ON pedido(id_farmacia);
 CREATE INDEX idx_detalle_pedido_repartidor ON detalle_pedido(id_repartidor);

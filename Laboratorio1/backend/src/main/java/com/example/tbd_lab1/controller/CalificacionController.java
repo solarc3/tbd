@@ -23,25 +23,28 @@ import java.util.Optional;
 public class CalificacionController {
 
     @Autowired
-    CalificacionRepository calificacionRepository;
-    ModelMapper modelMapper;
+    private CalificacionRepository calificacionRepository;
+    
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("{id_calificacion}")
-    public ResponseEntity<Object> getCalification(@PathVariable Long id_calification, @AuthenticationPrincipal UserDetailsImpl currentUser){
+    public ResponseEntity<Object> getCalification(@PathVariable Long id_calificacion, @AuthenticationPrincipal UserDetailsImpl currentUser){
         //recuperar id del cliente que hizo la calificacion en base al repositorio para luego comparar si en verdad el q lo solicita hizo esa calificacion
         Long currentUserId = currentUser.getId();
-        Optional<CalificacionEntity> calification = calificacionRepository.findById(id_calification);
+        Optional<CalificacionEntity> calification = calificacionRepository.findById(id_calificacion);
         if (calification.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponse("Rip Bozo PACKWATCH"));
+                    .body(new MessageResponse("Calificación no encontrada"));
         }
 
         if(!calification.get().getClienteId().equals(currentUserId)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        CalificacionResponse dto = modelMapper.map(calification, CalificacionResponse.class);
-        //DTO Mapper aca
+        
+        CalificacionResponse dto = new CalificacionResponse();
+        dto.setPuntuacion(calification.get().getPuntuacion());
         return ResponseEntity.ok(dto);
 
     }

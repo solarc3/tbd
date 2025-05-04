@@ -1,9 +1,10 @@
 
 <template>
-  <Header>
-  </Header>
+  <div>
+    <!-- Home page content goes here -->
+  </div>
 </template>
 
 <script setup lang="ts">
-import Header from "@/components/layout/Header.vue";
+// Index page - main content will appear within the default layout
 </script>

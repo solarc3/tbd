@@ -1,14 +1,11 @@
 @import "tailwindcss";
-
 :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.13 0.028 261.692);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.13 0.028 261.692);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.13 0.028 261.692);
-    --primary: oklch(0.76 0.134 184.33);
+    --primary: oklch(0.21 0.034 264.665);
     --primary-foreground: oklch(0.985 0.002 247.839);
     --secondary: oklch(0.967 0.003 264.542);
     --secondary-foreground: oklch(0.21 0.034 264.665);
@@ -33,12 +30,7 @@
     --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
     --sidebar-border: oklch(0.928 0.006 264.531);
     --sidebar-ring: oklch(0.707 0.022 261.325);
-}
-
-@layer base {
-    button,
-    [role="button"] {
-        @apply cursor-pointer;
-        @apply disabled:cursor-not-allowed;
-    }
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.13 0.028 261.692);
+    --destructive-foreground: oklch(0.577 0.245 27.325);
 }

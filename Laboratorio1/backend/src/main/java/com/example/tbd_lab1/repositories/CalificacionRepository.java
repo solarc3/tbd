@@ -22,7 +22,7 @@ public class CalificacionRepository {
     }
 
     public Optional<CalificacionEntity> findById(Long id) {
-        String sql = "SELECT id, id_detalle_pedido, cliente_id, puntuacion FROM calificaciones WHERE id = ?";
+        String sql = "SELECT id_calificacion, id_detalle_pedido, cliente_id, puntuacion FROM calificacion WHERE id_calificacion = ?";
         try {
             CalificacionEntity calificacion = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(CalificacionEntity.class), id);
 
@@ -35,11 +35,11 @@ public class CalificacionRepository {
 
     public CalificacionEntity save(CalificacionEntity calificacion) {
         if (calificacion.getIdCalificacion() == null) {
-            String sql = "INSERT INTO calificaciones (id_detalle_pedido, cliente_id, puntuacion) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO calificacion (id_detalle_pedido, cliente_id, puntuacion) VALUES (?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
-                        PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+                        PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id_calificacion"});
                         ps.setLong(1, calificacion.getIdDetallePedido());
                         ps.setLong(2, calificacion.getClienteId());
                         ps.setFloat(3, calificacion.getPuntuacion());
@@ -55,7 +55,7 @@ public class CalificacionRepository {
             }
         }
         else {
-            String sql = "UPDATE calificaciones SET id_detalle_pedido = ?, cliente_id = ?, puntuacion = ? WHERE id_calificacion = ?";
+            String sql = "UPDATE calificacion SET id_detalle_pedido = ?, cliente_id = ?, puntuacion = ? WHERE id_calificacion = ?";
             jdbcTemplate.update(sql,
                     calificacion.getIdDetallePedido(),
                     calificacion.getClienteId(),

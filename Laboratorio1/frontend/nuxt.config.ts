@@ -4,7 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/tailwind.css'],
+  plugins: [
+    { src: '~/plugins/init-auth.client.ts', mode: 'client' }
+  ],
   vite: {
     plugins: [
       tailwindcss()
@@ -21,8 +24,12 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxt/ui',
     '@nuxtjs/color-mode',
-    'shadcn-nuxt'
+    'shadcn-nuxt',
+      '@pinia/nuxt',
   ],
+  pinia: {
+    autoImports: ['defineStore', 'storeToRefs'],
+  },
   colorMode: { classSuffix: '' },
   shadcn: {
     prefix: '',

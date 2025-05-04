@@ -7,20 +7,28 @@ import com.example.tbd_lab1.security.JwtUtils;
 import com.example.tbd_lab1.security.services.RefreshTokenService;
 import com.example.tbd_lab1.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.Map;
 
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(
+    origins = "http://localhost:3000",
+    allowCredentials = "true",
+    maxAge = 3600
+)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -38,28 +46,45 @@ public class AuthController {
 
     @Autowired
     RefreshTokenService refreshTokenService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         String jwt = jwtUtils.generateJwtToken(authentication);
 
+        ResponseCookie jwtCookie = ResponseCookie.from("SESSION", jwt)
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(Duration.ofHours(1))
+            .sameSite("Lax")
+            .build();
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         String refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        ResponseCookie refreshCookie = ResponseCookie.from("REFRESH", refreshToken)
+            .httpOnly(true)
+            .secure(false)
+            .path("/api/auth/refreshtoken")
+            .maxAge(Duration.ofDays(7))
+            .sameSite("Lax")
+            .build();
 
-        return ResponseEntity.ok(JwtResponse.builder()
-                                     .token(jwt)
-                                     .refreshToken(refreshToken)
-                                     .id(userDetails.getId())
-                                     .username(userDetails.getUsername())
-                                     .email(userDetails.getEmail())
-                                     .build());
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(Map.of(
+                "id",       userDetails.getId(),
+                "username", userDetails.getUsername(),
+                "email",    userDetails.getEmail()
+                        ));
     }
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
@@ -89,22 +114,82 @@ public class AuthController {
 
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
+        return refreshTokenService.findByToken(request.getRefreshToken())
+            .map(userEntity -> {
+                refreshTokenService.verifyExpiration(userEntity);
 
-        return refreshTokenService.findByToken(requestRefreshToken)
-            .map(user -> {
-                refreshTokenService.verifyExpiration(user);
-                String token = jwtUtils.generateJwtToken(user.getUsername());
-                return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken, "Bearer"));
+                UserDetailsImpl userDetails =
+                    (UserDetailsImpl) userDetailsService.loadUserByUsername(userEntity.getUsername());
+
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                String newJwt = jwtUtils.generateJwtToken(authentication);
+
+                return ResponseEntity.ok(
+                    new TokenRefreshResponse(newJwt, request.getRefreshToken(), "Bearer")
+                                        );
             })
-            .orElseThrow(() -> new RuntimeException("Refresh token is not in database"));
+            .orElseGet(() ->
+                           (ResponseEntity<TokenRefreshResponse>) ResponseEntity.badRequest()
+                      );
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails =
+            (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);
-        return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+
+        ResponseCookie deleteJwtCookie = ResponseCookie.from("SESSION", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(0)
+            .sameSite("Lax")
+            .build();
+
+        ResponseCookie deleteRefreshCookie = ResponseCookie.from("REFRESH", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth/refreshtoken")
+            .maxAge(0)
+            .sameSite("Lax")
+            .build();
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, deleteJwtCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, deleteRefreshCookie.toString())
+            .body(new MessageResponse("Log out successful!"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder
+            .getContext()
+            .getAuthentication();
+
+        if (authentication == null
+            || !authentication.isAuthenticated()
+            || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("No authenticated"));
+        }
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UserInfoResponse dto = UserInfoResponse.builder()
+            .id(userDetails.getId())
+            .username(userDetails.getUsername())
+            .email(userDetails.getEmail())
+            .build();
+
+        return ResponseEntity.ok(dto);
     }
 }
