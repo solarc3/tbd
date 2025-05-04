@@ -1,8 +1,11 @@
 package com.example.tbd_lab1.repositories;
 
 import java.sql.PreparedStatement;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import com.example.tbd_lab1.DTO.TopClienteResponse;
 import com.example.tbd_lab1.entities.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -62,6 +65,38 @@ public class UserRepository {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count != null && count > 0;
+    }
+
+
+    // Inicio querys
+    // Buscar cliente que haya gastado mas
+    public TopClienteResponse findClienteWithMostSpending() {
+        try {
+            String sql = "SELECT u.id, u.username, SUM(p.monto) as total_gastado " +
+                    "FROM users u " +
+                    "JOIN pedido p ON u.id = p.id_cliente " +
+                    "WHERE p.estado_pedido::text = 'ENTREGADO' " +
+                    "GROUP BY u.id, u.username " +
+                    "ORDER BY total_gastado DESC " +
+                    "LIMIT 1";
+
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql);
+            if (result != null) {
+                return TopClienteResponse.builder()
+                        .id(((Number) result.get("id")).longValue())
+                        .username((String) result.get("username"))
+                        .totalGastado(((Number) result.get("total_gastado")).intValue())
+                        .build();
+            }
+            return null;
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println("No results found");
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error con query: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public UserEntity save(UserEntity userEntity) {
