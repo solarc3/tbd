@@ -6,7 +6,8 @@
           <House class="w-4 h-4 mr-1" /> Home
         </Button>
         <Button variant="link">Clientes</Button>
-        <Button variant="link">Pedidos</Button>
+        <Button variant="link" @click="router.push('/productos')">Productos</Button>
+        <Button variant="link" @click="router.push('/pedidos')">Pedidos</Button>
         <Button variant="link">Farmacias</Button>
       </div>
 
