@@ -38,13 +38,14 @@ onMounted(() => {
 <template>
   <div>
     <!-- carrusel hay que ver bn las dimensiones y q poner ToT -->
+    <!-- aca puse mejor la dimension horizontal en 1850px para que coincida con los blocks -->
     <div class="embla" ref="emblaRef">
       <div class="embla__container">
         <div class="embla__slide">
           <img src="/slide4.jpeg" alt="Slide 1" />
         </div>
         <div class="embla__slide">
-          <img src="/slide2.jpg" alt="Slide 2" />
+          <img src="/slide5.png" alt="Slide 2" />
         </div>
         <div class="embla__slide">
           <img src="/slide3.jpg" alt="Slide 3" />
@@ -53,7 +54,8 @@ onMounted(() => {
     </div>
 
     <!-- blocks de las imagenes para redireccion a productos -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
+    <!-- le acabo de poner un margen chiquito con el borde de la pagina (px-4) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-8 px-4">
       <div
         v-for="category in categories"
         :key="category.name"
@@ -82,8 +84,8 @@ onMounted(() => {
 .embla {
   overflow: hidden;
   width: 100%;
-  max-width: 900px;
-  margin: 50px auto;
+  max-width: 1850px; /* aca!! */
+  margin: 20px auto; /* margen con la navbar, lo cambie para que no hubiera tanto desplazamiento vertical */
 }
 
 .embla__container {
@@ -97,7 +99,7 @@ onMounted(() => {
 
 img {
   width: 100%;
-  height: 300px;
+  height: 400px; /* si lo ponemos en 400 se ve bien igual pero queda todo muy grande */
   object-fit: cover;
 }
 </style>

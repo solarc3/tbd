@@ -1,8 +1,9 @@
+import './assets/main.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import authService from './api/services/authService'
-import './assets/main.css'
+
 
 // Initialize authentication state
 authService.initAuthFromSession();
