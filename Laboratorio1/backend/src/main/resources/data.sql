@@ -76,7 +76,7 @@ INSERT INTO pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, 
 (90, '2023-05-05 16:20:00', false, 'POR_CONFIRMAR', 5, 5),
 (15, '2023-05-10 11:10:00', true, 'ENTREGADO', 6, 1),
 (50, '2023-05-15 12:30:00', false, 'CONFIRMADO', 7, 2),
-(22, '2023-05-20 17:00:00', true, 'CANCELADO', 8, 3),
+(22, '2023-05-20 17:00:00', true, 'CANCELADO', 8, 1),
 (38, '2023-05-25 08:00:00', false, 'ENTREGADO', 9, 4),
 (80, '2023-06-01 13:45:00', true, 'POR_CONFIRMAR', 10, 5),
 (42, '2023-06-05 10:20:00', false, 'ENTREGADO', 1, 1),
@@ -99,18 +99,19 @@ INSERT INTO pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, 
 
 -- Insertar detalles de pedido (detalle_pedido)
 INSERT INTO detalle_pedido (id_pedido, id_repartidor, metodo_pago, fecha_entrega) VALUES
-(1, 1, 'Tarjeta', '2023-04-11'),
-(2, 3, 'Efectivo', '2023-04-16'),
-(4, 4, 'Tarjeta', '2023-05-02'),
-(6, 2, 'Efectivo', '2023-05-11'),
-(7, 5, 'Transferencia', '2023-05-16'),
-(9, 1, 'Tarjeta', '2023-05-26'),
-(11, 2, 'Efectivo', '2023-06-06'),
-(13, 3, 'Transferencia', '2023-06-16'),
-(14, 4, 'Tarjeta', '2023-06-21'),
-(16, 5, 'Efectivo', '2023-07-02'),
-(17, 1, 'Transferencia', '2023-07-06'),
-(19, 3, 'Tarjeta', '2023-07-16');
+(1, 1, 'Tarjeta', '2023-04-11 10:30:00'),
+(2, 3, 'Efectivo', '2023-04-16 14:45:00'),
+(4, 4, 'Tarjeta', '2023-05-02 09:00:00'),
+(6, 2, 'Efectivo', '2023-05-11 16:20:00'),
+(7, 5, 'Transferencia', '2023-05-16 11:15:00'),
+(9, 1, 'Tarjeta', '2023-05-26 18:10:00'),
+(11, 2, 'Efectivo', '2023-06-06 08:30:00'),
+(13, 3, 'Transferencia', '2023-06-16 12:00:00'),
+(14, 4, 'Tarjeta', '2023-06-21 17:05:00'),
+(16, 5, 'Efectivo', '2023-07-02 15:40:00'),
+(17, 1, 'Transferencia', '2023-07-06 13:25:00'),
+(19, 3, 'Tarjeta', '2023-07-16 20:00:00');
+
 
 -- Insertar productos en pedidos (producto_pedido)
 -- Cada pedido tiene 1-3 productos
