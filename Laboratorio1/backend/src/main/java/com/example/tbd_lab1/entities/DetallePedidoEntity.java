@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,5 +20,5 @@ public class DetallePedidoEntity {
     // llave foranea
     private Long idRepartidor;
     private String metodoPago;
-    private Date fechaEntrega;
+    private LocalDateTime fechaEntrega;
 }

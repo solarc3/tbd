@@ -55,7 +55,7 @@ CREATE TABLE detalle_pedido (
     id_pedido BIGINT REFERENCES pedido(id_pedido) ON DELETE CASCADE,
     id_repartidor BIGINT,
     metodo_pago VARCHAR(50) NOT NULL,
-    fecha_entrega DATE NOT NULL
+    fecha_entrega TIMESTAMP NOT NULL
 );
 
 CREATE TABLE producto_farmacia (
