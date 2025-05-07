@@ -66,7 +66,7 @@ public class WebSecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> // para proposito de testing se añaden rutas
-                                       auth.requestMatchers("/api/auth/**", "/api/users/**", "/api/productos/**").permitAll()
+                                       auth.requestMatchers("/api/auth/**","api/pedido/**", "api/farmacia/**","/api/users/**", "/api/productos/**").permitAll()
                                            .anyRequest().authenticated()
                                   )
             .authenticationProvider(authenticationProvider())
