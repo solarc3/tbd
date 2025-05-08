@@ -50,3 +50,26 @@ BEGIN
     WHERE id_pedido = p_id_pedido;
 END;
 $$;
+
+-- Trigger Function: Actualizar fecha_entrega en detalle_pedido cuando el pedido se marca como ENTREGADO
+CREATE OR REPLACE FUNCTION actualizar_fecha_entrega_trigger_func()
+    RETURNS TRIGGER AS $$
+BEGIN
+    -- Verificar si el nuevo estado del pedido es 'ENTREGADO'
+    -- y si el estado anterior no era 'ENTREGADO' (para evitar actualizaciones repetidas si ya estaba entregado)
+    IF NEW.estado_pedido = 'ENTREGADO' AND (OLD IS NULL OR OLD.estado_pedido != 'ENTREGADO') THEN
+        -- Actualizar la fecha_entrega en la tabla detalle_pedido
+        -- Asumimos que solo hay un detalle_pedido por pedido. Si puede haber más, esta lógica necesitaría ajuste.
+        UPDATE detalle_pedido
+        SET fecha_entrega = NOW()
+        WHERE id_pedido = NEW.id_pedido;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger: Ejecutar la función después de actualizar la tabla pedido
+CREATE TRIGGER trg_actualizar_fecha_entrega_pedido
+    AFTER UPDATE ON pedido
+    FOR EACH ROW
+EXECUTE FUNCTION actualizar_fecha_entrega_trigger_func();
