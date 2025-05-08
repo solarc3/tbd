@@ -59,24 +59,26 @@ onMounted(() => {
     <div class="flex-1">
       <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Productos disponibles</h1>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div
-          v-for="product in filteredProducts"
-          :key="product.id"
-          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-        >
-          <!-- esta linea es dms importante pq hace q se vea la imagen cmo perfecta en las cajas, por si no les da bn la dimension -->
-          <img :src="product.image" :alt="product.name" class="w-full h-48 object-contain bg-white-100" />
-          <div class="p-4">
-            <h2 class="text-lg font-semibold text-gray-800">{{ product.name }}</h2>
-            <p class="text-sm text-gray-600">{{ product.description }}</p>
-            <p class="text-lg font-bold text-blue-500 mt-2">${{ product.price.toLocaleString() }}</p>
-            <button
-                class="btn-custom mt-4 w-full flex items-center justify-center space-x-2"
-            >
-              <ShoppingCart class="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+		<div
+		  v-for="product in filteredProducts"
+		  :key="product.id"
+		  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
+		>
+		  <!-- esta linea es dms importante pq hace q se vea la imagen cmo perfecta en las cajas, por si no les da bn la dimension -->
+		  <img :src="product.image" :alt="product.name" class="w-full h-48 object-contain bg-white-100" />
+		  <div class="p-4 flex flex-col flex-grow">
+		    <div class="flex-grow">
+		      <h2 class="text-lg font-semibold text-gray-800">{{ product.name }}</h2>
+		      <p class="text-sm text-gray-600">{{ product.description }}</p>
+		      <p class="text-lg font-bold text-blue-500 mt-2">${{ product.price.toLocaleString() }}</p>
+		    </div>
+		    <button
+		      class="btn-custom mt-4 w-full flex items-center justify-center space-x-2"
+		    >
+		      <ShoppingCart class="w-5 h-5" />
+		    </button>
+		  </div>
+		</div>
       </div>
     </div>
   </div>

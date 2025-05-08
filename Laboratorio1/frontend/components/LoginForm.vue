@@ -1,8 +1,4 @@
 <script lang="ts">
-export const containerClass = 'w-full min-h-screen flex items-center justify-center px-4 py-8 bg-gray-50'
-</script>
-
-<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
@@ -10,6 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth'
+export const containerClass = 'w-full min-h-screen flex items-center justify-center px-4 py-8 bg-gray-50'
+</script>
+
+<script setup lang="ts">
+
 
 const router = useRouter()
 const authStore = useAuthStore()
