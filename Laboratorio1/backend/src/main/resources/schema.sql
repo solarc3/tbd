@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS repartidor CASCADE;
 DROP TABLE IF EXISTS producto CASCADE;
 DROP TABLE IF EXISTS farmacia CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS notificacion CASCADE;
 
 -- This will drop the enum type if it exists and isn't being used
 DROP TYPE IF EXISTS estado_pedido CASCADE;
@@ -87,8 +88,19 @@ CREATE TABLE farmacia_repartidor (
 CREATE TABLE producto_pedido (
     id_producto_pedido BIGSERIAL PRIMARY KEY,
     id_pedido BIGINT REFERENCES pedido(id_pedido) ON DELETE CASCADE,
-    id_producto BIGINT REFERENCES producto(id_producto) ON DELETE CASCADE
+    id_producto BIGINT REFERENCES producto(id_producto) ON DELETE CASCADE,
+    receta_validada BOOLEAN
 );
+
+-- notificacion para Trigger 11 - medicamentos que pidan recetas, no validadas.
+CREATE TABLE notificacion (
+    id_notificacion BIGSERIAL PRIMARY KEY,
+    id_pedido BIGINT,
+    id_producto BIGINT,
+    mensaje TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 -- Create indexes
 CREATE INDEX idx_pedido_cliente ON pedido(id_cliente);

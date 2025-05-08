@@ -93,6 +93,25 @@ CREATE TRIGGER trg_actualizar_fecha_entrega_pedido
 EXECUTE FUNCTION actualizar_fecha_entrega_trigger_func();
 
 -- [11] - Registrar notificacion si un medicamento con receta es pedido sin validación
+-- Al generarse un pedido, particularmente sus productos (tabla producto_pedido), se hace la validacion
+CREATE OR REPLACE FUNCTION verificar_receta()
+    RETURNS TRIGGER AS $$
+BEGIN
+    -- si el producto requiere receta y no se ha validado
+    IF EXISTS (SELECT 1 FROM producto WHERE id_producto = NEW.id_producto AND requiere_receta = TRUE)
+        AND NEW.receta_validada = FALSE THEN
+        -- crear notificacion
+        INSERT INTO notificacion(id_pedido, id_producto, mensaje)
+        VALUES (NEW.id_pedido, NEW.id_producto, 'Receta no validada');
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_verificar_receta
+    AFTER INSERT ON producto_pedido
+    FOR EACH ROW
+EXECUTE FUNCTION verificar_receta();
 
 -- [12] - Insertar califiacion automatica si no se recibe en 48 hrs
 CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()

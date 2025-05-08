@@ -115,36 +115,36 @@ INSERT INTO detalle_pedido (id_pedido, id_repartidor, metodo_pago, fecha_entrega
 
 -- Insertar productos en pedidos (producto_pedido)
 -- Cada pedido tiene 1-3 productos
-INSERT INTO producto_pedido (id_pedido, id_producto) VALUES
-(1, 1), (1, 2), (1, 3),
-(2, 4), (2, 5),
-(3, 6), (3, 7),
-(4, 8), (4, 9), (4, 10),
-(5, 11), (5, 12),
-(6, 13), (6, 14),
-(7, 15), (7, 16),
-(8, 17), (8, 18),
-(9, 19), (9, 20),
-(10, 1), (10, 2),
-(11, 3), (11, 4), (11, 5),
-(12, 6), (12, 7),
-(13, 8), (13, 9),
-(14, 10), (14, 11), (14, 12),
-(15, 13), (15, 14),
-(16, 15), (16, 16),
-(17, 17), (17, 18),
-(18, 19), (18, 20),
-(19, 1), (19, 3), (19, 5),
-(20, 7), (20, 9),
+INSERT INTO producto_pedido (id_pedido, id_producto, receta_validada) VALUES
+(1, 1, NULL), (1, 2, NULL), (1, 3, TRUE),
+(2, 4, NULL), (2, 5, NULL),
+(3, 6, TRUE),
+(4, 8, TRUE), (4, 9, NULL), (4, 10, TRUE),
+(5, 11, NULL), (5, 12, NULL),
+(6, 13, NULL), (6, 14, NULL),
+(7, 15, NULL), (7, 16, NULL),
+(8, 17, NULL), (8, 18, TRUE),
+(9, 19, TRUE), (9, 20, TRUE),
+(10, 1, NULL), (10, 2, NULL),
+(11, 3, TRUE), (11, 4, NULL), (11, 5, NULL),
+(12, 6, TRUE), (12, 7, NULL),
+(13, 8, TRUE), (13, 9, NULL),
+(14, 10, TRUE), (14, 11, NULL), (14, 12, NULL),
+(15, 13, NULL), (15, 14, NULL),
+(16, 15, NULL), (16, 16, NULL),
+(17, 17, NULL), (17, 18, TRUE),
+(18, 19, TRUE), (18, 20, TRUE),
+(19, 1, NULL), (19, 3, TRUE), (19, 5, NULL),
+(20, 7, NULL), (20, 9, NULL),
 -- April 2025 pedidos (id 21-22)
-(21, 1),   -- Paracetamol (Analgésico)
-(22, 2),   -- Ibuprofeno (Antiinflamatorio)
+(21, 1, NULL),   -- Paracetamol (Analgésico)
+(22, 2, NULL),   -- Ibuprofeno (Antiinflamatorio)
 -- May 2025 pedidos (id 23-27)
-(23, 1), (23, 7),                  -- Paracetamol + Aspirina (Analgésico)
-(24, 2), (24, 2),                  -- Ibuprofeno x2 (Antiinflamatorio)
-(25, 3),                            -- Amoxicilina (Antibiótico)
-(26, 1), (26, 1), (26, 1),         -- Paracetamol x3 (Analgésico)
-(27, 2);                            -- Ibuprofeno (Antiinflamatorio)
+(23, 1, NULL), (23, 7, NULL),                  -- Paracetamol + Aspirina (Analgésico)
+(24, 2, NULL), (24, 2, NULL),                  -- Ibuprofeno x2 (Antiinflamatorio)
+(25, 3, TRUE),                            -- Amoxicilina (Antibiótico)
+(26, 1, NULL), (26, 1, NULL), (26, 1, NULL),         -- Paracetamol x3 (Analgésico)
+(27, 2, NULL);                            -- Ibuprofeno (Antiinflamatorio)
 
 -- Insertar calificaciones (solo para pedidos entregados)
 -- Insertar calificaciones (solo para pedidos entregados y con detalles existentes)
