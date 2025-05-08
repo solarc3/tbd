@@ -24,7 +24,7 @@ public class FarmaciaController {
         this.farmaciaService = farmaciaService;
     }
 
-    @GetMapping("/pedido")
+    @GetMapping("/pedidofallado")
     public ResponseEntity<?> failedPedido() {
         List<FarmaciaPedidoFallidoResponse> farmacias = farmaciaService.getFarmaciasWithMostCancelledPedidos();
 

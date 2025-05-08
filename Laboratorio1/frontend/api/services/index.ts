@@ -1,8 +1,14 @@
-import authService from './authService';
+import authService from './authService'
+import farmaciaService from './farmaciaService'
+import repartidorService from './repartidorService'
+import pedidoService from './pedidoService'
 
 export {
-  authService
-};
+  authService,
+  farmaciaService,
+  repartidorService,
+  pedidoService
+}
 
 // In the future, you can add more services here:
 // export { userService } from './userService';

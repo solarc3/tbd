@@ -101,7 +101,6 @@ CREATE TABLE notificacion (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 -- Create indexes
 CREATE INDEX idx_pedido_cliente ON pedido(id_cliente);
 CREATE INDEX idx_pedido_farmacia ON pedido(id_farmacia);
