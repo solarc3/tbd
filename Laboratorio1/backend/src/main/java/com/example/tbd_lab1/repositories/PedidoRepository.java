@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.repositories;
 
 import com.example.tbd_lab1.DTO.PagoMasUsadoUrgenteResponse;
+import com.example.tbd_lab1.DTO.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab1.entities.FarmaciaEntity;
 import com.example.tbd_lab1.entities.PedidoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,57 @@ public class PedidoRepository {
             return true;
         } catch (DataAccessException e) {
             System.err.println("Error al cambiar estado pedido: " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean registrarPedidoCompleto(RegistrarPedidoCompletoRequest request) {
+        try {
+            List<SqlParameter> params = List.of(
+                    new SqlParameter("p_monto", Types.INTEGER),
+                    new SqlParameter("p_fecha_pedido", Types.TIMESTAMP),
+                    new SqlParameter("p_es_urgente", Types.BOOLEAN),
+                    new SqlParameter("p_estado_pedido", Types.VARCHAR), // Will be cast to estado_pedido in SQL
+                    new SqlParameter("p_id_cliente", Types.BIGINT),
+                    new SqlParameter("p_id_farmacia", Types.BIGINT),
+                    new SqlParameter("p_id_repartidor", Types.BIGINT),
+                    new SqlParameter("p_metodo_pago", Types.VARCHAR),
+                    new SqlParameter("p_fecha_entrega", Types.TIMESTAMP),
+                    new SqlParameter("p_id_productos", Types.ARRAY)
+            );
+
+            jdbcTemplate.call(con -> {
+                CallableStatement callableStatement = con.prepareCall("CALL registrar_pedido_completo(?, ?, ?, ?::estado_pedido, ?, ?, ?, ?, ?, ?)");
+                callableStatement.setInt(1, request.getMonto());
+                callableStatement.setTimestamp(2, java.sql.Timestamp.valueOf(request.getFechaPedido()));
+                callableStatement.setBoolean(3, request.getEsUrgente());
+                callableStatement.setString(4, request.getEstadoPedido().name());
+                callableStatement.setLong(5, request.getIdCliente());
+                callableStatement.setLong(6, request.getIdFarmacia());
+
+                if (request.getIdRepartidor() != null) {
+                    callableStatement.setLong(7, request.getIdRepartidor());
+                } else {
+                    callableStatement.setNull(7, Types.BIGINT);
+                }
+
+                callableStatement.setString(8, request.getMetodoPago());
+
+                if (request.getFechaEntrega() != null) {
+                    callableStatement.setTimestamp(9, java.sql.Timestamp.valueOf(request.getFechaEntrega()));
+                } else {
+                    callableStatement.setNull(9, Types.TIMESTAMP);
+                }
+
+                Long[] productosArray = request.getIdProductos().toArray(new Long[0]);
+                java.sql.Array sqlArray = con.createArrayOf("BIGINT", productosArray);
+                callableStatement.setArray(10, sqlArray);
+
+                return callableStatement;
+            }, params);
+            return true;
+        } catch (DataAccessException e) {
+            System.err.println("Error al registrar pedido completo: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

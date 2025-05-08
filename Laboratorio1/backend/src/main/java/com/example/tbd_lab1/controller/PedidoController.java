@@ -3,6 +3,7 @@ package com.example.tbd_lab1.controller;
 import com.example.tbd_lab1.DTO.EstadoPedidoRequest;
 import com.example.tbd_lab1.DTO.MessageResponse;
 import com.example.tbd_lab1.DTO.PagoMasUsadoUrgenteResponse;
+import com.example.tbd_lab1.DTO.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab1.entities.PedidoEntity;
 import com.example.tbd_lab1.services.PedidoService;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,15 @@ public class PedidoController {
             return ResponseEntity.ok().body(new MessageResponse("Estado cambiado"));
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new MessageResponse("Error al cambiar estado"));
+    }
+
+    @PostMapping("/registrarcompleto")
+    public ResponseEntity<?> registrarPedidoCompleto(@RequestBody RegistrarPedidoCompletoRequest request) {
+        boolean success = pedidoService.registrarPedidoCompleto(request);
+        if (success) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Pedido registrado exitosamente."));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error al registrar el pedido completo."));
     }
 }
