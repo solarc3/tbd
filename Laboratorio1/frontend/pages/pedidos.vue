@@ -53,30 +53,8 @@ function actualizarEstado(id: number, nuevoEstado: Pedido['estado']) {
               >
                 {{ pedido.estado }}
               </span>
-            </td> <!-- d aqui --> <!-- aca hay que arreglar una irregularidad en la linea horizontal q m da toc T-T -->
-            <td class="px-6 py-4 text-sm border-b flex items-center space-x-2">
-
-            <button
-                @click="actualizarEstado(pedido.id, 'Pendiente')"
-                :class="pedido.estado === 'Pendiente' ? 'text-yellow-600' : 'text-gray-400'"
-              >
-                <Clock class="w-6 h-6" />
-              </button>
-              <button
-                @click="actualizarEstado(pedido.id, 'Enviado')"
-                :class="pedido.estado === 'Enviado' ? 'text-green-600' : 'text-gray-400'"
-              >
-                <CheckCircle class="w-6 h-6" />
-              </button>
-              <button
-                @click="actualizarEstado(pedido.id, 'Cancelado')"
-                :class="pedido.estado === 'Cancelado' ? 'text-red-600' : 'text-gray-400'"
-              >
-                <XCircle class="w-6 h-6" />
-              </button>
-            </td> <!-- hasta aqui -->
-            <!-- si no les gustaron los icons usemos los select, es borrar del td al td y dejar este comentao !
             </td>
+
             <td class="px-6 py-4 text-sm border-b">
               <select
                   class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring focus:ring-blue-200"
@@ -88,7 +66,6 @@ function actualizarEstado(id: number, nuevoEstado: Pedido['estado']) {
                 <option value="Cancelado">Cancelado</option>
               </select>
             </td>
-            -->
           </tr>
         </tbody>
       </table>
