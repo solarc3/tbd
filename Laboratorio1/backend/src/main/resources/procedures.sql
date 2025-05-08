@@ -1,4 +1,6 @@
--- [XX] - Registrar un pedido completo
+-- ** PROCEDIMIENTOS ALMACENADOS **
+
+-- [07] - Registrar un pedido completo
 CREATE OR REPLACE PROCEDURE registrar_pedido_completo(
     p_monto INTEGER,
     p_fecha_pedido TIMESTAMP,
@@ -43,7 +45,7 @@ CREATE OR REPLACE PROCEDURE cambiar_estado_pedido(
     p_id_pedido BIGINT,
     p_nuevo_estado estado_pedido
 )
-LANGUAGE plpgsql AS $$
+    LANGUAGE plpgsql AS $$
 BEGIN
     UPDATE pedido
     SET estado_pedido = p_nuevo_estado
@@ -51,47 +53,24 @@ BEGIN
 END;
 $$;
 
+-- [09] - Descontar el stock al confirmar el pedido
 CREATE OR REPLACE PROCEDURE actualizarStock(
     IN id_productoN INTEGER,
     IN id_FarmaciaN INTEGER,
     IN cant_pedido INTEGER
 )
-LANGUAGE plpgsql AS $$
+    LANGUAGE plpgsql AS $$
     -- Actualizar stock del producto según el id.
-    BEGIN
+BEGIN
     UPDATE producto_farmacia
     SET stock_producto = stock_producto - cant_pedido
     WHERE id_producto = id_ProductoN and id_farmacia = id_FarmaciaN;
-    END;
+END;
 $$;
 
+-- ** TRIGGERS **
 
-CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()
-    RETURNS TRIGGER AS $func$ -- Use explicit tag
-BEGIN
-    IF NEW.estado_pedido = 'ENTREGADO' AND OLD.estado_pedido <> 'ENTREGADO' THEN
-        IF (CURRENT_TIMESTAMP - NEW.fecha_pedido) >= INTERVAL '48 hours' THEN
-UPDATE calificacion
-SET puntuacion = 5
-WHERE id_detalle_pedido IN (
-    SELECT id_detalle_pedido
-    FROM detalle_pedido
-    WHERE id_pedido = NEW.id_pedido
-);
-END IF;
-END IF;
-RETURN NEW;
-END;
-$func$ LANGUAGE plpgsql; -- Close with the same tag
-
-
--- Create the trigger
-CREATE TRIGGER trig_update_calificacion
-    AFTER UPDATE ON pedido
-    FOR EACH ROW
-    EXECUTE FUNCTION update_calificacion_after_delivery();
-
--- Trigger Function: Actualizar fecha_entrega en detalle_pedido cuando el pedido se marca como ENTREGADO
+-- [10] - Insertar automática fecha_entrega en detalle_pedido cuando el pedido se marca como ENTREGADO
 CREATE OR REPLACE FUNCTION actualizar_fecha_entrega_trigger_func()
     RETURNS TRIGGER AS $$
 BEGIN
@@ -108,8 +87,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger: Ejecutar la función después de actualizar la tabla pedido
 CREATE TRIGGER trg_actualizar_fecha_entrega_pedido
     AFTER UPDATE ON pedido
     FOR EACH ROW
 EXECUTE FUNCTION actualizar_fecha_entrega_trigger_func();
+
+-- [11] - Registrar notificacion si un medicamento con receta es pedido sin validación
+
+-- [12] - Insertar califiacion automatica si no se recibe en 48 hrs
+CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()
+    RETURNS TRIGGER AS $func$
+BEGIN
+    IF NEW.estado_pedido = 'ENTREGADO' AND OLD.estado_pedido <> 'ENTREGADO' THEN
+        IF (CURRENT_TIMESTAMP - NEW.fecha_pedido) >= INTERVAL '48 hours' THEN
+UPDATE calificacion
+SET puntuacion = 5
+WHERE id_detalle_pedido IN (
+    SELECT id_detalle_pedido
+    FROM detalle_pedido
+    WHERE id_pedido = NEW.id_pedido
+);
+END IF;
+END IF;
+RETURN NEW;
+END;
+$func$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trig_update_calificacion
+    AFTER UPDATE ON pedido
+    FOR EACH ROW
+    EXECUTE FUNCTION update_calificacion_after_delivery();
