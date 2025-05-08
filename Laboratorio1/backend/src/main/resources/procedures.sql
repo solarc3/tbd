@@ -51,6 +51,46 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE actualizarStock(
+    IN id_productoN INTEGER,
+    IN id_FarmaciaN INTEGER,
+    IN cant_pedido INTEGER
+)
+LANGUAGE plpgsql AS $$
+    -- Actualizar stock del producto según el id.
+    BEGIN
+    UPDATE producto_farmacia
+    SET stock_producto = stock_producto - cant_pedido
+    WHERE id_producto = id_ProductoN and id_farmacia = id_FarmaciaN;
+    END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()
+    RETURNS TRIGGER AS $func$ -- Use explicit tag
+BEGIN
+    IF NEW.estado_pedido = 'ENTREGADO' AND OLD.estado_pedido <> 'ENTREGADO' THEN
+        IF (CURRENT_TIMESTAMP - NEW.fecha_pedido) >= INTERVAL '48 hours' THEN
+UPDATE calificacion
+SET puntuacion = 5
+WHERE id_detalle_pedido IN (
+    SELECT id_detalle_pedido
+    FROM detalle_pedido
+    WHERE id_pedido = NEW.id_pedido
+);
+END IF;
+END IF;
+RETURN NEW;
+END;
+$func$ LANGUAGE plpgsql; -- Close with the same tag
+
+
+-- Create the trigger
+CREATE TRIGGER trig_update_calificacion
+    AFTER UPDATE ON pedido
+    FOR EACH ROW
+    EXECUTE FUNCTION update_calificacion_after_delivery();
+
 -- Trigger Function: Actualizar fecha_entrega en detalle_pedido cuando el pedido se marca como ENTREGADO
 CREATE OR REPLACE FUNCTION actualizar_fecha_entrega_trigger_func()
     RETURNS TRIGGER AS $$
