@@ -2,12 +2,11 @@ package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
 import com.example.tbd_lab1.DTO.TopProductosPorCategoriaResponse;
+import com.example.tbd_lab1.entities.ProductoEntity;
 import com.example.tbd_lab1.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +29,19 @@ public class ProductoController {
         }
 
         return ResponseEntity.ok(topProductos);
+    }
+
+    //FALTA IMPLEMENTAR ACTUALIZAR
+
+    @PostMapping("/crear")
+    public ResponseEntity<?> crearProducto(@RequestBody ProductoEntity productoEntity) {
+        ProductoEntity nuevoProducto = productoService.crearProducto(productoEntity);
+        return ResponseEntity.ok(nuevoProducto);
+    }
+
+    @DeleteMapping("/{id}/eliminar")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
     }
 }

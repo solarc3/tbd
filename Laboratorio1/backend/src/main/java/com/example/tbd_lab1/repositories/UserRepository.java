@@ -147,4 +147,10 @@ public class UserRepository {
         String sql = "UPDATE users SET refresh_token = NULL, refresh_token_expiration = NULL WHERE id = ?";
         return jdbcTemplate.update(sql, userId);
     }
+
+    public boolean deleteCliente(Long id){
+        String sql = "DELETE FROM users WHERE id = ?";
+        Object[] args = new Object[] {id};
+        return jdbcTemplate.update(sql, args) == 1;
+    }
 }

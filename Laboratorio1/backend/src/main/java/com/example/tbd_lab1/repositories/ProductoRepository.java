@@ -1,11 +1,16 @@
 package com.example.tbd_lab1.repositories;
 import com.example.tbd_lab1.DTO.PagoMasUsadoUrgenteResponse;
 import com.example.tbd_lab1.DTO.TopProductosPorCategoriaResponse;
+import com.example.tbd_lab1.entities.ProductoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,11 +18,45 @@ import java.util.Optional;
 @Repository
 public class ProductoRepository {
     private final JdbcTemplate jdbcTemplate;
+
     @Autowired
     public ProductoRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+
+    public ProductoEntity saveProducto(ProductoEntity producto) {
+        if (producto.getIdProducto() == null) {
+            String sql = "INSERT INTO producto (nombre_producto, precio,categoria,requiere_receta) VALUES (?, ?, ?, ?)";
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+                ps.setString(1, producto.getNombreProducto());
+                ps.setFloat(2, producto.getPrecio());
+                ps.setString(3, producto.getCategoria());
+                ps.setBoolean(4, producto.isRequiereReceta());
+                return ps;
+            }, keyHolder);
+            Number generatedId = keyHolder.getKey();
+            if (generatedId != null) {
+                producto.setIdProducto(generatedId.longValue());
+            } else {
+                System.err.println("No se pudo agregar el id del producto");
+            }
+        }else{
+            String sql = "UPDATE producto SET nombre_producto = ?, precio = ?, categoria = ?, requiere_receta = ? WHERE id_producto = ?";
+            jdbcTemplate.update(sql, producto.getNombreProducto(),
+                    producto.getPrecio(),producto.getCategoria(),producto.isRequiereReceta(),producto.isRequiereReceta());
+        }
+        return producto;
+    }
+
+    public boolean deleteProducto(Long id) {
+        String sql = "DELETE FROM producto WHERE id_producto = ?";
+        Object[] args = new Object[] {id};
+        return jdbcTemplate.update(sql, args) == 0;
+    }
 
     public List<TopProductosPorCategoriaResponse> findMostOrderedProductsByCategory() {
         try {

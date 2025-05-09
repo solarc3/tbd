@@ -17,4 +17,10 @@ public class UserService {
     public TopClienteResponse getClienteWithMostSpending() {
         return userRepository.findClienteWithMostSpending();
     }
+
+    public boolean eliminarCliente(Long id){
+        return userRepository.deleteCliente(id);
+    }
+
+
 }

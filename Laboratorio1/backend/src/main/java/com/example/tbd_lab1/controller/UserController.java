@@ -5,9 +5,7 @@ import com.example.tbd_lab1.DTO.TopClienteResponse;
 import com.example.tbd_lab1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,5 +24,15 @@ public class UserController {
             return ResponseEntity.ok().body(new MessageResponse("No hay clientes."));
         }
         return ResponseEntity.ok(topClienteResponse);
+    }
+
+    @DeleteMapping("/{id}/eliminar")
+    public ResponseEntity<?> eliminarCliente(@PathVariable Long id){
+        try {
+            userService.eliminarCliente(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.ok().body(new MessageResponse("No se pudo borrar el usuario"));
+        }
     }
 }
