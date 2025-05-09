@@ -22,6 +22,10 @@ public class PedidoService {
         return pedidoRepository.findById(id);
     }
 
+    public List<PedidoEntity> getByIdCliente(Long idCliente) {
+        return pedidoRepository.findByIdCliente(idCliente);
+    }
+
     public List<PagoMasUsadoUrgenteResponse> pagoMasUsadoUrgente() {
         return pedidoRepository.findMostUsedPaymentMethodWhenUrgent();
     }

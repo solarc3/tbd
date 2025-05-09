@@ -2,13 +2,16 @@ package com.example.tbd_lab1.repositories;
 
 import com.example.tbd_lab1.DTO.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab1.DTO.RepartidorTiempoPromedioResponse;
+import com.example.tbd_lab1.entities.RepartidorEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class RepartidorRepository {
@@ -17,6 +20,16 @@ public class RepartidorRepository {
     @Autowired
     public RepartidorRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public Optional<RepartidorEntity> findById(Long id) {
+        try {
+            String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion FROM repartidor WHERE id_repartidor = ?";
+            RepartidorEntity repartidorEntity = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(RepartidorEntity.class), id);
+            return Optional.ofNullable(repartidorEntity);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public List<RepartidorTiempoPromedioResponse> findAverageDeliveryTime() {

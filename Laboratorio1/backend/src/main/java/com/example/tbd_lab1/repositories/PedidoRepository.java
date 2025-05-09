@@ -40,6 +40,11 @@ public class PedidoRepository {
         }
     }
 
+    public List<PedidoEntity> findByIdCliente(Long idCliente) {
+        String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia FROM pedido WHERE id_cliente = ?";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PedidoEntity.class), idCliente);
+    }
+
     public List<PagoMasUsadoUrgenteResponse> findMostUsedPaymentMethodWhenUrgent(){
         try{
             String sql = "Select count(detalle_pedido.metodo_pago) as Cantidad_pagos, metodo_pago FROM pedido RIGHT JOIN detalle_pedido ON pedido.id_pedido = detalle_pedido.id_pedido WHERE pedido.es_urgente = 'true'\n" +
