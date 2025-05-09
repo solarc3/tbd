@@ -35,6 +35,17 @@ public class PedidoController {
         return ResponseEntity.ok(pedido.get());
     }
 
+    @GetMapping("/cliente/{idCliente}")
+    public ResponseEntity<?> getPedidosByCliente(@PathVariable Long idCliente) {
+        List<PedidoEntity> pedidos = pedidoService.getByIdCliente(idCliente);
+
+        if (pedidos.isEmpty()) {
+            return ResponseEntity.ok().body(new MessageResponse("No hay pedidos para este cliente."));
+        }
+
+        return ResponseEntity.ok(pedidos);
+    }
+
     @GetMapping("/{id_pedido}/detalles")
     public ResponseEntity<?> getDetallePedido(@PathVariable Long id_pedido) {
         Optional<PedidoEntity> pedido = pedidoService.getById(id_pedido);

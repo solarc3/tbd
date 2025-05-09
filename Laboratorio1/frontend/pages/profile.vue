@@ -3,8 +3,13 @@ import { ref, onMounted, computed } from 'vue'
 //import { useRouter } from '#app'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/auth'
+// importar componente
+import type PedidosCliente from '@/components/PedidosCliente.vue'
+
 
 const shouldRender = ref(false)
+const pedidosRef = ref<InstanceType<typeof PedidosCliente> | null>(null)
+
 onMounted(() => {
   shouldRender.value = true
 })
@@ -23,6 +28,10 @@ async function logoutUser() {
   router.push('/login')
 }
 */
+
+function mostrarPedidos() {
+  pedidosRef.value?.toggleModal()
+}
 
 </script>
 
@@ -61,7 +70,7 @@ async function logoutUser() {
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-lg font-semibold text-gray-700 mb-4">Pedidos</h2>
           <p class="text-gray-600">Aquí puedes ver tus pedidos recientes.</p>
-          <Button class="btn-custom mt-4">Ver pedidos</Button>
+          <Button class="btn-custom mt-4" @click="mostrarPedidos">Ver pedidos</Button>
         </div>
 
         <!-- boletas -->
@@ -84,6 +93,9 @@ async function logoutUser() {
           <p class="text-gray-600">Consulta las valoraciones que has realizado.</p>
           <Button class="btn-custom mt-4">Ver valoraciones</Button>
         </div>
+
+        <!-- Componente de Pedidos (inicialmente oculto) -->
+        <PedidosCliente ref="pedidosRef" />
       </div>
     </div>
   </ClientOnly>
