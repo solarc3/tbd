@@ -48,7 +48,7 @@ public class PedidoRepository {
     public List<PagoMasUsadoUrgenteResponse> findMostUsedPaymentMethodWhenUrgent(){
         try{
             String sql = "Select count(detalle_pedido.metodo_pago) as Cantidad_pagos, metodo_pago FROM pedido RIGHT JOIN detalle_pedido ON pedido.id_pedido = detalle_pedido.id_pedido WHERE pedido.es_urgente = 'true'\n" +
-                    "GROUP BY detalle_pedido.metodo_pago ORDER BY Cantidad_pagos DESC limit 1";
+                    "GROUP BY detalle_pedido.metodo_pago ORDER BY Cantidad_pagos";
             return  jdbcTemplate.query(sql, (rs, rowNum) ->
                     PagoMasUsadoUrgenteResponse.builder()
                             .metodoPago(rs.getString("metodo_pago"))
