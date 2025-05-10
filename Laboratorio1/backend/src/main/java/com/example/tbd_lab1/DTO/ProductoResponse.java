@@ -1,4 +1,5 @@
-package com.example.tbd_lab1.entities;
+package com.example.tbd_lab1.DTO;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductoEntity {
+public class ProductoResponse {
     private Long idProducto;
     private String nombreProducto;
     private float precio;

@@ -1,93 +1,187 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { ShoppingCart } from 'lucide-vue-next' // ya use esto en varias partes pero se m olvido ponerlo xd, usenlo para
-                                               // ver los distintos iconos que les podria gustar cambiar, aca use el
-                                               // del carrito x ejemplo !!
+import { ref, computed, onMounted } from "vue";
+import { ShoppingCart } from "lucide-vue-next";
+import { productoService } from "@/api/services";
+import type { Product } from "@/api/models";
 
-// productos q tenemos que setear dsps por categoria para que funcione el filtro y redireccionamiento del inicio
-const products = ref([
-  { id: 1, name: 'Limpiador Control Imperfecciones CeraVe 236ml', description: 'descripcion aa', price: 13599, image: '/crema.png', category: 'dermatologia' },
-  { id: 2, name: 'Pasta Dental Colgate Total Clean Mint', description: 'descripcion aa', price: 6499, image: '/pastadental.png', category: 'higiene' },
-  { id: 3, name: 'Paracetamol 16 compromidos', description: 'descripcion aa', price: 1500, image: '/paracetamol.png', category: 'medicamentos' },
-  { id: 4, name: 'VitaminLife Proteína Whey Cookies & Crema 907g', description: 'descripcion aa', price: 47399, image: '/suplemento.png', category: 'suplementos' },
-  { id: 5, name: 'Bálsamo Labial Nivea Cherry Shine', description: 'descripcion aa', price: 4990, image: '/labialnivea.png', category: 'cosmeticos' },
-])
+// State for products
+const products = ref<Product[]>([]);
+const loading = ref(true);
+const error = ref("");
 
-// categorias q puse, igual pueden ser mas pero por las farmacias q estuve viendo son las + importantes
-const categories = ref(['dermatologia', 'higiene', 'medicamentos', 'suplementos', 'cosmeticos'])
-const selectedCategory = ref('')
+// Categories
+const categories = ref([
+	"dermatologia",
+	"higiene",
+	"medicamentos",
+	"suplementos",
+	"cosmeticos",
+]);
+const selectedCategory = ref("");
+
+// Computed property for filtered products
 const filteredProducts = computed(() => {
-  if (!selectedCategory.value) return products.value
-  return products.value.filter(product => product.category === selectedCategory.value)
-})
+	if (!selectedCategory.value) return products.value;
+	return products.value.filter(
+		(product) =>
+			product.categoria.toLowerCase() ===
+			selectedCategory.value.toLowerCase(),
+	);
+});
 
-const route = useRoute()
-onMounted(() => {
-  const categoryFromQuery = route.query.category
-  if (categoryFromQuery && categories.value.includes(categoryFromQuery as string)) {
-    selectedCategory.value = categoryFromQuery as string
-  }
-})
+// Fetch products from API
+const fetchProducts = async () => {
+	try {
+		loading.value = true;
+		error.value = "";
+		products.value = await productoService.getAllProducts();
+	} catch (err) {
+		console.error("Error fetching products:", err);
+		error.value =
+			"Error al cargar productos. Por favor, intente de nuevo más tarde.";
+	} finally {
+		loading.value = false;
+	}
+};
 
+// Format price - utility function
+const formatPrice = (price: number) => {
+	return price.toLocaleString("es-CL");
+};
+
+const route = useRoute();
+onMounted(async () => {
+	// Get category from URL query parameter
+	const categoryFromQuery = route.query.category;
+	if (
+		categoryFromQuery &&
+		categories.value.includes(categoryFromQuery as string)
+	) {
+		selectedCategory.value = categoryFromQuery as string;
+	}
+
+	// Fetch products
+	await fetchProducts();
+});
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 flex">
-    <!-- para gestionar el "menu" del costado veanlo aca !! -->
-    <aside class="w-64 mr-6">
-      <h2 class="text-lg font-bold text-gray-800 mb-4">Categorías</h2>
-      <ul class="space-y-2">
-        <li
-          v-for="category in categories"
-          :key="category"
-          class="cursor-pointer text-gray-700 hover:text-blue-500"
-          :class="{ 'font-bold text-blue-500': selectedCategory === category }"
-          @click="selectedCategory = category"
-        >
-          {{ category.charAt(0).toUpperCase() + category.slice(1) }}
-        </li>
-        <li
-          class="cursor-pointer text-gray-700 hover:text-blue-500"
-          :class="{ 'font-bold text-blue-500': selectedCategory === '' }"
-          @click="selectedCategory = ''"
-        >
-          Todos
-        </li>
-      </ul>
-    </aside>
+	<div class="container mx-auto px-4 py-8 flex">
+		<!-- Sidebar categories -->
+		<aside class="w-64 mr-6">
+			<h2 class="text-lg font-bold text-gray-800 mb-4">Categorías</h2>
+			<ul class="space-y-2">
+				<li
+					v-for="category in categories"
+					:key="category"
+					class="cursor-pointer text-gray-700 hover:text-blue-500"
+					:class="{
+						'font-bold text-blue-500':
+							selectedCategory === category,
+					}"
+					@click="selectedCategory = category"
+				>
+					{{ category.charAt(0).toUpperCase() + category.slice(1) }}
+				</li>
+				<li
+					class="cursor-pointer text-gray-700 hover:text-blue-500"
+					:class="{
+						'font-bold text-blue-500': selectedCategory === '',
+					}"
+					@click="selectedCategory = ''"
+				>
+					Todos
+				</li>
+			</ul>
+		</aside>
 
-    <div class="flex-1">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Productos disponibles</h1>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-		<div
-		  v-for="product in filteredProducts"
-		  :key="product.id"
-		  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
-		>
-		  <!-- esta linea es dms importante pq hace q se vea la imagen cmo perfecta en las cajas, por si no les da bn la dimension -->
-		  <img :src="product.image" :alt="product.name" class="w-full h-48 object-contain bg-white-100" />
-		  <div class="p-4 flex flex-col flex-grow">
-		    <div class="flex-grow">
-		      <h2 class="text-lg font-semibold text-gray-800">{{ product.name }}</h2>
-		      <p class="text-sm text-gray-600">{{ product.description }}</p>
-		      <p class="text-lg font-bold text-blue-500 mt-2">${{ product.price.toLocaleString() }}</p>
-		    </div>
-		    <button
-		      class="btn-custom mt-4 w-full flex items-center justify-center space-x-2"
-		    >
-		      <ShoppingCart class="w-5 h-5" />
-		    </button>
-		  </div>
+		<div class="flex-1">
+			<h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+				Productos disponibles
+			</h1>
+
+			<!-- Loading state -->
+			<div v-if="loading" class="flex justify-center items-center py-12">
+				<div
+					class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
+				></div>
+			</div>
+
+			<!-- Error state -->
+			<div v-else-if="error" class="text-center py-12">
+				<p class="text-red-500">{{ error }}</p>
+				<button
+					@click="fetchProducts"
+					class="mt-4 text-blue-500 hover:underline"
+				>
+					Intentar de nuevo
+				</button>
+			</div>
+
+			<!-- Empty state -->
+			<div
+				v-else-if="filteredProducts.length === 0"
+				class="text-center py-12"
+			>
+				<p class="text-gray-500">
+					No hay productos disponibles en esta categoría.
+				</p>
+			</div>
+
+			<!-- Products grid -->
+			<div
+				v-else
+				class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+			>
+				<div
+					v-for="product in filteredProducts"
+					:key="product.idProducto"
+					class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
+				>
+					<!-- Image with fallback -->
+					<img
+						:src="
+							product.imageUrl ||
+							'https://via.placeholder.com/150'
+						"
+						:alt="product.nombreProducto"
+						class="w-full h-48 object-contain bg-white-100"
+						@error="
+							(e) =>
+								(e.target.src =
+									'https://via.placeholder.com/150')
+						"
+					/>
+					<div class="p-4 flex flex-col flex-grow">
+						<div class="flex-grow">
+							<h2 class="text-lg font-semibold text-gray-800">
+								{{ product.nombreProducto }}
+							</h2>
+							<p
+								v-if="product.requiereReceta"
+								class="text-sm text-red-600 mt-1"
+							>
+								Requiere receta
+							</p>
+							<p class="text-lg font-bold text-blue-500 mt-2">
+								${{ formatPrice(product.precio) }}
+							</p>
+						</div>
+						<button
+							class="btn-custom mt-4 w-full flex items-center justify-center space-x-2"
+						>
+							<ShoppingCart class="w-5 h-5" />
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
-      </div>
-    </div>
-  </div>
+	</div>
 </template>
 
 <style scoped>
 .container {
-  background-color: #f9fafb;
-  min-height: 100vh;
+	background-color: #f9fafb;
+	min-height: 100vh;
 }
-
 </style>
