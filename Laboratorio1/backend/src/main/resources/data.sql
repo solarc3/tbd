@@ -189,6 +189,482 @@ VALUES
      'Medicamentos',
      true,
      'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwdf3a7e8e/images/products/69943/69943.jpg'
+    ),
+    (
+        22,
+        'Máquina de Afeitar Gillete Prestrobarba Ultra Grip Bolsa 5 un',
+        7899,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw48a0f65e/images/products/50702/50702.jpg'
+    ),
+    (
+        23,
+        'Espuma de Afeitar Nivea For Men Deep 200 mL',
+        6439,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw400bae5f/images/products/88112/88112.jpg'
+    ),
+    (
+        24,
+        'Toallas Higiénicas Kotex Ultrafina Suave Con Alas 16 un',
+        2590,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw1036c2e2/images/products/48810/48810.jpg'
+    ),
+    (
+        25,
+        'Jabón Líquido Dove Mandarina Recarga 700 mL',
+        3690,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwa5c5bb2c/images/products/87273/87273.jpg'
+    ),
+    (
+        26,
+        'Máquina de Afeitar Gillette Venus Sensitive Suave 2 un',
+        3899,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw911eea88/images/products/87366/87366.jpg'
+    ),
+    (
+        27,
+        'Cepillo de Dientes Oral B Advanced Suave 2 un',
+        6049,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw198c1393/images/products/67824/67824.jpg'
+    ),
+    (
+        28,
+        'Enjuague Bucal Vitis Orthodontic 500 mL',
+        8899,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwd275acee/images/products/63068/63068.jpg'
+    ),
+    (
+        29,
+        'PACK ELITE PAÑUELO NORM.AROMA FRUT.6U',
+        2499,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw12bbb2bb/images/products/63126/63126.jpg'
+    ),
+    (
+        30,
+        'Repuesto Máquina de Afeitar Venus Breeze 3 Hojas 4 un',
+        12999,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwf5327e0f/images/products/93753/93753.jpg'
+    ),
+    (
+        31,
+        'Desosdorante Rexona Clinical Women Classic 48 g',
+        7049,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwa2c0a42b/images/products/64467/64467.jpg'
+    ),
+    (
+        32,
+        'Desosdorante Rexona Clinical Women Barra Extra Dry 48 g',
+        6899,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw4bd6500a/images/products/76162001/76162001.jpg'
+    ),
+    (
+        33,
+        'Pasta Dental Colgate Tiple Acción 75 mL 3 un',
+        2990,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwbfb82ea0/images/products/62918/62918.jpg'
+    ),
+    (
+        34,
+        'Repuesto Cabezal Cepillo de Dientes Eléctrico Oral B Sensitive Clean 2 un',
+        14069,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw75c18e7a/images/products/87249/87249.jpg'
+    ),
+    (
+        35,
+        'Pasta Dental Vitis Cpc Protect 100ml',
+        5399,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw9954ad4a/images/products/89587/89587.jpg'
+    ),
+    (
+        36,
+        'Máquina de Afeitar Schick Intuition Mujer 2 un',
+        7799,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw4bb0c8a9/images/products/83130/83130.jpg'
+    ),
+    (
+        37,
+        'Cepillo Interdental Interprox Plus Nano 6 un',
+        6749,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw95e5fab0/images/products/68474/68474.jpg'
+    ),
+    (
+        38,
+        'TOA HIG NOSOTRAS BUENAS NOCHES ULTRA 16U',
+        3929,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwbcdb21c9/images/products/88134/88134.jpg'
+    ),
+    (
+        39,
+        'TALCO DESODORANTE PARA PIES HANSAPLAST 300 GR',
+        6499,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw2a1eb20d/images/products/40783/40783.jpg'
+    ),
+    (
+        40,
+        'Gel de Ducha Nivea Waterlilly & Oil 240 mL',
+        3303,
+        'Higiene',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw134ba184/images/products/86180/86180.jpg'
+    ),
+
+-- COSMÉTICOS (COSMETICS) PRODUCTS
+    (
+        41,
+        'BÁLSAMO LABIAL NIVEA BLACKBERRY SHINE 4,8GR',
+        3534,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw15f15282/images/products/88514/88514.jpg'
+    ),
+    (
+        42,
+        'Super Lock Glue',
+        7069,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwff8bb0db/images/products/94131/94131.jpg'
+    ),
+    (
+        43,
+        'Labial Maybelline Super Stay Teddy Tint 20 Mascara Tear',
+        9599,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwc7573133/images/products/94548/94548.jpg'
+    ),
+    (
+        44,
+        'S-NAILS ISDIN UÑAS 2ML',
+        20799,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw09b9c174/images/products/88389/88389.jpg'
+    ),
+    (
+        45,
+        'Máscara De Pestañas Lash Sensational Sky High A Prueba De Agua',
+        13509,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw7d503cc8/images/products/90671/90671.jpg'
+    ),
+    (
+        46,
+        'Labial Maybelline Super Stay Teddy Tint 50 Wild At Heart',
+        9599,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0e5ecdee/images/products/94534/94534.jpg'
+    ),
+    (
+        47,
+        'Máscara de Pestañas Falsies Surreal Extensions Overload -WTP',
+        13509,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwf1c7d4cd/images/products/92440/92440.jpg'
+    ),
+    (
+        48,
+        'Sombra Maybelline Rivals Extra X Lowkey',
+        4189,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0ccf78a3/images/products/93059/93059.jpg'
+    ),
+    (
+        49,
+        'Trim Encrespador De Pestañas Easy Hold x 1 Unidad',
+        6599,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw981cc27c/images/products/76368/76368.jpg'
+    ),
+    (
+        50,
+        'Brillo Labial Lip Lifter Gloss Moon',
+        7299,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw95055cda/images/products/91832/91832.jpg'
+    ),
+    (
+        51,
+        'Sunkisser Glow Blush - Blazing Blush',
+        7269,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwef56cbe0/images/products/94085/94085.jpg'
+    ),
+    (
+        52,
+        'Labial Vinyl Ink SULTRY',
+        10389,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw1f3b647e/images/products/92743/92743.jpg'
+    ),
+    (
+        53,
+        'Polvo Infallible Loreal Sand 9Gr',
+        9999,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw037d7f46/images/products/89619/89619.jpg'
+    ),
+    (
+        54,
+        'Super stay hybrid compacto 24h 110',
+        8499,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwfafde22e/images/products/94114/94114.jpg'
+    ),
+    (
+        55,
+        'Ecopads Garnier Discos Desmaquillantes Reutilizables 3 Un',
+        8199,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw82d117ef/images/products/90937/90937.jpg'
+    ),
+    (
+        56,
+        'Alicate de Pieles Manicura Beter',
+        8999,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw709ba910/images/products/94542/94542.jpg'
+    ),
+    (
+        57,
+        'Rizador Pestañas Beter Automatico',
+        5299,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8ca2fe96/images/products/94579/94579.jpg'
+    ),
+    (
+        58,
+        'Bálsamo Labial Nivea Edición Limitada Pride Kiss 4,8 g',
+        5299,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8e36ae4f/images/products/94968/94968.jpg'
+    ),
+    (
+        59,
+        'Pack Ojos Maybelline Mirada Sky',
+        18709,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw18588c51/images/products/93018/93018.jpg'
+    ),
+    (
+        60,
+        'BÁLSAMO LABIAL NIVEA CHERRY SHINE 4,8GR',
+        3534,
+        'Cosmético',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw740598ca/images/products/71477/71477.jpg'
+    ),
+
+-- MEDICAMENTOS (MEDICATIONS) PRODUCTS
+    (
+        61,
+        'Tapsin Compuesto Noche 5 g x 1 Sobre Polvo Para Solución Oral',
+        693,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0afc6c9c/images/products/15226/15226.jpg'
+    ),
+    (
+        62,
+        'Kitadol 500 mg x 24 Comprimidos',
+        995,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw850274b1/images/products/15414/15414.jpg'
+    ),
+    (
+        63,
+        'Losartan 50 mg x 30 Comprimidos Recubiertos CHILE',
+        2799,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwf9766b70/images/products/86132/86132.jpg'
+    ),
+    (
+        64,
+        'Natuvit Caramelo Propoleo x 10 Comprimidos',
+        1295,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw2761754a/images/products/49014/49014.jpg'
+    ),
+    (
+        65,
+        'Omeprazol 20 mg x 60 Cápsulas CHILE',
+        3999,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwe22f7f24/images/products/84417/84417.jpg'
+    ),
+    (
+        66,
+        'Femelle x 28 Comprimidos Recubiertos',
+        15339,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwbd9607ef/images/products/41554/41554.jpg'
+    ),
+    (
+        67,
+        'Ibuprofeno 200 mg x 20 Comprimidos Recubiertos',
+        1999,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw063fa220/images/products/86357/86357.jpg'
+    ),
+    (
+        68,
+        'Xumadol 1 g Sobres x 20 Sobres Con Granulado Efervescente',
+        10922,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw41d1f00e/images/products/44884/44884.jpg'
+    ),
+    (
+        69,
+        'Gaviscon Comprimidos Masticables Doble Acción x8',
+        4759,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwaf8aaf98/images/products/72036/72036.jpg'
+    ),
+    (
+        70,
+        'Ciruelax Forte 125 mg x 60 Comprimidos Recubiertos',
+        9264,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw6099a442/images/products/79941/79941.jpg'
+    ),
+    (
+        71,
+        'Panadol Niños 100mg/Ml Gotas 15ml',
+        3495,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw19b1c268/images/products/90333/90333.jpg'
+    ),
+    (
+        72,
+        'Neuroval Cd 10 mg Caja 30 Comp. Dispersables',
+        13194,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw13ccae30/images/products/78701/78701.jpg'
+    ),
+    (
+        73,
+        'Cardioaspirina EC 100 mg x 50 Comprimidos Con Recubrimiento Entérico',
+        11432,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwa1f85b49/images/products/1302/1302.jpg'
+    ),
+    (
+        74,
+        'Terbinafina 250 mg x 30 Comprimidos',
+        8699,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwdc98599a/images/products/92811/92811.jpg'
+    ),
+    (
+        75,
+        'Nogesta 75 mcg x 28 Comprimidos Recubiertos',
+        11179,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw78ce1f46/images/products/44024/44024.jpg'
+    ),
+    (
+        76,
+        'MUXOL JARABE ADULTO Ambroxol Clorhidrato 600 mg 100 ml',
+        3995,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwc884d75b/images/products/9257/9257.jpg'
+    ),
+    (
+        77,
+        'Abrilar 35 mg/5 mL x 100 mL Jarabe',
+        6017,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw569c027d/images/products/26896/26896.jpg'
+    ),
+    (
+        78,
+        'Tapsin 100 mg/mL x 15 mL Solución Oral Para Gotas',
+        3654,
+        'Medicamento',
+        false,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8552a39f/images/products/19274/19274.jpg'
+    ),
+    (
+        79,
+        'Pilocarpina Clorhidrato 4 % x 10 ml Solución Oftálmica SAVAL S.A.',
+        14199,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw977e3535/images/products/8412/8412.jpg'
+    ),
+    (
+        80,
+        'Engystol x 50 Comprimidos',
+        20314,
+        'Medicamento',
+        true,
+        'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwe74a2eed/images/products/49937/49937.jpg'
     );
 
 INSERT INTO
@@ -213,8 +689,69 @@ VALUES
 	(17, 1, 45),
 	(18, 1, 55),
 	(19, 1, 30),
-	(20, 1, 65);
+	(20, 1, 65),
+(21, 1, 60),
+	(22, 1, 45),
+	(23, 1, 55),
+	(24, 1, 80),
+	(25, 1, 70),
+	(26, 1, 40),
+	(27, 1, 65),
+	(28, 1, 30),
+	(29, 1, 90),
+	(30, 1, 35),
+	(31, 1, 50),
+	(32, 1, 45),
+	(33, 1, 75),
+	(34, 1, 30),
+	(35, 1, 40),
+	(36, 1, 35),
+	(37, 1, 60),
+	(38, 1, 70),
+	(39, 1, 45),
+	(40, 1, 55),
 
+	(41, 1, 40),
+	(42, 1, 30),
+	(43, 1, 35),
+	(44, 1, 25),
+	(45, 1, 40),
+	(46, 1, 35),
+	(47, 1, 30),
+	(48, 1, 45),
+	(49, 1, 50),
+	(50, 1, 35),
+	(51, 1, 40),
+	(52, 1, 30),
+	(53, 1, 25),
+	(54, 1, 30),
+	(55, 1, 40),
+	(56, 1, 35),
+	(57, 1, 45),
+	(58, 1, 40),
+	(59, 1, 30),
+	(60, 1, 50),
+
+	(61, 1, 100),
+	(62, 1, 150),
+	(63, 1, 80),
+	(64, 1, 90),
+	(65, 1, 70),
+	(66, 1, 60),
+	(67, 1, 120),
+	(68, 1, 90),
+	(69, 1, 80),
+	(70, 1, 60),
+	(71, 1, 75),
+	(72, 1, 50),
+	(73, 1, 70),
+	(74, 1, 55),
+	(75, 1, 60),
+	(76, 1, 80),
+	(77, 1, 65),
+	(78, 1, 90),
+	(79, 1, 40),
+	(80, 1, 35);
 INSERT INTO
 	repartidor (nombre_repartidor, fecha_contratacion)
 VALUES
