@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.repositories;
 
 import com.example.tbd_lab1.DTO.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab1.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab1.entities.CalificacionEntity;
 import com.example.tbd_lab1.entities.FarmaciaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,23 @@ public class FarmaciaRepository {
                             .idFarmacia(rs.getLong("id_farmacia")).build());
 
         } catch (EmptyResultDataAccessException e) {
+            System.out.println("No results found: " + e.getMessage());
+            return new ArrayList<>();
+        } catch (Exception e) {
+            System.err.println("Error executing query: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<RankingFarmaciaPedidoResponse> obtenerFarmaciaRankingPedido(){
+        try {
+            String sql = "select farmacia.nombre_farmacia as farmacia, count(pedido.id_farmacia) as pedidos_entregados FROM farmacia RIGHT JOIN public.farmacia_repartidor fr on farmacia.id_farmacia = fr.id_farmacia Join pedido  ON farmacia.id_farmacia = pedido.id_farmacia  GROUP BY farmacia.nombre_farmacia ORDER BY pedidos_entregados DESC";
+            return jdbcTemplate.query(sql, (rs, rowNum) ->
+                    RankingFarmaciaPedidoResponse.builder()
+                            .nombreFarmacia(rs.getString("farmacia"))
+                            .cantPedidosEntregados(rs.getInt("pedidos_entregados")).build());
+        }catch (EmptyResultDataAccessException e) {
             System.out.println("No results found: " + e.getMessage());
             return new ArrayList<>();
         } catch (Exception e) {

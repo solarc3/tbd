@@ -10,6 +10,8 @@ export {
   pedidoService
 }
 
+export * from './farmaciaService'
+
 // In the future, you can add more services here:
 // export { userService } from './userService';
 // export { productService } from './productService';

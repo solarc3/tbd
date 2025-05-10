@@ -161,30 +161,47 @@ const topRepartidoresOptions = reactive({
   ],
 })
 
-// script chiquito pal grafo d prueba d "farmacia con mayor producto de volumenes entregados"
-const farmaciaMayorVolumenOptions = {
+// Replace the farmaciaMayorVolumenOptions declaration with this:
+
+// Make chart options reactive
+const loadingFarmaciaRanking = ref(true);
+const farmaciaMayorVolumenOptions = reactive({
   title: {
     text: 'Farmacia con mayor producto de volúmenes entregados',
     left: 'center',
   },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    },
+    formatter: function (params) {
+      return `${params[0].name}<br/>Pedidos entregados: ${params[0].value}`;
+    }
+  },
   xAxis: {
     type: 'category',
-    data: ['Farmacia X'],
+    data: [] as string[],
+    axisLabel: {
+      interval: 0,
+      rotate: 30  // Rotate labels for better visibility
+    }
   },
   yAxis: {
     type: 'value',
+    name: 'Cantidad de pedidos'
   },
   series: [
     {
-      name: 'Volumen entregado',
+      name: 'Pedidos entregados',
       type: 'bar',
-      data: [100],
+      data: [] as number[],
       itemStyle: {
         color: '#8e56ff',
       },
     },
   ],
-}
+});
 
 onMounted(async () => {
   try {
@@ -205,6 +222,8 @@ onMounted(async () => {
       )
     }
 
+
+
     loadingFarmacias.value = false
   } catch (error) {
       console.error('Error fetching farmacias falladas:', error)
@@ -214,6 +233,45 @@ onMounted(async () => {
       loadingFarmacias.value = false
   }
 
+  //Farmacia Ranking
+  // Replace the Farmacia Ranking section in onMounted with this:
+
+// Farmacia Ranking
+try {
+  console.log('Fetching farmacia ranking data...')
+  loadingFarmaciaRanking.value = true
+  const farmaciaRanking = await farmaciaService.getFarmaciasRanking()
+  console.log('Farmacia ranking data:', farmaciaRanking)
+  
+  if (farmaciaRanking && Array.isArray(farmaciaRanking) && farmaciaRanking.length > 0) {
+    // Make sure we're getting the data in the right format
+    console.log('First item sample:', farmaciaRanking[0])
+    
+    // Sort by cantPedidosEntregados descending for better visualization
+    const sortedData = [...farmaciaRanking].sort((a, b) => 
+      b.cantPedidosEntregados - a.cantPedidosEntregados
+    )
+    
+    // Update chart with the data from API
+    farmaciaMayorVolumenOptions.xAxis.data = sortedData.map(f => f.nombreFarmacia || 'Sin nombre')
+    farmaciaMayorVolumenOptions.series[0].data = sortedData.map(f => 
+      typeof f.cantPedidosEntregados === 'number' ? f.cantPedidosEntregados : 0
+    )
+  } else {
+    console.warn('No farmacia ranking data found or invalid format', farmaciaRanking)
+    farmaciaMayorVolumenOptions.xAxis.data = ['Sin datos disponibles']
+    farmaciaMayorVolumenOptions.series[0].data = [0]
+  }
+  loadingFarmaciaRanking.value = false
+} catch (error) {
+  console.error('Error fetching farmacia ranking:', error)
+  // Default data to avoid breaking the chart
+  farmaciaMayorVolumenOptions.xAxis.data = ['Error al cargar datos']
+  farmaciaMayorVolumenOptions.series[0].data = [0]
+  loadingFarmaciaRanking.value = false
+}
+  
+  
   // para el grafico de "top 3 repartidores con mejor rendimiento"
   try {
     // sacar top 3 repartidores con mejor rendimiento

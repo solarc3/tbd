@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.services;
 
 import com.example.tbd_lab1.DTO.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab1.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab1.entities.FarmaciaEntity;
 import com.example.tbd_lab1.repositories.FarmaciaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +20,8 @@ public class FarmaciaService {
 
     public List<FarmaciaPedidoFallidoResponse> getFarmaciasWithMostCancelledPedidos() {
         return farmaciaRepository.listFarmaciaByCantPedidoCancelado();
+    }
+    public List<RankingFarmaciaPedidoResponse> rankingFarmaciaPedidos() {
+        return farmaciaRepository.obtenerFarmaciaRankingPedido();
     }
 }

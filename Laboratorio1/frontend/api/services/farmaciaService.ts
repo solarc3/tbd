@@ -5,6 +5,12 @@ export interface FarmaciaFallada {
   cantidad: number
 }
 
+// Add this to your types file or directly in farmaciaService.ts
+export interface FarmaciaRanking {
+  nombreFarmacia: string;
+  cantPedidosEntregados: number;
+}
+
 class FarmaciaService {
   async getFarmaciasFalladas(): Promise<FarmaciaFallada[]> {
     try {
@@ -16,6 +22,19 @@ class FarmaciaService {
       throw error
     }
   }
+
+  async getFarmaciasRanking(): Promise<FarmaciaRanking[]> {
+    try {
+      const { data } = await apiClient.get<FarmaciaRanking[]>('/farmacia/ranking')
+      console.log('Farmacia ranking data received:', data)
+      return data
+    } catch (error) {
+      console.error('Error fetching farmacias ranking:', error)
+      throw error
+    }
+  }
 }
+
+
 
 export default new FarmaciaService()

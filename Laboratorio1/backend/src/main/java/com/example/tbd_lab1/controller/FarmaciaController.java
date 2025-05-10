@@ -2,6 +2,7 @@ package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.FarmaciaPedidoFallidoResponse;
 import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab1.DTO.TopProductosPorCategoriaResponse;
 import com.example.tbd_lab1.entities.FarmaciaEntity;
 import com.example.tbd_lab1.repositories.FarmaciaRepository;
@@ -32,6 +33,15 @@ public class FarmaciaController {
             return ResponseEntity.ok().body(new MessageResponse("No existen farmacias con pedidos cancelados"));
         }
         return ResponseEntity.ok(farmacias);
+    }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<?> ranking() {
+        List<RankingFarmaciaPedidoResponse> ranking = farmaciaService.rankingFarmaciaPedidos();
+        if (ranking.isEmpty()) {
+            return ResponseEntity.ok().body(new MessageResponse("No es posible generar un Ranking"));
+        }
+        return ResponseEntity.ok(ranking);
     }
 
 }
