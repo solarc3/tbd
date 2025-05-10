@@ -51,15 +51,14 @@ public class DetallePedidoRepository {
     public DetallePedidoEntity save(DetallePedidoEntity detallePedidoEntity) {
         // create
         if (detallePedidoEntity.getIdDetallePedido() == null) {
-            String sql = "INSERT INTO detalle_pedido(id_pedido, id_repartidor, metodo_pago, fecha_entrega) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO detalle_pedido(id_pedido, id_repartidor, metodo_pago) VALUES (?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(con -> {
-                PreparedStatement ps = con.prepareStatement(sql, new String[] {"id"});
+                PreparedStatement ps = con.prepareStatement(sql, new String[] {"id_detalle_pedido"});
                 ps.setLong(1, detallePedidoEntity.getIdPedido());
                 ps.setLong(2, detallePedidoEntity.getIdRepartidor());
                 ps.setString(3, detallePedidoEntity.getMetodoPago());
-                ps.setTimestamp(4, Timestamp.valueOf(detallePedidoEntity.getFechaEntrega()));
                 return ps;
             }, keyHolder);
 

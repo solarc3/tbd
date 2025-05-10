@@ -72,7 +72,7 @@ CREATE TABLE detalle_pedido (
 	id_pedido BIGINT REFERENCES pedido (id_pedido) ON DELETE CASCADE,
 	id_repartidor BIGINT,
 	metodo_pago VARCHAR(50) NOT NULL,
-	fecha_entrega TIMESTAMP NOT NULL
+	fecha_entrega TIMESTAMP
 );
 
 CREATE TABLE producto_farmacia (
@@ -105,6 +105,7 @@ CREATE TABLE producto_pedido (
 	id_producto_pedido BIGSERIAL PRIMARY KEY,
 	id_pedido BIGINT REFERENCES pedido (id_pedido) ON DELETE CASCADE,
 	id_producto BIGINT REFERENCES producto (id_producto) ON DELETE CASCADE,
+    cantidad BIGINT,
 	receta_validada BOOLEAN
 );
 

@@ -80,12 +80,13 @@ public class PedidoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new MessageResponse("Pedido no encontrado"));
         }
-        DetallePedidoEntity detalle = detallePedidoService.createDetallePedido(
+        detallePedidoService.createDetallePedido(
                 pedidoEntity.get(),
-                detallePedidoRequest.getFechaEntrega(),
                 detallePedidoRequest.getIdRepartidor(),
                 detallePedidoRequest.getMetodoPago());
-        return ResponseEntity.ok().body(detalle);
+        pedidoService.cambiarEstado(id_pedido, "ENTREGADO");
+        // volver a recuperarlo de la db para obtener el timestamp generado por el trigger
+        return ResponseEntity.ok().body(detallePedidoService.getByIdPedido(id_pedido).get());
     }
 
     @PostMapping("/cambiarestado")

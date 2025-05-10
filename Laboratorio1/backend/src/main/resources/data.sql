@@ -181,7 +181,15 @@ VALUES
 		'Dermatológico',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0ccd5ed8/images/products/82003/82003.jpg'
-	);
+	),
+    (
+     21,
+     'Clonazepam 2 mg Caja 30 Comp.',
+     5999,
+     'Medicamentos',
+     true,
+     'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwdf3a7e8e/images/products/69943/69943.jpg'
+    );
 
 INSERT INTO
 	producto_farmacia (id_producto, id_farmacia, stock_producto)
@@ -216,3 +224,18 @@ INSERT INTO
 	farmacia_repartidor (id_farmacia, id_repartidor)
 VALUES
 	(1, 1);
+
+INSERT INTO
+    pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia)
+VALUES
+    (18309, '2025-05-10', false, 'CONFIRMADO', 1, 1);
+
+INSERT INTO
+    producto_pedido (id_pedido, id_producto, cantidad, receta_validada)
+VALUES
+    (1, 4, 2, NULL),
+    (1, 20, 1, NULL),
+    (1, 21, 1, FALSE);
+
+
+

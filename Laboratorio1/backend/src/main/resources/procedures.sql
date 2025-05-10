@@ -55,8 +55,8 @@ $$;
 
 -- [09] - Descontar el stock al confirmar el pedido
 CREATE OR REPLACE PROCEDURE actualizarStock(
-    IN id_productoN INTEGER,
-    IN id_FarmaciaN INTEGER,
+    IN id_productoN BIGINT,
+    IN id_FarmaciaN BIGINT,
     IN cant_pedido INTEGER
 )
     LANGUAGE plpgsql AS $$

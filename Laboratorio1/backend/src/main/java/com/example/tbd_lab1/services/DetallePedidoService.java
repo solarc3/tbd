@@ -3,8 +3,11 @@ package com.example.tbd_lab1.services;
 import com.example.tbd_lab1.DTO.DetallePedidoResponse;
 import com.example.tbd_lab1.entities.DetallePedidoEntity;
 import com.example.tbd_lab1.entities.PedidoEntity;
+import com.example.tbd_lab1.entities.ProductoPedidoEntity;
 import com.example.tbd_lab1.entities.RepartidorEntity;
 import com.example.tbd_lab1.repositories.DetallePedidoRepository;
+import com.example.tbd_lab1.repositories.ProductoFarmaciaRepository;
+import com.example.tbd_lab1.repositories.ProductoPedidoRepository;
 import com.example.tbd_lab1.repositories.RepartidorRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,20 +19,34 @@ import java.util.Optional;
 @Service
 public class DetallePedidoService {
     private final DetallePedidoRepository detallePedidoRepository;
+    private final ProductoPedidoRepository productoPedidoRepository;
+    private final ProductoFarmaciaRepository productoFarmaciaRepository;
     private final RepartidorRepository repartidorRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public DetallePedidoService(DetallePedidoRepository detallePedidoRepository, RepartidorRepository repartidorRepository) {
+    public DetallePedidoService(DetallePedidoRepository detallePedidoRepository, ProductoPedidoRepository productoPedidoRepository, ProductoFarmaciaRepository productoFarmaciaRepository, RepartidorRepository repartidorRepository) {
         this.detallePedidoRepository = detallePedidoRepository;
+        this.productoPedidoRepository = productoPedidoRepository;
+        this.productoFarmaciaRepository = productoFarmaciaRepository;
         this.repartidorRepository = repartidorRepository;
     }
 
-    public DetallePedidoEntity createDetallePedido(PedidoEntity pedidoEntity, LocalDateTime fechaEntrega, Long idRepartidor, String metodoPago) {
+    public DetallePedidoEntity createDetallePedido(PedidoEntity pedidoEntity, Long idRepartidor, String metodoPago) {
         DetallePedidoEntity detallePedidoEntity = new DetallePedidoEntity();
-        detallePedidoEntity.setIdPedido(pedidoEntity.getIdPedido());
-        detallePedidoEntity.setFechaEntrega(fechaEntrega);
+        Long idPedido = pedidoEntity.getIdPedido();
+        detallePedidoEntity.setIdPedido(idPedido);
+        // la fecha de entrega la setea el trigger!
         detallePedidoEntity.setIdRepartidor(idRepartidor);
         detallePedidoEntity.setMetodoPago(metodoPago);
+
+        // descontar stock
+        List<ProductoPedidoEntity> productos = productoPedidoRepository.findByIdPedido(idPedido);
+        productos.forEach(p ->
+                    productoFarmaciaRepository.descontarStock(
+                            p.getIdProducto(),
+                            pedidoEntity.getIdFarmacia(),
+                            p.getCantidad())
+                    );
         return detallePedidoRepository.save(detallePedidoEntity);
     }
 

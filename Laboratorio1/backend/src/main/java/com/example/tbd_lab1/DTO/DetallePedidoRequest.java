@@ -14,5 +14,4 @@ import java.time.LocalDateTime;
 public class DetallePedidoRequest {
     private Long idRepartidor;
     private String metodoPago;
-    private LocalDateTime fechaEntrega;
 }
