@@ -1,13 +1,4 @@
 INSERT INTO
-	users (username, email, password)
-VALUES
-	(
-		'cliente1',
-		'cliente1@example.com',
-		'$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'
-	);
-
-INSERT INTO
 	farmacia (nombre_farmacia, direccion)
 VALUES
 	('Farmacia Salud', 'Av. Principal 123');
@@ -758,18 +749,4 @@ INSERT INTO
 	farmacia_repartidor (id_farmacia, id_repartidor)
 VALUES
 	(1, 1);
-
-INSERT INTO
-    pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia)
-VALUES
-    (18309, '2025-05-10', false, 'CONFIRMADO', 1, 1);
-
-INSERT INTO
-    producto_pedido (id_pedido, id_producto, cantidad, receta_validada)
-VALUES
-    (1, 4, 2, NULL),
-    (1, 20, 1, NULL),
-    (1, 21, 1, FALSE);
-
-
 

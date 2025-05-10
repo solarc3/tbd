@@ -28,7 +28,7 @@ public class UserRepository {
 
 	public Optional<UserEntity> findById(Long id) {
 		String sql =
-			"SELECT id, username, password, email, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
+			"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 				sql,
@@ -43,7 +43,7 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByUsername(String username) {
 		String sql =
-			"SELECT id, username, password, email, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
+			"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 				sql,
@@ -56,9 +56,24 @@ public class UserRepository {
 		}
 	}
 
+	public Optional<UserEntity> findByEmail(String email) {
+		String sql =
+			"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE email = ?";
+		try {
+			UserEntity userEntity = jdbcTemplate.queryForObject(
+				sql,
+				new BeanPropertyRowMapper<>(UserEntity.class),
+				email
+			);
+			return Optional.ofNullable(userEntity);
+		} catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		}
+	}
+
 	public Optional<UserEntity> findByRefreshToken(String refreshToken) {
 		String sql =
-			"SELECT id, username, password, email, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
+			"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 				sql,
@@ -85,6 +100,12 @@ public class UserRepository {
 	public boolean existsByEmail(String email) {
 		String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
 		Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+		return count != null && count > 0;
+	}
+
+	public boolean existsByRut(String rut) {
+		String sql = "SELECT COUNT(*) FROM users WHERE rut = ?";
+		Integer count = jdbcTemplate.queryForObject(sql, Integer.class, rut);
 		return count != null && count > 0;
 	}
 
@@ -125,7 +146,7 @@ public class UserRepository {
 	public UserEntity save(UserEntity userEntity) {
 		if (userEntity.getId() == null) {
 			String sql =
-				"INSERT INTO users (username, password, email, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?)";
+				"INSERT INTO users (username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(
@@ -135,13 +156,16 @@ public class UserRepository {
 						new String[] { "id" }
 					);
 					ps.setString(1, userEntity.getUsername());
-					ps.setString(2, userEntity.getPassword());
-					ps.setString(3, userEntity.getEmail());
-					ps.setString(4, userEntity.getRefreshToken());
+					ps.setString(2, userEntity.getFirstName());
+					ps.setString(3, userEntity.getLastName());
+					ps.setString(4, userEntity.getRut());
+					ps.setString(5, userEntity.getPassword());
+					ps.setString(6, userEntity.getEmail());
+					ps.setString(7, userEntity.getRefreshToken());
 					if (userEntity.getRefreshTokenExpiration() != null) {
-						ps.setLong(5, userEntity.getRefreshTokenExpiration());
+						ps.setLong(8, userEntity.getRefreshTokenExpiration());
 					} else {
-						ps.setNull(5, java.sql.Types.BIGINT);
+						ps.setNull(8, java.sql.Types.BIGINT);
 					}
 					return ps;
 				},
@@ -159,10 +183,13 @@ public class UserRepository {
 			}
 		} else {
 			String sql =
-				"UPDATE users SET username = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ? WHERE id = ?";
+				"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ? WHERE id = ?";
 			jdbcTemplate.update(
 				sql,
 				userEntity.getUsername(),
+				userEntity.getFirstName(),
+				userEntity.getLastName(),
+				userEntity.getRut(),
 				userEntity.getPassword(),
 				userEntity.getEmail(),
 				userEntity.getRefreshToken(),
@@ -188,13 +215,11 @@ public class UserRepository {
 			"UPDATE users SET refresh_token = NULL, refresh_token_expiration = NULL WHERE id = ?";
 		return jdbcTemplate.update(sql, userId);
 	}
-
 	public boolean deleteCliente(Long id) {
 		String sql = "DELETE FROM users WHERE id = ?";
 		Object[] args = new Object[] { id };
 		return jdbcTemplate.update(sql, args) == 1;
 	}
-
 	public List<ClienteGastoResponse> findAllClientsWithSpending() {
 		try {
 			String sql =
@@ -215,7 +240,7 @@ public class UserRepository {
 		} catch (Exception e) {
 			System.err.println(
 				"Error retrieving clients with spending: " + e.getMessage()
-			);
+							  );
 			e.printStackTrace();
 			return new ArrayList<>();
 		}

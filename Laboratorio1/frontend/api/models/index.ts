@@ -1,10 +1,13 @@
 export interface LoginRequest {
-	username: string;
+	email: string;
 	password: string;
 }
 
 export interface SignupRequest {
 	username: string;
+	firstName: string;
+	lastName: string;
+	rut: string;
 	email: string;
 	password: string;
 }
@@ -13,9 +16,11 @@ export interface SignupRequest {
 export interface User {
 	id: number;
 	username: string;
+	firstName: string;
+	lastName: string;
+	rut: string;
 	email: string;
 }
-
 export interface Product {
 	idProducto: number;
 	nombreProducto: string;
