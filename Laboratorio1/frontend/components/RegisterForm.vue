@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,14 +11,15 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/stores/auth";
+import { toast } from "vue-sonner";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const error = ref("");
 const success = ref("");
+const isLoading = ref(false);
 
+// Datos del formulario
 const form = ref({
 	firstName: "",
 	lastName: "",
@@ -27,8 +29,7 @@ const form = ref({
 	confirmPassword: "",
 });
 
-const isLoading = ref(false);
-
+// Validación de RUT
 const validateRut = (rut: string): boolean => {
 	if (!rut) return false;
 
@@ -58,29 +59,41 @@ const validateRut = (rut: string): boolean => {
 	return dv === expectedDV;
 };
 
-const handleRegister = async () => {
+// Validaciones básicas
+const validateForm = () => {
 	error.value = "";
-	success.value = "";
 
 	if (
 		!form.value.firstName ||
 		!form.value.lastName ||
+		!form.value.rut ||
 		!form.value.email ||
 		!form.value.password ||
-		!form.value.rut
+		!form.value.confirmPassword
 	) {
 		error.value = "Por favor completa todos los campos requeridos";
-		return;
+		return false;
 	}
 
 	if (form.value.password !== form.value.confirmPassword) {
 		error.value = "Las contraseñas no coinciden";
-		return;
+		return false;
 	}
 
-	// Validate RUT
 	if (!validateRut(form.value.rut)) {
 		error.value = "El RUT ingresado no es válido";
+		return false;
+	}
+
+	return true;
+};
+
+const handleRegister = async () => {
+	error.value = "";
+	success.value = "";
+
+	if (!validateForm()) {
+		toast.error(error.value);
 		return;
 	}
 
@@ -104,12 +117,15 @@ const handleRegister = async () => {
 		);
 
 		success.value = "Cuenta creada exitosamente!";
+		toast.success(success.value);
+
 		setTimeout(() => {
 			router.push("/login");
 		}, 1500);
 	} catch (err: any) {
 		console.error("Register error:", err);
 		error.value = err.response?.data?.message || "Error al crear la cuenta";
+		toast.error(error.value);
 	} finally {
 		isLoading.value = false;
 	}
@@ -119,10 +135,10 @@ const handleRegister = async () => {
 <template>
 	<Card class="mx-auto max-w-sm">
 		<CardHeader>
-			<CardTitle class="text-xl"> Sign Up </CardTitle>
-			<CardDescription>
-				Ingresa tu información para crear una cuenta
-			</CardDescription>
+			<CardTitle class="text-xl">Sign Up</CardTitle>
+			<CardDescription
+				>Ingresa tu información para crear una cuenta</CardDescription
+			>
 		</CardHeader>
 		<CardContent>
 			<!-- Error and success messages -->
@@ -141,27 +157,33 @@ const handleRegister = async () => {
 
 			<form @submit.prevent="handleRegister" class="grid gap-4">
 				<div class="grid grid-cols-2 gap-4">
-					<div class="grid gap-2">
-						<Label for="first-name">Nombre</Label>
+					<div class="space-y-2">
+						<label for="firstName" class="text-sm font-medium"
+							>Nombre</label
+						>
 						<Input
-							id="first-name"
+							id="firstName"
 							v-model="form.firstName"
 							placeholder="Juan"
 							required
 						/>
 					</div>
-					<div class="grid gap-2">
-						<Label for="last-name">Apellido</Label>
+
+					<div class="space-y-2">
+						<label for="lastName" class="text-sm font-medium"
+							>Apellido</label
+						>
 						<Input
-							id="last-name"
+							id="lastName"
 							v-model="form.lastName"
 							placeholder="Pérez"
 							required
 						/>
 					</div>
 				</div>
-				<div class="grid gap-2">
-					<Label for="rut">RUT</Label>
+
+				<div class="space-y-2">
+					<label for="rut" class="text-sm font-medium">RUT</label>
 					<Input
 						id="rut"
 						v-model="form.rut"
@@ -169,34 +191,44 @@ const handleRegister = async () => {
 						required
 					/>
 				</div>
-				<div class="grid gap-2">
-					<Label for="email">Correo electrónico</Label>
+
+				<div class="space-y-2">
+					<label for="email" class="text-sm font-medium"
+						>Correo electrónico</label
+					>
 					<Input
 						id="email"
-						type="email"
 						v-model="form.email"
+						type="email"
 						placeholder="correo@ejemplo.com"
 						required
 					/>
 				</div>
-				<div class="grid gap-2">
-					<Label for="password">Contraseña</Label>
+
+				<div class="space-y-2">
+					<label for="password" class="text-sm font-medium"
+						>Contraseña</label
+					>
 					<Input
 						id="password"
-						type="password"
 						v-model="form.password"
-						required
-					/>
-				</div>
-				<div class="grid gap-2">
-					<Label for="confirm-password">Confirmar Contraseña</Label>
-					<Input
-						id="confirm-password"
 						type="password"
-						v-model="form.confirmPassword"
 						required
 					/>
 				</div>
+
+				<div class="space-y-2">
+					<label for="confirmPassword" class="text-sm font-medium"
+						>Confirmar Contraseña</label
+					>
+					<Input
+						id="confirmPassword"
+						v-model="form.confirmPassword"
+						type="password"
+						required
+					/>
+				</div>
+
 				<Button
 					type="submit"
 					class="w-full bg-[var(--primary)] transition-colors duration-200 ease-in-out hover:bg-[var(--secondary)]/90"
@@ -207,7 +239,7 @@ const handleRegister = async () => {
 			</form>
 			<div class="mt-4 text-center text-sm">
 				¿Ya tienes una cuenta?
-				<a href="/login" class="underline"> Iniciar sesión </a>
+				<a href="/login" class="underline">Iniciar sesión</a>
 			</div>
 		</CardContent>
 	</Card>

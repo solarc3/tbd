@@ -1,9 +1,10 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage/>
-  </NuxtLayout>
+	<NuxtLayout>
+		<NuxtPage />
+		<Toaster position="top-right" richColors />
+	</NuxtLayout>
 </template>
 
 <script setup lang="ts">
-// Layout components are loaded automatically in layouts
+import { Toaster } from "vue-sonner";
 </script>

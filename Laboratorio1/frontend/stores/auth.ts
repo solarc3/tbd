@@ -6,6 +6,7 @@ interface AuthState {
 	user: User | null;
 	isAuthenticated: boolean;
 	loading: boolean;
+	initialized: boolean;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -13,6 +14,7 @@ export const useAuthStore = defineStore("auth", {
 		user: null,
 		isAuthenticated: false,
 		loading: false,
+		initialized: false,
 	}),
 
 	getters: {
@@ -79,6 +81,7 @@ export const useAuthStore = defineStore("auth", {
 				this.isAuthenticated = false;
 			} finally {
 				this.loading = false;
+				this.initialized = true;
 			}
 		},
 	},
