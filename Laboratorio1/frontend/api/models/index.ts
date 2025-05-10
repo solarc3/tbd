@@ -24,3 +24,10 @@ export interface Product {
 	requiereReceta: boolean;
 	imageUrl: string;
 }
+
+export interface ClienteGasto {
+	id: number;
+	username: string;
+	email: string;
+	totalGastado: number;
+}
