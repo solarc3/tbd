@@ -69,4 +69,9 @@ public class FarmaciaRepository {
             return new ArrayList<>();
         }
     }
+
+    public List<FarmaciaEntity> findAll() {
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class));
+    }
 }

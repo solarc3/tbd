@@ -31,3 +31,9 @@ export interface ClienteGasto {
 	email: string;
 	totalGastado: number;
 }
+export interface FarmaciaEntity {
+	idFarmacia: number;
+	nombreFarmacia: string;
+	direccion: string;
+	telefono?: string;
+}

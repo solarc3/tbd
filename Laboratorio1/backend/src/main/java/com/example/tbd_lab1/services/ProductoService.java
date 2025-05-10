@@ -37,6 +37,10 @@ public class ProductoService {
 		return productoRepository.findMostOrderedProductsByCategory();
 	}
 
+	public List<ProductoEntity> getProductosByFarmaciaId(Long idFarmacia) {
+		return productoRepository.findByFarmaciaId(idFarmacia);
+	}
+
 	public boolean eliminarProducto(Long id) {
 		return productoRepository.deleteProducto(id);
 	}

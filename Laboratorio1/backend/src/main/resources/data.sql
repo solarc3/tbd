@@ -26,7 +26,7 @@ VALUES
 		1,
 		'Multivitamínico Bion3 Senior 60 Comp',
 		24995,
-		'Suplemento',
+		'Suplementos',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwa1090340/images/products/91076/91076.jpg'
 	),
@@ -34,7 +34,7 @@ VALUES
 		2,
 		'Crema Corporal Nivea Soft Milk 1000ML',
 		6859,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw818f7b1e/images/products/76366/76366.jpg'
 	),
@@ -42,7 +42,7 @@ VALUES
 		3,
 		'Agua Micelar Bifásica NIVEA Rose Care 400 ml',
 		5298,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8209c984/images/products/88493/88493.jpg'
 	),
@@ -50,7 +50,7 @@ VALUES
 		4,
 		'Crema facial NIVEA Rose Care en Gel 50ml',
 		6005,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw60443129/images/products/88860/88860.jpg'
 	),
@@ -58,7 +58,7 @@ VALUES
 		5,
 		'Loreal Serum Rellenador Revitalift 1,5% Ácido Hialurónico 30 mL',
 		14099,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw9e9c9348/images/products/87900001/87900001.jpg'
 	),
@@ -66,7 +66,7 @@ VALUES
 		6,
 		'LOCION MICELAR 3 EN 1 NIVEA PIEL SENSIBLE 400ML',
 		3877,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dweeebcc33/images/products/83593/83593.jpg'
 	),
@@ -74,7 +74,7 @@ VALUES
 		7,
 		'Serum Loreal Revitalif Retinol 30Ml',
 		18199,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw02618021/images/products/91374/91374.jpg'
 	),
@@ -82,7 +82,7 @@ VALUES
 		8,
 		'Serum de Ojos Revitalift 2,5% Ácido Hialurónico + Cafeína 20Ml',
 		14099,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw540d53b1/images/products/91010/91010.jpg'
 	),
@@ -90,7 +90,7 @@ VALUES
 		9,
 		'Travel Kit Centella Skin1004',
 		45999,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw91e18f04/images/products/94894/94894.jpg'
 	),
@@ -98,7 +98,7 @@ VALUES
 		10,
 		'Crema de Manos Té Verde',
 		2119,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwd2f0b970/images/products/92626/92626.jpg'
 	),
@@ -106,7 +106,7 @@ VALUES
 		11,
 		'Garnier Skin Active Mascarilla Express Aclara 28 g',
 		2619,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwd17e053a/images/products/88202/88202.jpg'
 	),
@@ -114,7 +114,7 @@ VALUES
 		12,
 		'Serum Nivea Expert Lift 30Ml',
 		12361,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw48cbacf7/images/products/92573/92573.jpg'
 	),
@@ -122,7 +122,7 @@ VALUES
 		13,
 		'Humectante Care Intensive 3 en 1 100ml',
 		8899,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw94733ebe/images/products/90941/90941.jpg'
 	),
@@ -130,7 +130,7 @@ VALUES
 		14,
 		'Serum Nivea Q10 Expert 15Ml',
 		8833,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw4dc4a6bf/images/products/91920/91920.jpg'
 	),
@@ -138,7 +138,7 @@ VALUES
 		15,
 		'CREMA MULTIPROPOSITO NIVEA SOFT CARA MANOS CUERPO 200ML',
 		4948,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwb2f20a32/images/products/7300/7300.jpg'
 	),
@@ -146,7 +146,7 @@ VALUES
 		16,
 		'Loreal Crema Revitalift Acido Hialurónico Dia FPS 20 50 mL',
 		14099,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwdba41833/images/products/86957001/86957001.jpg'
 	),
@@ -154,7 +154,7 @@ VALUES
 		17,
 		'Nivea Crema Hyaluron Cellular Filler Día 50 mL',
 		11654,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw10ae4b39/images/products/87399/87399.jpg'
 	),
@@ -162,7 +162,7 @@ VALUES
 		18,
 		'Crema Nivea Face Energy Noche 50ml',
 		9470,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw6d902e07/images/products/91461/91461.jpg'
 	),
@@ -170,7 +170,7 @@ VALUES
 		19,
 		'Cicatricure Crema 60 G',
 		17999,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwd7276205/images/products/70077/70077.jpg'
 	),
@@ -178,7 +178,7 @@ VALUES
 		20,
 		'Loreal Crema Hidra Total 5 Colageno 35 50 mL',
 		6299,
-		'Dermatológico',
+		'Dermatologia',
 		false,
 		'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0ccd5ed8/images/products/82003/82003.jpg'
 	),
@@ -343,12 +343,11 @@ VALUES
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw134ba184/images/products/86180/86180.jpg'
     ),
 
--- COSMÉTICOS (COSMETICS) PRODUCTS
     (
         41,
         'BÁLSAMO LABIAL NIVEA BLACKBERRY SHINE 4,8GR',
         3534,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw15f15282/images/products/88514/88514.jpg'
     ),
@@ -356,7 +355,7 @@ VALUES
         42,
         'Super Lock Glue',
         7069,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwff8bb0db/images/products/94131/94131.jpg'
     ),
@@ -364,7 +363,7 @@ VALUES
         43,
         'Labial Maybelline Super Stay Teddy Tint 20 Mascara Tear',
         9599,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwc7573133/images/products/94548/94548.jpg'
     ),
@@ -372,7 +371,7 @@ VALUES
         44,
         'S-NAILS ISDIN UÑAS 2ML',
         20799,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw09b9c174/images/products/88389/88389.jpg'
     ),
@@ -380,7 +379,7 @@ VALUES
         45,
         'Máscara De Pestañas Lash Sensational Sky High A Prueba De Agua',
         13509,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw7d503cc8/images/products/90671/90671.jpg'
     ),
@@ -388,7 +387,7 @@ VALUES
         46,
         'Labial Maybelline Super Stay Teddy Tint 50 Wild At Heart',
         9599,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0e5ecdee/images/products/94534/94534.jpg'
     ),
@@ -396,7 +395,7 @@ VALUES
         47,
         'Máscara de Pestañas Falsies Surreal Extensions Overload -WTP',
         13509,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwf1c7d4cd/images/products/92440/92440.jpg'
     ),
@@ -404,7 +403,7 @@ VALUES
         48,
         'Sombra Maybelline Rivals Extra X Lowkey',
         4189,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw0ccf78a3/images/products/93059/93059.jpg'
     ),
@@ -412,7 +411,7 @@ VALUES
         49,
         'Trim Encrespador De Pestañas Easy Hold x 1 Unidad',
         6599,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw981cc27c/images/products/76368/76368.jpg'
     ),
@@ -420,7 +419,7 @@ VALUES
         50,
         'Brillo Labial Lip Lifter Gloss Moon',
         7299,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw95055cda/images/products/91832/91832.jpg'
     ),
@@ -428,7 +427,7 @@ VALUES
         51,
         'Sunkisser Glow Blush - Blazing Blush',
         7269,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwef56cbe0/images/products/94085/94085.jpg'
     ),
@@ -436,7 +435,7 @@ VALUES
         52,
         'Labial Vinyl Ink SULTRY',
         10389,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw1f3b647e/images/products/92743/92743.jpg'
     ),
@@ -444,7 +443,7 @@ VALUES
         53,
         'Polvo Infallible Loreal Sand 9Gr',
         9999,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw037d7f46/images/products/89619/89619.jpg'
     ),
@@ -452,7 +451,7 @@ VALUES
         54,
         'Super stay hybrid compacto 24h 110',
         8499,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwfafde22e/images/products/94114/94114.jpg'
     ),
@@ -460,7 +459,7 @@ VALUES
         55,
         'Ecopads Garnier Discos Desmaquillantes Reutilizables 3 Un',
         8199,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw82d117ef/images/products/90937/90937.jpg'
     ),
@@ -468,7 +467,7 @@ VALUES
         56,
         'Alicate de Pieles Manicura Beter',
         8999,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw709ba910/images/products/94542/94542.jpg'
     ),
@@ -476,7 +475,7 @@ VALUES
         57,
         'Rizador Pestañas Beter Automatico',
         5299,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8ca2fe96/images/products/94579/94579.jpg'
     ),
@@ -484,7 +483,7 @@ VALUES
         58,
         'Bálsamo Labial Nivea Edición Limitada Pride Kiss 4,8 g',
         5299,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw8e36ae4f/images/products/94968/94968.jpg'
     ),
@@ -492,7 +491,7 @@ VALUES
         59,
         'Pack Ojos Maybelline Mirada Sky',
         18709,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw18588c51/images/products/93018/93018.jpg'
     ),
@@ -500,12 +499,10 @@ VALUES
         60,
         'BÁLSAMO LABIAL NIVEA CHERRY SHINE 4,8GR',
         3534,
-        'Cosmético',
+        'Cosméticos',
         false,
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dw740598ca/images/products/71477/71477.jpg'
     ),
-
--- MEDICAMENTOS (MEDICATIONS) PRODUCTS
     (
         61,
         'Tapsin Compuesto Noche 5 g x 1 Sobre Polvo Para Solución Oral',

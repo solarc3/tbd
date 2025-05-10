@@ -11,6 +11,31 @@ export interface FarmaciaRanking {
 }
 
 class FarmaciaService {
+	async getAllFarmacias(): Promise<FarmaciaEntity[]> {
+		try {
+			const { data } =
+				await apiClient.get<FarmaciaEntity[]>("/farmacia/all");
+			return data;
+		} catch (error) {
+			console.error("Error fetching farmacias:", error);
+			throw error;
+		}
+	}
+
+	async getProductosByFarmaciaId(idFarmacia: number): Promise<Product[]> {
+		try {
+			const { data } = await apiClient.get<Product[]>(
+				`/productos/farmacia/${idFarmacia}`,
+			);
+			return data;
+		} catch (error) {
+			console.error(
+				`Error fetching products for farmacia ${idFarmacia}:`,
+				error,
+			);
+			throw error;
+		}
+	}
 	async getFarmaciasFalladas(): Promise<FarmaciaFallada[]> {
 		try {
 			const { data } = await apiClient.get<FarmaciaFallada[]>(

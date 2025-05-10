@@ -124,4 +124,24 @@ public class ProductoController {
 			new MessageResponse("Producto eliminado correctamente")
 		);
 	}
+
+	@GetMapping("/farmacia/{idFarmacia}")
+	public ResponseEntity<?> getProductosByFarmaciaId(
+		@PathVariable Long idFarmacia
+	) {
+		List<ProductoEntity> productos =
+			productoService.getProductosByFarmaciaId(idFarmacia);
+
+		if (productos.isEmpty()) {
+			return ResponseEntity.ok()
+				.body(
+					new MessageResponse(
+						"No hay productos disponibles en la farmacia con ID: " +
+						idFarmacia
+					)
+				);
+		}
+
+		return ResponseEntity.ok(productos);
+	}
 }

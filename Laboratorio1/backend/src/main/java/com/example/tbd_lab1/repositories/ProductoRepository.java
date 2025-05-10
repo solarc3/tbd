@@ -66,18 +66,30 @@ public class ProductoRepository {
 		}
 		return producto;
 	}
+
 	public List<ProductoEntity> findByCategory(String category) {
-		String sql = "SELECT id_producto, nombre_producto, precio, categoria, requiere_receta, image_url as imageUrl FROM producto WHERE LOWER(categoria) = LOWER(?)";
+		String sql =
+			"SELECT id_producto, nombre_producto, precio, categoria, requiere_receta, image_url as imageUrl FROM producto WHERE LOWER(categoria) = LOWER(?)";
 		try {
-			return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(ProductoEntity.class), category);
+			return jdbcTemplate.query(
+				sql,
+				new BeanPropertyRowMapper<>(ProductoEntity.class),
+				category
+			);
 		} catch (EmptyResultDataAccessException e) {
 			return new ArrayList<>();
 		} catch (Exception e) {
-			System.err.println("Error fetching products for category " + category + ": " + e.getMessage());
+			System.err.println(
+				"Error fetching products for category " +
+				category +
+				": " +
+				e.getMessage()
+			);
 			e.printStackTrace();
 			return new ArrayList<>();
 		}
 	}
+
 	public boolean deleteProducto(Long id) {
 		String sql = "DELETE FROM producto WHERE id_producto = ?";
 		Object[] args = new Object[] { id };
@@ -169,6 +181,40 @@ public class ProductoRepository {
 			);
 			e.printStackTrace();
 			return Optional.empty();
+		}
+	}
+
+	public List<ProductoEntity> findByFarmaciaId(Long idFarmacia) {
+		String sql =
+			"SELECT " +
+			"  p.id_producto      AS idProducto, " +
+			"  p.nombre_producto  AS nombreProducto, " +
+			"  p.precio, " +
+			"  p.categoria, " +
+			"  p.requiere_receta  AS requiereReceta, " +
+			"  p.image_url        AS imageUrl " +
+			"FROM producto p " +
+			"JOIN producto_farmacia pf ON p.id_producto = pf.id_producto " +
+			"WHERE pf.id_farmacia = ? " +
+			"  AND pf.stock_producto > 0";
+
+		try {
+			return jdbcTemplate.query(
+				sql,
+				new BeanPropertyRowMapper<>(ProductoEntity.class),
+				idFarmacia
+			);
+		} catch (EmptyResultDataAccessException e) {
+			return new ArrayList<>();
+		} catch (Exception e) {
+			System.err.println(
+				"Error fetching products for farmacia " +
+				idFarmacia +
+				": " +
+				e.getMessage()
+			);
+			e.printStackTrace();
+			return new ArrayList<>();
 		}
 	}
 }
