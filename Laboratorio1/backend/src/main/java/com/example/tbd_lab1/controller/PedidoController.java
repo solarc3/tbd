@@ -5,6 +5,7 @@ import com.example.tbd_lab1.entities.DetallePedidoEntity;
 import com.example.tbd_lab1.entities.PedidoEntity;
 import com.example.tbd_lab1.services.DetallePedidoService;
 import com.example.tbd_lab1.services.PedidoService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,15 @@ public class PedidoController {
     public PedidoController(PedidoService pedidoService, DetallePedidoService detallePedidoService) {
         this.pedidoService = pedidoService;
         this.detallePedidoService = detallePedidoService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<?> getPedidos(){
+        List<PedidoEntity> pedidos = pedidoService.getPedidos();
+        if(pedidos.isEmpty()){
+            return ResponseEntity.ok().body(new MessageResponse("No hay pedidos en el sistema."));
+        }
+        return ResponseEntity.ok(pedidos);
     }
 
     @GetMapping("/{id_pedido}")

@@ -30,6 +30,26 @@ public class PedidoRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public List<PedidoEntity> getPedidos() {
+        try {
+            String sql = "SELECT * FROM pedido";
+            return jdbcTemplate.query(sql, (rs, rowNum) ->
+                    PedidoEntity.builder()
+                            .idPedido(rs.getLong("id_pedido"))
+                            .monto(rs.getInt("monto"))
+                            .fechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime())
+                            .esUrgente(rs.getBoolean("es_urgente"))
+                            .estadoPedido(PedidoEntity.EstadoPedido.valueOf(rs.getString("estado_pedido")))
+                            .idCliente(rs.getObject("id_cliente", Long.class))
+                            .idFarmacia(rs.getObject("id_farmacia", Long.class))
+                            .build()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     public Optional<PedidoEntity> findById(Long id) {
         try {
             String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia FROM pedido WHERE id_pedido = ?";

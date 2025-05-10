@@ -18,6 +18,8 @@ public class PedidoService {
         this.pedidoRepository = pedidoRepository;
     }
 
+    public List<PedidoEntity> getPedidos() {return pedidoRepository.getPedidos(); }
+
     public Optional<PedidoEntity> getById(Long id) {
         return pedidoRepository.findById(id);
     }
