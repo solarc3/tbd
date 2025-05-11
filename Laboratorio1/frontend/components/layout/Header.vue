@@ -18,6 +18,9 @@
 				<Button variant="link" @click="router.push('/reportes')"
 					>Reportes</Button
 				>
+				<Button variant = "link" @click="router.push('/repartidores')"
+					>Repartidores</Button
+				>
 			</div>
 
 			<!-- genera problemas de hidration, se debe hacer client side para evitar que se genera un missmatch -->

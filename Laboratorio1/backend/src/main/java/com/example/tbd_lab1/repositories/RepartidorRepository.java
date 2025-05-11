@@ -1,5 +1,6 @@
 package com.example.tbd_lab1.repositories;
 
+import com.example.tbd_lab1.DTO.RepartidorInfoResponse;
 import com.example.tbd_lab1.DTO.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab1.DTO.RepartidorTiempoPromedioResponse;
 import com.example.tbd_lab1.entities.RepartidorEntity;
@@ -29,6 +30,29 @@ public class RepartidorRepository {
             return Optional.ofNullable(repartidorEntity);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
+        }
+    }
+
+    public List<RepartidorEntity> findAll() {
+        String sql = "select * from repartidor";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(RepartidorEntity.class));
+    }
+
+    public List<RepartidorInfoResponse> findAllRepartidorInfo() {
+        try{
+            String sql = "Select repartidor.nombre_repartidor ,count(detalle_pedido.id_repartidor) as cantidad_entregas from detalle_pedido inner Join repartidor ON repartidor.id_repartidor=detalle_pedido.id_repartidor GROUP BY nombre_repartidor";
+
+            return jdbcTemplate.query(sql, (rs, rowNum) ->
+                    RepartidorInfoResponse.builder().nombre(rs.getString("nombre_repartidor"))
+                            .cantPaquetesEntregados(rs.getInt("cantidad_entregas")).build());
+
+        }catch (EmptyResultDataAccessException e) {
+            System.out.println("No hay resultados para repartidores por tiempo promedio: "
+                    + e.getMessage());
+            return new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 

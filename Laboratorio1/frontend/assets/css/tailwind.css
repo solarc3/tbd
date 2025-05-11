@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
     --radius: 0.625rem;
@@ -53,5 +56,19 @@
     .btn-custom:hover {
         background-color: var(--secondary);
         color: var(--secondary-foreground);
+    }
+}
+
+@theme inline {
+    --animate-accordion-down: accordion-down 0.2s ease-out;
+    --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@layer base {
+  * {
+    @apply border-[color:var(--border)] outline-[color:var(--ring)]/50;
+    }
+  body {
+    @apply bg-[color:var(--background)] text-[color:var(--foreground)];
     }
 }
