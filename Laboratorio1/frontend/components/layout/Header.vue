@@ -1,4 +1,3 @@
-HEADER:
 <template>
   <header class="border-b bg-[var(--primary)] text-white">
     <nav class="mx-auto flex justify-between items-center px-6 py-3">

@@ -9,6 +9,9 @@ interface AuthState {
 	initialized: boolean;
 }
 
+// Create a singleton promise to track initialization
+let initPromise: Promise<void> | null = null;
+
 export const useAuthStore = defineStore("auth", {
 	state: (): AuthState => ({
 		user: null,
@@ -71,18 +74,26 @@ export const useAuthStore = defineStore("auth", {
 		},
 
 		async initAuth() {
-			this.loading = true;
-			try {
-				const user = await authService.me();
-				this.user = user;
-				this.isAuthenticated = true;
-			} catch {
-				this.user = null;
-				this.isAuthenticated = false;
-			} finally {
-				this.loading = false;
-				this.initialized = true;
+			if (initPromise) {
+				return initPromise;
 			}
+
+			this.loading = true;
+			initPromise = (async () => {
+				try {
+					const user = await authService.me();
+					this.user = user;
+					this.isAuthenticated = true;
+				} catch {
+					this.user = null;
+					this.isAuthenticated = false;
+				} finally {
+					this.loading = false;
+					this.initialized = true;
+				}
+			})();
+
+			return initPromise;
 		},
 	},
 });
