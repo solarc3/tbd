@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class ProductoEntity {
     private Long idProducto;
     private String nombreProducto;
-    private float precio;
+    private Integer precio;
     private String categoria;
     private boolean requiereReceta;
+    private String imageUrl;
 }

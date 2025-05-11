@@ -3,7 +3,10 @@ package com.example.tbd_lab1.security.services;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.example.tbd_lab1.entities.User;
+import com.example.tbd_lab1.entities.UserEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -26,22 +29,38 @@ public class UserDetailsImpl implements UserDetails {
     @Getter
     private String email;
 
+    @Getter
+    private String firstName;
+
+    @Getter
+    private String lastName;
+
     @JsonIgnore
     private String password;
 
+    @Getter
+    private String rut;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(UserEntity userEntity) {
+
+
         return UserDetailsImpl.builder()
-            .id(user.getId())
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .password(user.getPassword())
-            .authorities(Collections.emptyList())
-            .build();
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .rut(userEntity.getRut())
+                .password(userEntity.getPassword())
+                .authorities(Collections.emptyList())
+                .build();
     }
 
     @Override
+
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }

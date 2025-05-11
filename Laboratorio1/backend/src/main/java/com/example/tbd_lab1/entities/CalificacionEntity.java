@@ -14,5 +14,4 @@ public class CalificacionEntity {
     private Long idDetallePedido;
     private Long clienteId;
     private float puntuacion;
-    private String comentario;
 }
