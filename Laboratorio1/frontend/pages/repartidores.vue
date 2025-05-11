@@ -39,13 +39,13 @@
                 <p class="text-sm font-medium text-gray-500">Entregas realizadas</p>
                 <p class="text-lg font-semibold">{{ repartidor.cantPaquetesEntregados }}</p>
               </div>
-              
+
               <div>
                 <p class="text-sm font-medium text-gray-500">Eficiencia</p>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    class="bg-primary h-2.5 rounded-full" 
-                    :style="{ width: `${Math.min(repartidor.cantPaquetesEntregados * 25, 100)}%` }"
+                  <div
+                      class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+                      :style="{ width: `${Math.min(repartidor.cantPaquetesEntregados * 25, 100)}%` }"
                   ></div>
                 </div>
               </div>
@@ -56,13 +56,12 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { repartidorService } from '@/api/services'
 
 // Import Accordion components
-import { 
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -83,7 +82,7 @@ onMounted(async () => {
   try {
     loading.value = true
     repartidores.value = await repartidorService.getAllRepartidoresInfo()
-    
+
     // Sort by number of packages delivered (descending)
     repartidores.value.sort((a, b) => b.cantPaquetesEntregados - a.cantPaquetesEntregados)
   } catch (err) {

@@ -21,6 +21,7 @@ const router = useRouter();
 const authStore = useAuthStore()
 const currentStep = ref(1)
 const cartStore = useCartStore();
+const progressValue = computed(() => (currentStep.value / 3) * 100);
 
 // carrito,hay q moverlo pq lo deje en pedidos nomas lol
 const cartItems = computed(() => cartStore.items);
@@ -32,8 +33,6 @@ const subtotal = computed(() =>
 const shipping = ref(0)
 const total = computed(() => subtotal.value + shipping.value)
 const nextStep = () => {
-  console.log('Cart ITems', cartItems.value)
-  console.log('prescriptionConfirmations', prescriptionConfirmations)
   if (currentStep.value < 3) {
     currentStep.value++
   }
@@ -355,23 +354,28 @@ const placeOrder = async () => {
 
     <!-- barra de progreso q no me funciona xd -->
     <div class="mt-8">
-      <Progress :model-value="(currentStep / 3) * 100" class="h-3 bg-gray-200 rounded-full">
-        <div class="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full"></div>
-      </Progress>
+      <!-- barra -->
+      <div class="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div
+            class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-700 transition-all duration-300"
+            :style="{ width: progressValue + '%' }"
+        ></div>
+      </div>
     </div>
 
+    <!-- botones -->
     <div class="flex justify-between mt-8">
       <button
-        class="btn-custom px-6 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-lg shadow-md transition disabled:opacity-50"
-        :disabled="currentStep === 1"
-        @click="prevStep"
+          class="btn-custom px-6 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-lg shadow-md transition disabled:opacity-50"
+          :disabled="currentStep === 1"
+          @click="prevStep"
       >
         Anterior
       </button>
       <button
-        class="btn-custom px-6 py-2 text-white bg-custom hover:bg-custom rounded-lg shadow-md transition disabled:opacity-50"
-        :disabled="currentStep === 3 || cartItems.length === 0"
-        @click="nextStep"
+          class="btn-custom px-6 py-2 text-white bg-custom hover:bg-custom rounded-lg shadow-md transition disabled:opacity-50"
+          :disabled="currentStep === 3"
+          @click="nextStep"
       >
         Siguiente
       </button>
