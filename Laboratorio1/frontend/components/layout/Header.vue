@@ -8,7 +8,6 @@ HEADER:
         </Button>
         <Button variant="link" @click="router.push('/clients')">Clientes</Button>
         <Button variant="link" @click="router.push('/productos')">Productos</Button>
-        <Button variant="link" @click="router.push('/pedidos')">Pedidos</Button>
         <Button variant="link" @click="router.push('/reportes')">Reportes</Button>
         <Button variant="link" @click="router.push('/repartidores')">Repartidores</Button>
       </div>
