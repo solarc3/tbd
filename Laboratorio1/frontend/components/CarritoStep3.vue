@@ -26,7 +26,6 @@ const emit = defineEmits(['update:isUrgent', 'update:farmaciaId', 'placeOrder'])
 // Local state
 const isUrgent = ref(false);
 const selectedFarmacia = ref(props.farmacias.length > 0 ? props.farmacias[0].id : null);
-const termsAccepted = ref(false);
 
 // Update parent component when values change
 const updateIsUrgent = (value: boolean) => {

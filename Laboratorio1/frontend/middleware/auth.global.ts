@@ -11,8 +11,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const isPublic = publicPages.includes(to.path);
 
 	if (!auth.isAuthenticated && !isPublic) {
-		return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`);
-	}
+        return navigateTo('/login');
+    }
 
 	if (auth.isAuthenticated && isPublic) {
 		return navigateTo("/");
