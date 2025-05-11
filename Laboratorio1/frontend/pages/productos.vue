@@ -9,6 +9,33 @@ import {
 import { productoService } from "@/api/services";
 import farmaciaService from "@/api/services/farmaciaService";
 import type { Product, FarmaciaEntity } from "@/api/models";
+import { useCartStore } from '@/stores/cartStore';
+import { toast } from 'vue-sonner';
+
+// Cart store
+const cartStore = useCartStore();
+
+// Add function to handle adding product to cart
+const addToCart = (product: Product) => {
+	console.log("Adding to cart:", product);
+	cartStore.addItem({
+		idProducto: product.idProducto,
+		nombreProducto: product.nombreProducto,
+		precio: product.precio,
+		requiereReceta: product.requiereReceta,
+		image: product.imageUrl
+	});
+
+	// Show toast notification using Sonner
+    toast.info('Producto agregado', {
+        description: `${product.nombreProducto}`,
+        action: {
+            label: 'Deshacer',
+            onClick: () => cartStore.removeItem(product.idProducto),
+        }
+    });
+}
+
 
 // State for products
 const products = ref<Product[]>([]);
@@ -24,11 +51,11 @@ const searchQuery = ref("");
 
 // Categories
 const categories = ref([
-	"Dermatologia",
-	"higiene",
-	"Medicamento",
-	"Suplementos",
-	"Cosméticos",
+  "dermatologia",
+  "higiene",
+  "medicamentos",
+  "suplementos",
+  "cosméticos",
 ]);
 const selectedCategory = ref("");
 
@@ -38,6 +65,12 @@ const itemsPerPage = ref(8);
 
 // Computed property for filtered products
 const filteredProducts = computed(() => {
+
+	if (!Array.isArray(products.value)) {
+		console.log(products.value);
+		return [];
+  	}
+
 	let result = products.value;
 
 	// Filter by category if selected
@@ -387,6 +420,7 @@ onMounted(async () => {
 
 											<!-- Add to cart button -->
 											<button
+												@click="addToCart(product)"
 												class="btn-custom mt-3 w-full flex items-center justify-center space-x-2"
 											>
 												<ShoppingCart class="w-5 h-5" />

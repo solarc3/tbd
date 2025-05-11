@@ -58,6 +58,9 @@ public class PedidoService {
         return pedidoRepository.updateState(idPedido, nuevoEstado);
     }
     public boolean registrarPedidoCompleto(RegistrarPedidoCompletoRequest request) {
+        if (request.getIdCliente() == null || request.getIdFarmacia() == null || request.getEsUrgente() == null)
+            return false;
+
         if (request.getEstadoPedido() == null) {
             request.setEstadoPedido(PedidoEntity.EstadoPedido.POR_CONFIRMAR);
         }

@@ -35,7 +35,7 @@
     "lucide-vue-next": "^0.503.0",
     "nuxt": "^3.16.2",
     "pinia": "^3.0.2",
-    "pinia-plugin-persistedstate": "^4.2.0",
+    "pinia-plugin-persistedstate": "^4.3.0",
     "recharts": "^2.15.3",
     "registry": "^0.3.0",
     "reka-ui": "^2.2.1",

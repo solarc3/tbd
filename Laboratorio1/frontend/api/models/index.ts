@@ -37,9 +37,24 @@ export interface ClienteGasto {
 	email: string;
 	totalGastado: number;
 }
+
 export interface FarmaciaEntity {
 	idFarmacia: number;
 	nombreFarmacia: string;
 	direccion: string;
 	telefono?: string;
+}
+
+export interface ProductRequest {
+	idProducto: number;
+	cantidad: number;
+	recetaValidada: boolean;
+}
+
+export interface RegistrarPedidoRequest {
+	idCliente: number;
+	idFarmacia: number;
+	esUrgente: boolean;
+	productos: Array<ProductRequest>;
+	monto: number;
 }

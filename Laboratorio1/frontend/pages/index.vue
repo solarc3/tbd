@@ -16,7 +16,7 @@ const categories = [
 	{ name: "higiene", image: "/higiene.png" },
 	{ name: "medicamentos", image: "/medicamentos.png" },
 	{ name: "suplementos", image: "/suplementos.png" },
-	{ name: "cosmeticos", image: "/cosmeticos.png" },
+	{ name: "cosméticos", image: "/cosmeticos.png" },
 ];
 
 type Category = {

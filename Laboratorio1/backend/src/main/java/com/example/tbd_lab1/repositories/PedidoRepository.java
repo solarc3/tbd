@@ -122,7 +122,7 @@ public class PedidoRepository {
                     new SqlParameter("p_monto", Types.INTEGER),
                     new SqlParameter("p_fecha_pedido", Types.TIMESTAMP),
                     new SqlParameter("p_es_urgente", Types.BOOLEAN),
-                    new SqlParameter("p_estado_pedido", Types.VARCHAR), // Will be cast to estado_pedido in SQL
+                    new SqlParameter("p_estado_pedido", Types.VARCHAR),
                     new SqlParameter("p_id_cliente", Types.BIGINT),
                     new SqlParameter("p_id_farmacia", Types.BIGINT),
                     new SqlParameter("p_id_productos", Types.ARRAY),
