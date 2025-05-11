@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.repositories;
 
 import com.example.tbd_lab1.DTO.PagoMasUsadoUrgenteResponse;
+import com.example.tbd_lab1.DTO.ProductoPedidoRequest;
 import com.example.tbd_lab1.DTO.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab1.entities.FarmaciaEntity;
 import com.example.tbd_lab1.entities.PedidoEntity;
@@ -105,6 +106,18 @@ public class PedidoRepository {
     }
     public boolean registrarPedidoCompleto(RegistrarPedidoCompletoRequest request) {
         try {
+            // desempaquetar lista de dtos
+            List<ProductoPedidoRequest> productos = request.getProductos();
+            Long[] productosArray = productos.stream()
+                    .map(ProductoPedidoRequest::getIdProducto)
+                    .toArray(Long[]::new);
+            Integer[] cantidadesArray = productos.stream()
+                    .map(ProductoPedidoRequest::getCantidad)
+                    .toArray(Integer[]::new);
+            Boolean[] recetasValidasArray = productos.stream()
+                    .map(ProductoPedidoRequest::getRecetaValidada)
+                    .toArray(Boolean[]::new);
+
             List<SqlParameter> params = List.of(
                     new SqlParameter("p_monto", Types.INTEGER),
                     new SqlParameter("p_fecha_pedido", Types.TIMESTAMP),
@@ -112,14 +125,13 @@ public class PedidoRepository {
                     new SqlParameter("p_estado_pedido", Types.VARCHAR), // Will be cast to estado_pedido in SQL
                     new SqlParameter("p_id_cliente", Types.BIGINT),
                     new SqlParameter("p_id_farmacia", Types.BIGINT),
-                    new SqlParameter("p_id_repartidor", Types.BIGINT),
-                    new SqlParameter("p_metodo_pago", Types.VARCHAR),
-                    new SqlParameter("p_fecha_entrega", Types.TIMESTAMP),
-                    new SqlParameter("p_id_productos", Types.ARRAY)
+                    new SqlParameter("p_id_productos", Types.ARRAY),
+                    new SqlParameter("p_cantidades", Types.ARRAY),
+                    new SqlParameter("p_recetas_validadas", Types.ARRAY)
             );
 
             jdbcTemplate.call(con -> {
-                CallableStatement callableStatement = con.prepareCall("CALL registrar_pedido_completo(?, ?, ?, ?::estado_pedido, ?, ?, ?, ?, ?, ?)");
+                CallableStatement callableStatement = con.prepareCall("CALL registrar_pedido_completo(?, ?, ?, ?::estado_pedido, ?, ?, ?, ?, ?)");
                 callableStatement.setInt(1, request.getMonto());
                 callableStatement.setTimestamp(2, java.sql.Timestamp.valueOf(request.getFechaPedido()));
                 callableStatement.setBoolean(3, request.getEsUrgente());
@@ -127,23 +139,9 @@ public class PedidoRepository {
                 callableStatement.setLong(5, request.getIdCliente());
                 callableStatement.setLong(6, request.getIdFarmacia());
 
-                if (request.getIdRepartidor() != null) {
-                    callableStatement.setLong(7, request.getIdRepartidor());
-                } else {
-                    callableStatement.setNull(7, Types.BIGINT);
-                }
-
-                callableStatement.setString(8, request.getMetodoPago());
-
-                if (request.getFechaEntrega() != null) {
-                    callableStatement.setTimestamp(9, java.sql.Timestamp.valueOf(request.getFechaEntrega()));
-                } else {
-                    callableStatement.setNull(9, Types.TIMESTAMP);
-                }
-
-                Long[] productosArray = request.getIdProductos().toArray(new Long[0]);
-                java.sql.Array sqlArray = con.createArrayOf("BIGINT", productosArray);
-                callableStatement.setArray(10, sqlArray);
+                callableStatement.setArray(7, con.createArrayOf("BIGINT", productosArray));
+                callableStatement.setArray(8, con.createArrayOf("INTEGER", cantidadesArray));
+                callableStatement.setArray(9, con.createArrayOf("BOOLEAN", recetasValidasArray));
 
                 return callableStatement;
             }, params);

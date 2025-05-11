@@ -8,35 +8,31 @@ CREATE OR REPLACE PROCEDURE registrar_pedido_completo(
     p_estado_pedido estado_pedido,
     p_id_cliente BIGINT,
     p_id_farmacia BIGINT,
-    p_id_repartidor BIGINT,
-    p_metodo_pago VARCHAR(50),
-    p_fecha_entrega TIMESTAMP,
-    p_id_productos BIGINT[]
+    p_id_productos BIGINT[],
+    p_cantidades INTEGER[],
+    p_recetas_validadas BOOLEAN[]
 )
     LANGUAGE plpgsql AS $$
 DECLARE
     v_id_pedido BIGINT;
-    v_id_detalle_pedido BIGINT;
     producto_id BIGINT;
+    cantidad INTEGER;
+    receta_validada BOOLEAN;
 BEGIN
     -- Insertar en pedido
     INSERT INTO pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia)
     VALUES (p_monto, p_fecha_pedido, p_es_urgente, p_estado_pedido, p_id_cliente, p_id_farmacia)
     RETURNING id_pedido INTO v_id_pedido;
 
-    -- Insertar en detalle_pedido
-    INSERT INTO detalle_pedido (id_pedido, id_repartidor, metodo_pago, fecha_entrega)
-    VALUES (v_id_pedido, p_id_repartidor, p_metodo_pago, p_fecha_entrega)
-    RETURNING id_detalle_pedido INTO v_id_detalle_pedido; -- Optional if you need this ID back
-
     -- Insertar en producto_pedido
-    IF array_length(p_id_productos, 1) > 0 THEN
-        FOREACH producto_id IN ARRAY p_id_productos
-            LOOP
-                INSERT INTO producto_pedido (id_pedido, id_producto)
-                VALUES (v_id_pedido, producto_id);
-            END LOOP;
-    END IF;
+    FOR i IN 1..array_length(p_id_productos, 1) LOOP
+        producto_id := p_id_productos[i];
+        cantidad := p_cantidades[i];
+        receta_validada := p_recetas_validadas[i];
+
+        INSERT INTO producto_pedido (id_pedido, id_producto, cantidad, receta_validada)
+        VALUES (v_id_pedido, producto_id, cantidad, receta_validada);
+    END LOOP;
 END;
 $$;
 

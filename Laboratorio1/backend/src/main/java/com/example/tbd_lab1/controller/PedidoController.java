@@ -73,6 +73,17 @@ public class PedidoController {
         return ResponseEntity.ok(detallePedidoService.mapToResponse(detallePedidoEntity.get()));
     }
 
+    @GetMapping("/{id_pedido}/productos")
+    public ResponseEntity<?> getProductosPedido(@PathVariable Long id_pedido) {
+        Optional<PedidoEntity> pedido = pedidoService.getById(id_pedido);
+        if (pedido.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Pedido no encontrado"));
+        }
+        return ResponseEntity.ok(pedidoService.getProducts(id_pedido));
+    }
+
     @GetMapping("/pagourgente")
     public ResponseEntity<?> pagourgente() {
         List<PagoMasUsadoUrgenteResponse> pago = pedidoService.pagoMasUsadoUrgente();
@@ -90,6 +101,11 @@ public class PedidoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new MessageResponse("Pedido no encontrado"));
         }
+        if (detallePedidoService.getByIdPedido(id_pedido).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Pedido ya entregado"));
+        }
+
         detallePedidoService.createDetallePedido(
                 pedidoEntity.get(),
                 detallePedidoRequest.getIdRepartidor(),
@@ -106,7 +122,7 @@ public class PedidoController {
         if (updated) {
             return ResponseEntity.ok().body(new MessageResponse("Estado cambiado"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error al cambiar estado"));
     }
 

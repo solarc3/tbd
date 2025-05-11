@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.DTO;
 
 import com.example.tbd_lab1.entities.PedidoEntity;
+import com.example.tbd_lab1.entities.ProductoPedidoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,19 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrarPedidoCompletoRequest {
-    // Pedido fields
-    private Integer monto;
-    private LocalDateTime fechaPedido;
-    private Boolean esUrgente;
-    private PedidoEntity.EstadoPedido estadoPedido;
+    // Basta con estos
     private Long idCliente;
+    private Boolean esUrgente;
     private Long idFarmacia;
+    private List<ProductoPedidoRequest> productos;
 
-    // DetallePedido fields
-    private Long idRepartidor; // Can be null
-    private String metodoPago;
-    private LocalDateTime fechaEntrega; // Can be null
-
-    // ProductoPedido fields
-    private List<Long> idProductos;
+    // Opcionales                                   // Valor default
+    private LocalDateTime fechaPedido;              // timestamp actual
+    private PedidoEntity.EstadoPedido estadoPedido; // POR_CONFIRMAR
+    private Integer monto;                          // total computado en el service
 }
