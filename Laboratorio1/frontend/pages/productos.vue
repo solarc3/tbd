@@ -51,11 +51,11 @@ const searchQuery = ref("");
 
 // Categories
 const categories = ref([
-	"Dermatologia",
-	"higiene",
-	"Medicamento",
-	"Suplementos",
-	"Cosméticos",
+  "dermatologia",
+  "higiene",
+  "medicamentos",
+  "suplementos",
+  "cosméticos",
 ]);
 const selectedCategory = ref("");
 
