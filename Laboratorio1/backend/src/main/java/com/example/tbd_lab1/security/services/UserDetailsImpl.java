@@ -7,6 +7,9 @@ import com.example.tbd_lab1.entities.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -26,22 +29,38 @@ public class UserDetailsImpl implements UserDetails {
     @Getter
     private String email;
 
+    @Getter
+    private String firstName;
+
+    @Getter
+    private String lastName;
+
     @JsonIgnore
     private String password;
+
+    @Getter
+    private String rut;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(UserEntity userEntity) {
+
+
         return UserDetailsImpl.builder()
-            .id(userEntity.getId())
-            .username(userEntity.getUsername())
-            .email(userEntity.getEmail())
-            .password(userEntity.getPassword())
-            .authorities(Collections.emptyList())
-            .build();
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .rut(userEntity.getRut())
+                .password(userEntity.getPassword())
+                .authorities(Collections.emptyList())
+                .build();
     }
 
     @Override
+
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }

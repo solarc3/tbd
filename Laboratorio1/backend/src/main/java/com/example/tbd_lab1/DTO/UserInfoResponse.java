@@ -12,5 +12,8 @@ import lombok.NoArgsConstructor;
 public class UserInfoResponse {
     private Long id;
     private String username;
+    private String firstName;
+    private String lastName;
+    private String rut;
     private String email;
 }
