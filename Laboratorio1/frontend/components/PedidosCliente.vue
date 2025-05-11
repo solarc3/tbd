@@ -20,20 +20,30 @@ const pedidos = ref<Pedido[]>([])
 const loading = ref(false)
 const error = ref('')
 const showModal = ref(false)
+const clienteId = ref<number | null>(null)
+const clienteUsername = ref<string>('')
+
+function setClienteId(id: number) {
+  clienteId.value = id;
+}
 
 async function fetchPedidos() {
-  if (!authStore.currentUser?.id) return
+  // Usar el ID del cliente proporcionado por el componente padre si está disponible
+  const idToUse = clienteId.value || (authStore.currentUser?.id || null);
   
-  loading.value = true
-  error.value = ''
+  if (!idToUse) return;
+  
+  loading.value = true;
+  error.value = '';
   
   try {
-    pedidos.value = await pedidoService.getPedidosByCliente(authStore.currentUser.id)
+    // Usar idToUse en lugar de authStore.currentUser.id
+    pedidos.value = await pedidoService.getPedidosByCliente(idToUse);
   } catch (err) {
-    console.error('Error al obtener pedidos:', err)
-    error.value = 'Error al cargar los pedidos. Por favor, intente nuevamente.'
+    console.error('Error al obtener pedidos:', err);
+    error.value = 'Error al cargar los pedidos. Por favor, intente nuevamente.';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
@@ -62,7 +72,8 @@ function formatearFecha(fechaStr: string) {
 }
 
 defineExpose({
-  toggleModal
+  toggleModal,
+  setClienteId
 })
 </script>
 
@@ -72,7 +83,9 @@ defineExpose({
     <!-- Modal content -->
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
       <div class="bg-custom p-4 text-white flex justify-between items-center">
-        <h3 class="text-xl font-bold">Mis Pedidos</h3>
+        <h3 class="text-xl font-bold">
+          {{ clienteUsername ? `Pedidos de ${clienteUsername}` : 'Mis Pedidos' }}
+        </h3>
         <button @click="toggleModal" class="text-white hover:text-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -132,3 +145,4 @@ defineExpose({
     </div>
   </div>
 </template>
+<PedidosCliente ref="pedidosClienteRef" />
