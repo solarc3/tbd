@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { Button } from "@/components/ui/button";
@@ -29,34 +29,101 @@ const form = ref({
 	confirmPassword: "",
 });
 
-// Validación de RUT
+const rutError = ref("");
+
+// Format RUT as the user types (XX.XXX.XXX-X)
+const formatRut = (value: string): string => {
+    // Remove all non-alphanumeric characters
+    let cleaned = value.replace(/[^0-9kK]/g, "").toUpperCase();
+    
+    if (cleaned.length === 0) return "";
+    
+    // Format the RUT
+    let result = "";
+    
+    // Add the verification digit with a dash
+    if (cleaned.length > 1) {
+        const body = cleaned.slice(0, -1);
+        const dv = cleaned.slice(-1);
+        cleaned = body + "-" + dv;
+    }
+    
+    // Add dots for thousands
+    const parts = cleaned.split("-");
+    let num = parts[0];
+    
+    // Add dots
+    for (let i = num.length - 3; i > 0; i -= 3) {
+        num = num.slice(0, i) + "." + num.slice(i);
+    }
+    
+    result = parts.length > 1 ? num + "-" + parts[1] : num;
+    
+    return result;
+};
+
+// Watch for RUT changes and format it
+watch(() => form.value.rut, (newValue) => {
+    // Only format if not empty and if the last character isn't a dot or dash
+    // This prevents cursor jumping while typing
+    if (newValue && !newValue.endsWith(".") && !newValue.endsWith("-")) {
+        // Remember cursor position
+        const input = document.getElementById("rut") as HTMLInputElement;
+        const cursorPos = input?.selectionStart || 0;
+        const oldLength = newValue.length;
+        
+        // Format RUT
+        const formatted = formatRut(newValue);
+        
+        // Only update if formatting actually changed something
+        if (formatted !== newValue) {
+            form.value.rut = formatted;
+            
+            // Restore cursor position, accounting for added characters
+            setTimeout(() => {
+                if (input) {
+                    const newPos = cursorPos + (formatted.length - oldLength);
+                    input.setSelectionRange(newPos, newPos);
+                }
+            }, 0);
+        }
+    }
+    
+    // Validate in real-time
+    if (newValue) {
+        rutError.value = validateRut(newValue) ? "" : "RUT inválido";
+    } else {
+        rutError.value = "";
+    }
+});
+
 const validateRut = (rut: string): boolean => {
-	if (!rut) return false;
+    if (!rut) return false;
 
-	const cleanRut = rut.replace(/[.-]/g, "").toUpperCase();
+    const cleanRut = rut.replace(/[.-]/g, "").toUpperCase();
 
-	if (!/^\d{7,8}[0-9K]$/.test(cleanRut)) return false;
+    if (!/^\d{7,8}[0-9K]$/.test(cleanRut)) return false;
 
-	const digits = cleanRut.slice(0, -1);
-	const dv = cleanRut.slice(-1);
+    const digits = cleanRut.slice(0, -1);
+    const dv = cleanRut.slice(-1);
 
-	let sum = 0;
-	let multiplier = 2;
+    let sum = 0;
+    let multiplier = 2;
 
-	for (let i = digits.length - 1; i >= 0; i--) {
-		sum += parseInt(digits[i]) * multiplier;
-		multiplier = multiplier === 7 ? 2 : multiplier + 1;
-	}
+    for (let i = digits.length - 1; i >= 0; i--) {
+        sum += parseInt(digits[i]) * multiplier;
+        multiplier = multiplier === 7 ? 2 : multiplier + 1;
+    }
 
-	const remainder = sum % 11;
-	const calculatedDV = 11 - remainder;
+    const remainder = sum % 11;
+    const calculatedDV = 11 - remainder;
 
-	let expectedDV;
-	if (calculatedDV === 11) expectedDV = "0";
-	else if (calculatedDV === 10) expectedDV = "K";
-	else expectedDV = calculatedDV.toString();
+    let expectedDV;
+    if (calculatedDV === 11) expectedDV = "0";
+    else if (calculatedDV === 10) expectedDV = "K";
+    else expectedDV = calculatedDV.toString();
 
-	return dv === expectedDV;
+    return dv === expectedDV;
 };
 
 // Validaciones básicas
@@ -190,6 +257,7 @@ const handleRegister = async () => {
 						placeholder="12.345.678-9"
 						required
 					/>
+					<p v-if="rutError" class="text-sm text-red-500 mt-1">{{ rutError }}</p>
 				</div>
 
 				<div class="space-y-2">
