@@ -68,9 +68,10 @@ export const useCartStore = defineStore('cart', {
       }
 
     },
-    
+
+    // evita el error de: Persist the cart state to localStorage
     persist: {
       key: 'shopping-cart',
-      storage: localStorage
+      storage: typeof window !== 'undefined' ? localStorage : undefined,
     }
   });
