@@ -72,3 +72,12 @@
     @apply bg-[color:var(--background)] text-[color:var(--foreground)];
     }
 }
+
+@layer base {
+    button,
+    [role="button"] {
+       @apply cursor-pointer;
+       @apply disabled:cursor-not-allowed;
+    }
+ }
+ 

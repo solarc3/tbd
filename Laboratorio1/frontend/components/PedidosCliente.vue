@@ -79,7 +79,7 @@ defineExpose({
 
 <template>
   <!-- Modal backdrop -->
-  <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+  <div v-if="showModal" class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
     <!-- Modal content -->
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
       <div class="bg-custom p-4 text-white flex justify-between items-center">

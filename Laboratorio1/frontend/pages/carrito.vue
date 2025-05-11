@@ -9,26 +9,31 @@ import {
   StepperTrigger,
 } from '@/components/ui/stepper'
 import { Progress } from '@/components/ui/progress'
-import { ShoppingCart, CheckCircle, CreditCard } from 'lucide-vue-next'
+import { ShoppingCart, CheckCircle, CreditCard, Trash } from 'lucide-vue-next'
+import { useCartStore } from '@/stores/cartStore'
+import { pedidoService, farmaciaService } from "@/api/services";
+import type { FarmaciaEntity } from "@/api/models";
 
 // https://www.shadcn-vue.com/docs/components/stepper
 // https://www.shadcn-vue.com/docs/components/progress.html
 
+const router = useRouter();
+const authStore = useAuthStore()
 const currentStep = ref(1)
+const cartStore = useCartStore();
 
 // carrito,hay q moverlo pq lo deje en pedidos nomas lol
-const cartItems = ref([
-  { id: 1, name: 'Producto A', price: 10000, quantity: 2 },
-  { id: 2, name: 'Producto B', price: 15000, quantity: 1 },
-])
+const cartItems = computed(() => cartStore.items);
 
 // resumen de compra considerando que dsps deberia ir el tema del delivery etc
 const subtotal = computed(() =>
-  cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
+  cartItems.value.reduce((total, item) => total + item.precio * item.cantidad, 0)
 )
-const shipping = ref(5000)
+const shipping = ref(0)
 const total = computed(() => subtotal.value + shipping.value)
 const nextStep = () => {
+  console.log('Cart ITems', cartItems.value)
+  console.log('prescriptionConfirmations', prescriptionConfirmations)
   if (currentStep.value < 3) {
     currentStep.value++
   }
@@ -43,12 +48,151 @@ const prevStep = () => {
 watch(currentStep, (newVal) => {
   console.log('Paso actual:', newVal)
 })
+
+const showConfirmDialog = ref(false);
+const itemIdToRemove = ref<number | null>(null);
+const itemNameToRemove = ref<string>('');
+
+// Show confirmation dialog before removing item
+const confirmRemoveItem = (id: number, name: string) => {
+  itemIdToRemove.value = id;
+  itemNameToRemove.value = name;
+  showConfirmDialog.value = true;
+};
+
+// Confirm and remove item
+const handleConfirmRemove = () => {
+  if (itemIdToRemove.value !== null) {
+    removeItem(itemIdToRemove.value);
+    showConfirmDialog.value = false;
+    itemIdToRemove.value = null;
+  }
+};
+
+// Cancel remove action
+const cancelRemove = () => {
+  showConfirmDialog.value = false;
+  itemIdToRemove.value = null;
+};
+
+// Cart item actions
+const removeItem = (id: number) => {
+  cartStore.removeItem(id);
+  // Also remove the prescription confirmation for this product
+  if (id in prescriptionConfirmations) {
+    delete prescriptionConfirmations[id];
+  }
+};
+
+const incrementQuantity = (id: number) => {
+  cartStore.incrementQuantity(id);
+};
+
+const decrementQuantity = (id: number) => {
+  cartStore.decrementQuantity(id);
+};
+
+const hasRxItems = computed(() => {
+  return cartItems.value.some(item => item.requiereReceta);
+});
+
+// para recetas
+const prescriptionConfirmations = reactive<Record<number, boolean>>({})
+
+const initializePrescriptionConfirmations = () => {
+  // Find all products that require prescriptions
+  const rxItems = cartItems.value.filter(item => item.requiereReceta);
+  rxItems.forEach(item => {
+    if (prescriptionConfirmations[item.idProducto] === undefined) {
+      prescriptionConfirmations[item.idProducto] = false;
+    }
+  });
+};
+
+// Watch for changes in cart items to initialize new prescription items
+watch(() => cartItems.value, () => {
+  initializePrescriptionConfirmations();
+}, { deep: true });
+
+onMounted(() => {
+  // Initialize the prescription confirmations when the component mounts
+  initializePrescriptionConfirmations();
+
+  fetchFarmacias();
+});
+
+// parametros paso 3
+const isUrgent = ref(false)
+const selectedFarmaciaId = ref(null)
+const farmacias = ref<FarmaciaEntity[]>([]);
+const fetchFarmacias = async () => {
+	try {
+		farmacias.value = await farmaciaService.getAllFarmacias();
+	} catch (err) {
+		console.error("Error fetching farmacias:", err);
+	}
+};
+
+// Function to handle order placement
+const placeOrder = () => {
+  console.log('Placing order...')
+  const order = {
+    // mapear a ProductoPedidoRequest (id, cantidad, validada)
+    productos: cartItems.value.map(item => ({
+      idProducto: item.idProducto,
+      cantidad: item.cantidad,
+      recetaValidada: prescriptionConfirmations[item.idProducto] !== undefined ? prescriptionConfirmations[item.idProducto] : null,
+    })),
+    monto: total.value,
+    esUrgente: isUrgent.value,
+    idFarmacia: selectedFarmaciaId.value,
+  }
+  
+  console.log('Placing order:', order)
+  
+  // Here you would typically call an API to place the order
+  // api.placeOrder(order).then(...)
+  
+  // For now, just show a success message and clear the cart
+  alert('¡Pedido realizado con éxito!')
+  cartStore.clearCart()
+  router.push('/profile')
+}
+
+
 </script>
 
 <template>
   <div class="bg-gray-50 rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Procedimiento de compra</h2>
     <p class="text-gray-600 mb-8 text-center">Sigue los pasos para completar tu compra de manera rápida y sencilla.</p>
+
+    <!-- dialogo para confirmar eliminar producto -->
+    <div v-if="showConfirmDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+        <div class="flex items-center mb-4 text-amber-600">
+          <Trash class="w-6 h-6 mr-2" />
+          <h3 class="text-lg font-semibold">Confirmar eliminación</h3>
+        </div>
+        <p class="mb-6 text-gray-700">
+          ¿Estás seguro que deseas eliminar "{{ itemNameToRemove }}"?
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button 
+            @click="cancelRemove" 
+            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            Cancelar
+          </button>
+          <button 
+            @click="handleConfirmRemove" 
+            class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- stepper !!! -->
     <div class="mb-8">
@@ -166,20 +310,42 @@ watch(currentStep, (newVal) => {
       </Stepper>
     </div>
 
+    <div>
     <!-- paso 1 -->
     <div>
-      <div v-if="currentStep === 1" class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Productos en el carrito</h3>
-      </div>
+      <CarritoStep1
+        v-if="currentStep === 1"
+        :cart-items="cartItems"
+        :subtotal="subtotal"
+        :shipping="shipping"
+        :total="total"
+        @increment-quantity="incrementQuantity"
+        @decrement-quantity="decrementQuantity"
+        @confirm-remove="confirmRemoveItem"
+        @navigate="navigateTo"
+      />  
+    </div>
 
       <!-- paso 2 -->
       <div v-if="currentStep === 2" class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Confirmar detalles</h3>
+        <CarritoStep2
+          v-if="currentStep === 2"
+          :cart-items="cartItems"
+          :total="total"
+          :prescription-confirmations="prescriptionConfirmations"
+        />
       </div>
 
       <!-- paso 3 -->
       <div v-if="currentStep === 3" class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Finalizar compra</h3>
+        <CarritoStep3
+          :total="total"
+          :farmacias="farmacias"
+          :client-name="authStore.user?.firstName + ' ' + authStore.user?.lastName"
+          :client-email="authStore.user?.email"
+          v-model:is-urgent="isUrgent"
+          v-model:farmacia-id="selectedFarmaciaId"
+          @place-order="placeOrder"/>
       </div>
     </div>
 
@@ -200,7 +366,7 @@ watch(currentStep, (newVal) => {
       </button>
       <button
         class="btn-custom px-6 py-2 text-white bg-custom hover:bg-custom rounded-lg shadow-md transition disabled:opacity-50"
-        :disabled="currentStep === 3"
+        :disabled="currentStep === 3 || cartItems.length === 0"
         @click="nextStep"
       >
         Siguiente
