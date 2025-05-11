@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress'
 import { ShoppingCart, CheckCircle, CreditCard, Trash } from 'lucide-vue-next'
 import { useCartStore } from '@/stores/cartStore'
 import { pedidoService, farmaciaService } from "@/api/services";
-import type { FarmaciaEntity } from "@/api/models";
+import type { FarmaciaEntity, RegistrarPedidoRequest } from "@/api/models";
 
 // https://www.shadcn-vue.com/docs/components/stepper
 // https://www.shadcn-vue.com/docs/components/progress.html
@@ -123,7 +123,7 @@ onMounted(() => {
 
 // parametros paso 3
 const isUrgent = ref(false)
-const selectedFarmaciaId = ref(null)
+const selectedFarmaciaId = ref(0)
 const farmacias = ref<FarmaciaEntity[]>([]);
 const fetchFarmacias = async () => {
 	try {
@@ -134,9 +134,8 @@ const fetchFarmacias = async () => {
 };
 
 // Function to handle order placement
-const placeOrder = () => {
-  console.log('Placing order...')
-  const order = {
+const placeOrder = async () => {
+  const order : RegistrarPedidoRequest = {
     // mapear a ProductoPedidoRequest (id, cantidad, validada)
     productos: cartItems.value.map(item => ({
       idProducto: item.idProducto,
@@ -146,17 +145,22 @@ const placeOrder = () => {
     monto: total.value,
     esUrgente: isUrgent.value,
     idFarmacia: selectedFarmaciaId.value,
+    idCliente: authStore.user?.id? authStore.user.id : null
   }
   
   console.log('Placing order:', order)
   
-  // Here you would typically call an API to place the order
-  // api.placeOrder(order).then(...)
-  
-  // For now, just show a success message and clear the cart
-  alert('¡Pedido realizado con éxito!')
-  cartStore.clearCart()
-  router.push('/profile')
+  // Call The API to place the order :)
+  await pedidoService.completarPedido(order)
+    .then(() => {
+      alert('¡Pedido completado con éxito!')
+      cartStore.clearCart()
+      router.push('/profile')
+    })
+    .catch((error) => {
+      console.error('Error placing order:', error)
+      alert('Error al realizar el pedido. Intenta nuevamente.')
+    })
 }
 
 

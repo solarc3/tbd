@@ -3,8 +3,8 @@ package com.example.tbd_lab1.controller;
 import com.example.tbd_lab1.DTO.RepartidorInfoResponse;
 import com.example.tbd_lab1.DTO.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab1.DTO.RepartidorTiempoPromedioResponse;
+import com.example.tbd_lab1.entities.RepartidorEntity;
 import com.example.tbd_lab1.services.RepartidorService;
-import org.hibernate.validator.constraints.CodePointLength;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,12 @@ public class RepartidorController {
         this.repartidorService = repartidorService;
     }
 
+    @GetMapping("/")
+    public ResponseEntity<?> getAllRepartidores() {
+        List<RepartidorEntity> repartidores = repartidorService.findAll();
+        return ResponseEntity.ok(repartidores);
+    }
+
     @GetMapping("/tpromedio")
     public ResponseEntity<?> getByAvgTime() {
         List<RepartidorTiempoPromedioResponse> reps = repartidorService.getByAverageDeliveryTime();
@@ -29,7 +35,7 @@ public class RepartidorController {
 
     @GetMapping("/info")
     public ResponseEntity<?> getByInfoRepartidor() {
-        List<RepartidorInfoResponse> repartidores = repartidorService.findAll();
+        List<RepartidorInfoResponse> repartidores = repartidorService.findAllRepartidorInfo();
         return ResponseEntity.ok(repartidores);
     }
 

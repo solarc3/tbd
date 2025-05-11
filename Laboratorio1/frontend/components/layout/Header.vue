@@ -12,9 +12,7 @@
 				<Button variant="link" @click="router.push('/productos')"
 					>Productos</Button
 				>
-				<Button variant="link" @click="router.push('/pedidos')"
-					>Pedidos</Button
-				>
+
 				<Button variant="link" @click="router.push('/reportes')"
 					>Reportes</Button
 				>

@@ -82,7 +82,7 @@ const error = ref('')
 onMounted(async () => {
   try {
     loading.value = true
-    repartidores.value = await repartidorService.getAllRepartidores()
+    repartidores.value = await repartidorService.getAllRepartidoresInfo()
     
     // Sort by number of packages delivered (descending)
     repartidores.value.sort((a, b) => b.cantPaquetesEntregados - a.cantPaquetesEntregados)

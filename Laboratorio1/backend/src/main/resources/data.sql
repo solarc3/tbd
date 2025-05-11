@@ -933,6 +933,6 @@ INSERT INTO calificacion (id_calificacion, id_detalle_pedido, cliente_id, puntua
 (11, 19, 8, 5.0); -- Order 20
 
 -- Add notifications for unvalidated prescriptions
-INSERT INTO notificacion (id_notificacion, id_pedido, id_producto, mensaje, fecha_creacion) VALUES
-(1, 11, 9, 'Receta no validada para Clonazepam 2mg', '2025-05-02 12:35:00'),
-(2, 19, 15, 'Receta no validada para Losartán 50mg', '2025-04-24 08:20:00');
+INSERT INTO notificacion (id_pedido, id_producto, mensaje, fecha_creacion) VALUES
+(11, 9, 'Receta no validada para Clonazepam 2mg', '2025-05-02 12:35:00'),
+(19, 15, 'Receta no validada para Losartán 50mg', '2025-04-24 08:20:00');

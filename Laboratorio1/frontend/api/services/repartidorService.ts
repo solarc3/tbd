@@ -13,16 +13,26 @@ interface RepartidorInfo {
   cantPaquetesEntregados: number
 }
 
+export interface Repartidor {
+  idRepartidor: number
+  nombreRepartidor: string
+}
+
 class RepartidorService {
   async getTopRepartidores(): Promise<RepartidorRendimiento[]> {
     const { data } = await apiClient.get<RepartidorRendimiento[]>('/repartidor/rendimiento')
     return data
   }
   
-  async getAllRepartidores(): Promise<RepartidorInfo[]> {
-  const { data } = await apiClient.get<RepartidorInfo[]>('/repartidor/info')
-  return data
-}
+  async getAllRepartidoresInfo(): Promise<RepartidorInfo[]> {
+    const { data } = await apiClient.get<RepartidorInfo[]>('/repartidor/info')
+    return data
+  }
+
+  async getAllRepartidores(): Promise<Repartidor[]> {
+    const { data } = await apiClient.get<Repartidor[]>('/repartidor/')
+    return data
+  }
 }
 
 
