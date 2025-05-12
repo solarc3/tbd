@@ -1141,18 +1141,18 @@ VALUES
     (20, 7, 1, NULL),
     (20, 11, 1, NULL);
 
-INSERT INTO calificacion (id_calificacion, id_detalle_pedido, cliente_id, puntuacion) VALUES
-(1, 3, 2, 4.5),  -- Order 4
-(2, 5, 1, 5.0),  -- Order 6
-(3, 7, 6, 3.5),  -- Order 8
-(4, 8, 3, 4.0),  -- Order 9
-(5, 10, 8, 4.5), -- Order 11
-(6, 11, 10, 3.0), -- Order 12
-(7, 13, 4, 5.0),  -- Order 14
-(8, 14, 7, 4.0),  -- Order 15
-(9, 16, 5, 3.5),  -- Order 17
-(10, 17, 9, 4.5), -- Order 18
-(11, 19, 8, 5.0); -- Order 20
+INSERT INTO calificacion (id_detalle_pedido, cliente_id, puntuacion) VALUES
+(3, 2, 4.5),  -- Order 4
+(5, 1, 5.0),  -- Order 6
+(7, 6, 3.5),  -- Order 8
+(8, 3, 4.0),  -- Order 9
+(10, 8, 4.5), -- Order 11
+(11, 10, 3.0), -- Order 12
+(12, 4, 5.0),  -- Order 14
+( 14, 7, 4.0),  -- Order 15
+( 16, 5, 3.5),  -- Order 17
+( 17, 9, 4.5), -- Order 18
+( 19, 8, 5.0); -- Order 20
 
 -- Add notifications for unvalidated prescriptions
 INSERT INTO notificacion (id_pedido, id_producto, mensaje, fecha_creacion) VALUES

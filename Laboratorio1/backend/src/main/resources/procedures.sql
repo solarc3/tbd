@@ -112,16 +112,33 @@ EXECUTE FUNCTION verificar_receta();
 -- [12] - Insertar califiacion automatica si no se recibe en 48 hrs
 CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()
     RETURNS TRIGGER AS $func$
+DECLARE
+    v_cliente_id BIGINT;
+    v_detalle_id BIGINT;
 BEGIN
     IF NEW.estado_pedido = 'ENTREGADO' AND OLD.estado_pedido <> 'ENTREGADO' THEN
         IF (CURRENT_TIMESTAMP - NEW.fecha_pedido) >= INTERVAL '48 hours' THEN
-            UPDATE calificacion
-            SET puntuacion = 5
-            WHERE id_detalle_pedido IN (
-                SELECT id_detalle_pedido
-                FROM detalle_pedido
-                WHERE id_pedido = NEW.id_pedido
-            );
+            -- extraer el id del cliente del pedido
+            SELECT id_cliente INTO v_cliente_id
+            FROM pedido
+            WHERE id_pedido = NEW.id_pedido;
+
+            -- obtener el id del detalle del pedido
+            SELECT id_detalle_pedido INTO v_detalle_id
+            FROM detalle_pedido
+            WHERE id_pedido = NEW.id_pedido;
+
+            -- si es que no existe una calificacion
+            IF NOT EXISTS (SELECT 1 FROM calificacion WHERE id_detalle_pedido = v_detalle_id) THEN
+                -- se inserta una nueva calificacion con los valores predeterminados
+                INSERT INTO calificacion (id_detalle_pedido, cliente_id, puntuacion)
+                VALUES (v_detalle_id, v_cliente_id, 1);
+            ELSE
+                -- si no, se actualiza
+                UPDATE calificacion
+                SET puntuacion = 1
+                WHERE id_detalle_pedido = v_detalle_id;
+            END IF;
         END IF;
     END IF;
     RETURN NEW;
