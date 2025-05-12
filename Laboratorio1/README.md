@@ -7,12 +7,12 @@
 - **Node**: Node Package Manager (npm)
 
 ## Pasos a seguir para ejecutar
-> [!INFO]
 > Se ejecutan 3 componentes en simultaneo
 
 
 ### Base de Datos
-- En una terminal dentro del directorio `Laboratorio1/backend`, levantar el correspondiente `docker-compose.yaml` con el comando `docker compose up -d`
+- En una terminal dentro del directorio `Laboratorio1/backend`, levantar el correspondiente `docker-compose.yaml` con el comando
+```docker compose up -d```
 - El contenedor de PostrgeSQL quedaría levantado y listo para uso.
 
 #### Posibles errores:
@@ -26,7 +26,9 @@
 
 ### Frontend
 - Desde una terminal, acceder al directorio `Laboratorio1/frontend`.
-- En este, ingresar el comando para instalar los paquetes y dependencias: `npm install`
-- Finalmente, abrir el proyecto en modo developer con el comando: `npm run dev`.
+- En este, ingresar el comando para instalar los paquetes y dependencias:
+```npm install```
+- Finalmente, abrir el proyecto en modo developer con el comando:
+```npm run dev```
 
 #### SI se siguieron correctamente los pasos en el órden establecido, la aplicación será accesible desde cualquier navegador con el URL `http://localhost:3000`
