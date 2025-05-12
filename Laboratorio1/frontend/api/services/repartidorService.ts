@@ -13,10 +13,18 @@ interface RepartidorInfo {
   cantPaquetesEntregados: number
 }
 
+interface RepartidorTiempoPromedioResponse {
+  idRepartidor: number
+  nombreRepartidor: string
+  promedioHoras: number
+}
+
 export interface Repartidor {
   idRepartidor: number
   nombreRepartidor: string
 }
+
+
 
 class RepartidorService {
   async getTopRepartidores(): Promise<RepartidorRendimiento[]> {
@@ -31,6 +39,11 @@ class RepartidorService {
 
   async getAllRepartidores(): Promise<Repartidor[]> {
     const { data } = await apiClient.get<Repartidor[]>('/repartidor/')
+    return data
+  }
+
+  async getRepartidorTiempoPromedio(): Promise<RepartidorTiempoPromedioResponse[]>{
+    const { data } = await apiClient.get<RepartidorTiempoPromedioResponse[]>('/repartidor/tpromedio')
     return data
   }
 }

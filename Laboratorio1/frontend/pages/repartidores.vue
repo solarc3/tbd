@@ -41,6 +41,11 @@
               </div>
 
               <div>
+                <p class="text-sm font-medium text-gray-500">Tiempo promedio</p>
+                <p class="text-lg font-semibold">{{ formatPromedioHoras(repartidor.promedioHoras) }}</p>
+              </div>
+
+              <div>
                 <p class="text-sm font-medium text-gray-500">Eficiencia</p>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                   <div
@@ -72,16 +77,48 @@ import { Badge } from '@/components/ui/badge'
 interface RepartidorInfo {
   nombre: string
   cantPaquetesEntregados: number
+  promedioHoras: number
 }
 
 const repartidores = ref<RepartidorInfo[]>([])
 const loading = ref(true)
 const error = ref('')
 
+const formatPromedioHoras = (horas: number): string => {
+  if (horas === 0) return 'N/A';
+  
+  // Convert to hours and minutes
+  const hours = Math.floor(horas);
+  const minutes = Math.round((horas - hours) * 60);
+  
+  if (hours === 0) {
+    return `${minutes} min`;
+  } else if (minutes === 0) {
+    return `${hours} h`;
+  } else {
+    return `${hours} h ${minutes} min`;
+  }
+}
+
 onMounted(async () => {
   try {
     loading.value = true
-    repartidores.value = await repartidorService.getAllRepartidoresInfo()
+    
+    // Get both data sets
+    const infoRepartidores = await repartidorService.getAllRepartidoresInfo()
+    const tiemposRepartidores = await repartidorService.getRepartidorTiempoPromedio()
+    
+    // Create a map of nombreRepartidor -> promedioHoras for easier merging
+    const tiemposMap = new Map(
+      tiemposRepartidores.map(item => [item.nombreRepartidor, item.promedioHoras])
+    )
+    
+    // Merge the data
+    repartidores.value = infoRepartidores.map(repartidor => ({
+      nombre: repartidor.nombre,
+      cantPaquetesEntregados: repartidor.cantPaquetesEntregados,
+      promedioHoras: tiemposMap.get(repartidor.nombre) || 0
+    }))
 
     // Sort by number of packages delivered (descending)
     repartidores.value.sort((a, b) => b.cantPaquetesEntregados - a.cantPaquetesEntregados)
@@ -91,5 +128,7 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+
+  
 })
 </script>

@@ -31,27 +31,54 @@
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Farmacia con mayor producto de volúmenes entregados</h2>
         <v-chart :option="farmaciaMayorVolumenOptions" style="height: 400px;" />
       </div>
+      <!-- Replace the existing Top products by category div with this: -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Productos más pedidos por categoría</h2>
+        <div v-if="loadingTopProducts" class="flex justify-center items-center h-[400px]">
+          <p>Cargando datos...</p>
+        </div>
+        <div v-else class="overflow-y-auto" style="max-height: 400px;">
+          <div v-if="categorizedProducts.length === 0" class="text-center text-gray-500 py-10">
+            No hay datos disponibles
+          </div>
+          <div v-else>
+            <div v-for="(category, index) in categorizedProducts" :key="index" class="mb-6">
+              <h3 class="text-md font-medium text-blue-600 border-b pb-2 mb-3">{{ category.name }}</h3>
+              <div class="space-y-2">
+                <div v-for="product in category.products" :key="product.nombreProducto" 
+                    class="flex justify-between items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <span class="text-gray-800">{{ product.nombreProducto }}</span>
+                  <span class="bg-blue-100 text-blue-800 font-medium px-2.5 py-0.5 rounded-full">
+                    {{ product.cantidadPedidos }} pedidos
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { computed, ref, onMounted, reactive } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components'
+import { BarChart, PieChart } from 'echarts/charts'
+import { LegendComponent, GridComponent, TooltipComponent, TitleComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 
 // importar apis
-import { farmaciaService, repartidorService, pedidoService } from '@/api/services'
+import { farmaciaService, repartidorService, pedidoService, productoService } from '@/api/services'
 
-use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, TitleComponent])
+use([CanvasRenderer, BarChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
 
 // estados para aplicar "reactive"
 const loadingFarmacias = ref(true)
 const loadingRepartidores = ref(true)
 const loadingPedidos = ref(true)
+const topProductsData = ref<any[]>([])
 
 // script updateado para "farmacias con mas entregas fallidas"
 const farmaciasFallidasOptions = reactive({
@@ -203,6 +230,74 @@ const farmaciaMayorVolumenOptions = reactive({
   ],
 });
 
+// Add loading state for top products
+const loadingTopProducts = ref(true)
+
+// Configuration for top products by category chart
+const topProductsByCategoryOptions = reactive({
+  title: {
+    text: 'Productos más pedidos por categoría',
+    left: 'center',
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b}: {c} pedidos'
+  },
+  legend: {
+    type: 'scroll',
+    orient: 'vertical',
+    right: 10,
+    top: 50,
+    bottom: 20,
+  },
+  series: [
+    {
+      name: 'Categoría',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 10,
+        borderColor: '#fff',
+        borderWidth: 2
+      },
+      label: {
+        show: false,
+        position: 'center'
+      },
+      emphasis: {
+        label: {
+          show: true,
+          fontSize: 14,
+          fontWeight: 'bold'
+        }
+      },
+      labelLine: {
+        show: false
+      },
+      data: [] as { value: number; name: string; categoryName: string }[]
+    }
+  ]
+})
+
+const categorizedProducts = computed(() => {
+    // Group by category
+    const groupedByCategory = topProductsData.value.reduce((acc, product) => {
+      const category = product.categoria
+      if (!acc[category]) {
+        acc[category] = []
+      }
+      acc[category].push(product)
+      return acc
+    }, {})
+    
+    // Convert to array format for v-for
+    return Object.keys(groupedByCategory).map(category => ({
+      name: category,
+      products: groupedByCategory[category]
+    }))
+  })
+
 onMounted(async () => {
   try {
     // consumir api de farmacias y obtener las farmacias con pedidos fallidos
@@ -334,6 +429,28 @@ try {
     mediosPagoUrgentesOptions.xAxis.data = ['Error al cargar datos']
     mediosPagoUrgentesOptions.series[0].data = [0]
     loadingPedidos.value = false
+  }
+
+  try {
+    console.log('Fetching top products by category...')
+    loadingTopProducts.value = true
+    
+    const topProducts = await productoService.getTopProductsByCategory()
+    console.log('Top products data:', topProducts)
+    
+    if (topProducts && Array.isArray(topProducts) && topProducts.length > 0) {
+      // Store the raw data instead of formatting for pie chart
+      topProductsData.value = topProducts
+    } else {
+      console.warn('No top products data found or invalid format', topProducts)
+      topProductsData.value = []
+    }
+    
+    loadingTopProducts.value = false
+  } catch (error) {
+    console.error('Error fetching top products by category:', error)
+    topProductsData.value = []
+    loadingTopProducts.value = false
   }
 })
 

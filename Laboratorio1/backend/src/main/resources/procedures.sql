@@ -115,20 +115,20 @@ CREATE OR REPLACE FUNCTION update_calificacion_after_delivery()
 BEGIN
     IF NEW.estado_pedido = 'ENTREGADO' AND OLD.estado_pedido <> 'ENTREGADO' THEN
         IF (CURRENT_TIMESTAMP - NEW.fecha_pedido) >= INTERVAL '48 hours' THEN
-UPDATE calificacion
-SET puntuacion = 5
-WHERE id_detalle_pedido IN (
-    SELECT id_detalle_pedido
-    FROM detalle_pedido
-    WHERE id_pedido = NEW.id_pedido
-);
-END IF;
-END IF;
-RETURN NEW;
+            UPDATE calificacion
+            SET puntuacion = 5
+            WHERE id_detalle_pedido IN (
+                SELECT id_detalle_pedido
+                FROM detalle_pedido
+                WHERE id_pedido = NEW.id_pedido
+            );
+        END IF;
+    END IF;
+    RETURN NEW;
 END;
 $func$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trig_update_calificacion
     AFTER UPDATE ON pedido
     FOR EACH ROW
-    EXECUTE FUNCTION update_calificacion_after_delivery();
+EXECUTE FUNCTION update_calificacion_after_delivery();
