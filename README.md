@@ -10,4 +10,6 @@ Repositorio para trabajos del laboratorio de bases de datos avanzadas
 
 # Enlaces
 
-## [Control 1](https://github.com/solarc3/tbd/tree/main/Control1)
+## [Control 1] (https://github.com/solarc3/tbd/tree/main/Control1)
+
+## [Laboratorio 1] (https://github.com/solarc3/tbd/tree/main/Laboratorio1)
