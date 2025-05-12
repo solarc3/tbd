@@ -7,7 +7,7 @@
 - **Node**: Node Package Manager (npm)
 
 ## Pasos a seguir para ejecutar
->[!INFO]
+> [!INFO]
 > Se ejecutan 3 componentes en simultaneo
 
 
