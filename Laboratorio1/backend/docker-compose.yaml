@@ -1,15 +1,20 @@
 services:
-  postgres_db:
-    image: postgres:latest
+  postgis:
+    image: postgis/postgis:15-3.3
+    container_name: postgis-container
     env_file:
       - .env
     restart: unless-stopped
-    #se usa bridge asi que es necesario!!
     ports:
       - "5432:5432"
-    # se puede definir un volumen pero como es solo prueba, no es necesario
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
     networks:
-        - postgres_network
+      - postgres_network
+
+volumes:
+  postgis_data:
+
 networks:
   postgres_network:
     driver: bridge
