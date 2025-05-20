@@ -1,12 +1,7 @@
 package com.example.tbd_lab1.repositories;
 
-import com.example.tbd_lab1.DTO.ClienteGastoResponse;
-import com.example.tbd_lab1.DTO.TopClienteResponse;
 import com.example.tbd_lab1.entities.UserEntity;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -109,40 +104,6 @@ public class UserRepository {
 		return count != null && count > 0;
 	}
 
-	// Inicio querys
-	// Buscar cliente que haya gastado mas
-	public TopClienteResponse findClienteWithMostSpending() {
-		try {
-			String sql =
-					"SELECT u.id, u.username, SUM(p.monto) as total_gastado " +
-							"FROM users u " +
-							"JOIN pedido p ON u.id = p.id_cliente " +
-							"WHERE p.estado_pedido::text = 'ENTREGADO' " +
-							"GROUP BY u.id, u.username " +
-							"ORDER BY total_gastado DESC " +
-							"LIMIT 1";
-
-			Map<String, Object> result = jdbcTemplate.queryForMap(sql);
-			if (result != null) {
-				return TopClienteResponse.builder()
-						.id(((Number) result.get("id")).longValue())
-						.username((String) result.get("username"))
-						.totalGastado(
-								((Number) result.get("total_gastado")).intValue()
-						)
-						.build();
-			}
-			return null;
-		} catch (EmptyResultDataAccessException e) {
-			System.out.println("No results found");
-			return null;
-		} catch (Exception e) {
-			System.err.println("Error con query: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public UserEntity save(UserEntity userEntity) {
 		if (userEntity.getId() == null) {
 			String sql =
@@ -220,29 +181,5 @@ public class UserRepository {
 		Object[] args = new Object[] { id };
 		return jdbcTemplate.update(sql, args) == 1;
 	}
-	public List<ClienteGastoResponse> findAllClientsWithSpending() {
-		try {
-			String sql =
-					"SELECT u.id, u.username, u.email, COALESCE(SUM(p.monto), 0) as total_gastado " +
-							"FROM users u " +
-							"LEFT JOIN pedido p ON u.id = p.id_cliente " +
-							"GROUP BY u.id, u.username, u.email " +
-							"ORDER BY u.username";
 
-			return jdbcTemplate.query(sql, (rs, rowNum) -> {
-				ClienteGastoResponse cliente = new ClienteGastoResponse();
-				cliente.setId(rs.getLong("id"));
-				cliente.setUsername(rs.getString("username"));
-				cliente.setEmail(rs.getString("email"));
-				cliente.setTotalGastado(rs.getInt("total_gastado"));
-				return cliente;
-			});
-		} catch (Exception e) {
-			System.err.println(
-					"Error retrieving clients with spending: " + e.getMessage()
-			);
-			e.printStackTrace();
-			return new ArrayList<>();
-		}
-	}
 }

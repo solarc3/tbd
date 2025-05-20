@@ -1,8 +1,6 @@
 package com.example.tbd_lab1.controller;
 
-import com.example.tbd_lab1.DTO.ClienteGastoResponse;
 import com.example.tbd_lab1.DTO.MessageResponse;
-import com.example.tbd_lab1.DTO.TopClienteResponse;
 import com.example.tbd_lab1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +19,6 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@GetMapping("/topuser")
-	public ResponseEntity<?> getTopClientBySpending() {
-		TopClienteResponse topClienteResponse =
-			userService.getClienteWithMostSpending();
-		if (topClienteResponse == null) {
-			return ResponseEntity.ok()
-				.body(new MessageResponse("No hay clientes."));
-		}
-		return ResponseEntity.ok(topClienteResponse);
-	}
 
 	@DeleteMapping("/{id}/eliminar")
 	public ResponseEntity<?> eliminarCliente(@PathVariable Long id) {
@@ -41,18 +29,4 @@ public class UserController {
 			return ResponseEntity.ok()
 				.body(new MessageResponse("No se pudo borrar el usuario"));
 		}
-	}
-
-	@GetMapping("/clientes-gasto")
-	public ResponseEntity<?> getAllClientsWithSpending() {
-		List<ClienteGastoResponse> clientes =
-			userService.getAllClientsWithSpending();
-
-		if (clientes.isEmpty()) {
-			return ResponseEntity.ok()
-				.body(new MessageResponse("No hay clientes registrados."));
-		}
-
-		return ResponseEntity.ok(clientes);
-	}
-}
+	}}
