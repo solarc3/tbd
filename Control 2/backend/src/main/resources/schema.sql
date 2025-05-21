@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS tareas CASCADE;
-
+DROP TABLE IF EXISTS sector CASCADE;
 
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
@@ -12,7 +12,13 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     refresh_token VARCHAR(500),
     refresh_token_expiration BIGINT,
-    location GEOMETRY(Point)
+    location GEOMETRY(Point, 4326)
+);
+
+CREATE TABLE sector (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    area GEOGRAPHY(POLYGON, 4326)
 );
 
 CREATE TABLE tareas (
@@ -21,7 +27,7 @@ CREATE TABLE tareas (
     descripcion TEXT,
     fecha_vencimiento TIMESTAMP,
     id_usuario BIGINT REFERENCES users(id),
-    sector GEOMETRY(Point),
+    id_sector BIGINT REFERENCES sector(id),
     estado VARCHAR(50) DEFAULT 'PENDIENTE'
 );
 

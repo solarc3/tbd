@@ -23,11 +23,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(
-        origins = "http://localhost:3000",
-        allowCredentials = "true",
-        maxAge = 3600
-)
+//@CrossOrigin(
+//        origins = "http://localhost:3000",
+//        allowCredentials = "true",
+//        maxAge = 3600
+//)
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

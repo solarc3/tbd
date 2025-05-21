@@ -40,28 +40,29 @@ public class TareaRepository {
                 rs.getTimestamp("fecha_vencimiento").toLocalDateTime() : null);
         tarea.setIdUsuario(rs.getLong("id_usuario"));
         tarea.setEstado(rs.getString("estado"));
+        tarea.setIdSector(rs.getLong("id_sector"));
 
         // Handle Point data from PGgeometry
-        try {
-            Object pgObj = rs.getObject("sector");
-            if (pgObj != null) {
-                // Convert PostGIS geometry to WKT and then to JTS Point
-                String wktText = pgObj.toString();
-                if (wktText.startsWith("SRID=")) {
-                    wktText = wktText.substring(wktText.indexOf(';') + 1);
-                }
-                tarea.setSector((Point) wktReader.read(wktText));
-            }
-        } catch (SQLException | ParseException e) {
-            // Log error but continue
-            System.err.println("Error parsing Point data: " + e.getMessage());
-        }
+//        try {
+//            Object pgObj = rs.getObject("sector");
+//            if (pgObj != null) {
+//                // Convert PostGIS geometry to WKT and then to JTS Point
+//                String wktText = pgObj.toString();
+//                if (wktText.startsWith("SRID=")) {
+//                    wktText = wktText.substring(wktText.indexOf(';') + 1);
+//                }
+//                tarea.setSector((Point) wktReader.read(wktText));
+//            }
+//        } catch (SQLException | ParseException e) {
+//            // Log error but continue
+//            System.err.println("Error parsing Point data: " + e.getMessage());
+//        }
 
         return tarea;
     };
 
     public Optional<TareaEntity> findById(Long id) {
-        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, sector FROM tareas WHERE id = ?";
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas WHERE id = ?";
         try {
             List<TareaEntity> results = jdbcTemplate.query(sql, tareaRowMapper, id);
             return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
@@ -71,23 +72,23 @@ public class TareaRepository {
     }
 
     public List<TareaEntity> findAll() {
-        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, sector FROM tareas";
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas";
         return jdbcTemplate.query(sql, tareaRowMapper);
     }
 
     public List<TareaEntity> findByUsuario(Long idUsuario) {
-        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, sector FROM tareas WHERE id_usuario = ?";
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas WHERE id_usuario = ?";
         return jdbcTemplate.query(sql, tareaRowMapper, idUsuario);
     }
 
     public List<TareaEntity> findByEstado(String estado) {
-        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, sector FROM tareas WHERE estado = ?";
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas WHERE estado = ?";
         return jdbcTemplate.query(sql, tareaRowMapper, estado);
     }
 
     public TareaEntity save(TareaEntity tareaEntity) {
         if (tareaEntity.getId() == null) {
-            String sql = "INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, id_usuario, estado, sector) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado) VALUES (?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(
@@ -111,15 +112,13 @@ public class TareaRepository {
                             ps.setNull(4, java.sql.Types.BIGINT);
                         }
 
-                        ps.setString(5, tareaEntity.getEstado());
+                        ps.setString(6, tareaEntity.getEstado());
 
                         // Handle Point data for sector
-                        if (tareaEntity.getSector() != null) {
-                            String wktPoint = "SRID=4326;" + tareaEntity.getSector().toText();
-                            // Use PostgreSQL's ST_GeomFromText function to convert WKT to geometry
-                            ps.setObject(6, connection.createArrayOf("geometry", new Object[]{wktPoint}));
+                        if (tareaEntity.getIdSector() != null) {
+                            ps.setLong(5, tareaEntity.getIdSector());
                         } else {
-                            ps.setNull(6, java.sql.Types.OTHER);
+                            ps.setNull(5, java.sql.Types.OTHER);
                         }
 
                         return ps;
@@ -134,7 +133,7 @@ public class TareaRepository {
                 System.err.println("No se pudo obtener el ID generado para la tarea: " + tareaEntity.getTitulo());
             }
         } else {
-            String sql = "UPDATE tareas SET titulo = ?, descripcion = ?, fecha_vencimiento = ?, id_usuario = ?, estado = ?, sector = ? WHERE id = ?";
+            String sql = "UPDATE tareas SET titulo = ?, descripcion = ?, fecha_vencimiento = ?, id_usuario = ?, id_sector = ?, estado = ? WHERE id = ?";
             jdbcTemplate.update(
                     connection -> {
                         PreparedStatement ps = connection.prepareStatement(sql);
@@ -153,14 +152,13 @@ public class TareaRepository {
                             ps.setNull(4, java.sql.Types.BIGINT);
                         }
 
-                        ps.setString(5, tareaEntity.getEstado());
+                        ps.setString(6, tareaEntity.getEstado());
 
                         // Handle Point data for sector
-                        if (tareaEntity.getSector() != null) {
-                            String wktPoint = "SRID=4326;" + tareaEntity.getSector().toText();
-                            ps.setObject(6, wktPoint);
+                        if (tareaEntity.getIdSector() != null) {
+                            ps.setLong(5, tareaEntity.getIdSector());
                         } else {
-                            ps.setNull(6, java.sql.Types.OTHER);
+                            ps.setNull(5, java.sql.Types.OTHER);
                         }
 
                         ps.setLong(7, tareaEntity.getId());

@@ -13,7 +13,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tarea")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
+@CrossOrigin("*")
+//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
 public class TareaController {
 
     private final TareaService tareaService;
@@ -23,7 +24,7 @@ public class TareaController {
         this.tareaService = tareaService;
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<TareaEntity>> getAllTareas() {
         List<TareaEntity> tareas = tareaService.getAllTareas();
         return ResponseEntity.ok(tareas);
@@ -52,7 +53,7 @@ public class TareaController {
         return ResponseEntity.ok(tareas);
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<?> createTarea(@RequestBody TareaEntity tareaEntity) {
         try {
             TareaEntity createdTarea = tareaService.createTarea(tareaEntity);

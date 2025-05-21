@@ -123,6 +123,7 @@ public class UserRepository {
 						ps.setString(5, userEntity.getPassword());
 						ps.setString(6, userEntity.getEmail());
 						ps.setString(7, userEntity.getRefreshToken());
+						ps.setObject(8, userEntity.getLocation());
 						if (userEntity.getRefreshTokenExpiration() != null) {
 							ps.setLong(8, userEntity.getRefreshTokenExpiration());
 						} else {

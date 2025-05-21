@@ -13,24 +13,13 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "tareas")
+
 public class TareaEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
     private Long id;
     private String titulo;
     private String descripcion;
-
-    @Column(name = "fecha_vencimiento")
     private LocalDateTime fechaVencimiento;
-
-    @Column(name = "id_usuario")
     private Long idUsuario;
     private String estado;
-
-    // We'll handle this field manually through JDBC
-    @Transient
-    private Point sector;
+    private Long idSector;
 }
