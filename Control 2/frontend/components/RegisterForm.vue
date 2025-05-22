@@ -21,12 +21,14 @@ const isLoading = ref(false);
 
 // Datos del formulario
 const form = ref({
-	firstName: "",
-	lastName: "",
-	rut: "",
-	email: "",
-	password: "",
-	confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    rut: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    latitude: null as number | null, 
+    longitude: null as number | null, 
 });
 
 const rutError = ref("");
@@ -164,6 +166,9 @@ const handleRegister = async () => {
 		return;
 	}
 
+	console.log("Latitude before sending:", form.value.latitude, typeof form.value.latitude);
+    console.log("Longitude before sending:", form.value.longitude, typeof form.value.longitude);
+
 	try {
 		isLoading.value = true;
 		// Create username from first name + last name initial
@@ -181,6 +186,8 @@ const handleRegister = async () => {
 			cleanRut,
 			form.value.email,
 			form.value.password,
+			form.value.latitude, 
+            form.value.longitude, 
 		);
 
 		success.value = "Cuenta creada exitosamente!";
@@ -272,6 +279,33 @@ const handleRegister = async () => {
 						required
 					/>
 				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="latitude" class="text-sm font-medium"
+                            >Latitud</label
+                        >
+                        <Input
+                            id="latitude"
+                            v-model.number="form.latitude"
+                            type="number"
+                            step="any"
+                            placeholder="-33.456"
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="longitude" class="text-sm font-medium"
+                            >Longitud</label
+                        >
+                        <Input
+                            id="longitude"
+                            v-model.number="form.longitude"
+                            type="number"
+                            step="any"
+                            placeholder="-70.678"
+                        />
+                    </div>
+                </div>
 
 				<div class="space-y-2">
 					<label for="password" class="text-sm font-medium"

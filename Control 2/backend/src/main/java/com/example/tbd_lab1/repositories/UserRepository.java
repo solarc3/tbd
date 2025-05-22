@@ -10,6 +10,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.locationtech.jts.geom.Point;
+
+import java.sql.Types;
 
 @Repository
 public class UserRepository {
@@ -106,8 +109,9 @@ public class UserRepository {
 
 	public UserEntity save(UserEntity userEntity) {
 		if (userEntity.getId() == null) {
+			// Use ST_GeomFromText for location
 			String sql =
-					"INSERT INTO users (username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+					"INSERT INTO users (username, first_name, last_name, rut, password, email, location, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 4326), ?, ?)";
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(
@@ -122,12 +126,19 @@ public class UserRepository {
 						ps.setString(4, userEntity.getRut());
 						ps.setString(5, userEntity.getPassword());
 						ps.setString(6, userEntity.getEmail());
-						ps.setString(7, userEntity.getRefreshToken());
-						ps.setObject(8, userEntity.getLocation());
-						if (userEntity.getRefreshTokenExpiration() != null) {
-							ps.setLong(8, userEntity.getRefreshTokenExpiration());
+
+						Point location = userEntity.getLocation();
+						if (location != null) {
+							ps.setString(7, location.toText()); // Pass WKT string
 						} else {
-							ps.setNull(8, java.sql.Types.BIGINT);
+							ps.setNull(7, Types.VARCHAR); // ST_GeomFromText(NULL, 4326) will be NULL
+						}
+
+						ps.setString(8, userEntity.getRefreshToken());
+						if (userEntity.getRefreshTokenExpiration() != null) {
+							ps.setLong(9, userEntity.getRefreshTokenExpiration());
+						} else {
+							ps.setNull(9, java.sql.Types.BIGINT);
 						}
 						return ps;
 					},
@@ -137,27 +148,41 @@ public class UserRepository {
 			if (generatedId != null) {
 				userEntity.setId(generatedId.longValue());
 			} else {
+				// Consider logging or throwing an exception if ID generation fails
 				System.err.println(
-						"no hay id luego intentando recuperar al usuario " +
+						"Failed to retrieve generated ID for user: " +
 								userEntity.getUsername()
 				);
-				// throw new org.springframework.dao.DataRetrievalFailureException("Failed to retrieve ID for user: " + user.getUsername());
 			}
 		} else {
+			// Use ST_GeomFromText for location in UPDATE
 			String sql =
-					"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ? WHERE id = ?";
-			jdbcTemplate.update(
-					sql,
-					userEntity.getUsername(),
-					userEntity.getFirstName(),
-					userEntity.getLastName(),
-					userEntity.getRut(),
-					userEntity.getPassword(),
-					userEntity.getEmail(),
-					userEntity.getRefreshToken(),
-					userEntity.getRefreshTokenExpiration(),
-					userEntity.getId()
-			);
+					"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ?, location = ST_GeomFromText(?, 4326) WHERE id = ?";
+
+			jdbcTemplate.update(connection -> {
+				PreparedStatement ps = connection.prepareStatement(sql);
+				ps.setString(1, userEntity.getUsername());
+				ps.setString(2, userEntity.getFirstName());
+				ps.setString(3, userEntity.getLastName());
+				ps.setString(4, userEntity.getRut());
+				ps.setString(5, userEntity.getPassword());
+				ps.setString(6, userEntity.getEmail());
+				ps.setString(7, userEntity.getRefreshToken());
+				if (userEntity.getRefreshTokenExpiration() != null) {
+					ps.setLong(8, userEntity.getRefreshTokenExpiration());
+				} else {
+					ps.setNull(8, Types.BIGINT);
+				}
+
+				Point location = userEntity.getLocation();
+				if (location != null) {
+					ps.setString(9, location.toText()); // Pass WKT string
+				} else {
+					ps.setNull(9, Types.VARCHAR); // ST_GeomFromText(NULL, 4326) will be NULL
+				}
+				ps.setLong(10, userEntity.getId());
+				return ps;
+			});
 		}
 		return userEntity;
 	}
