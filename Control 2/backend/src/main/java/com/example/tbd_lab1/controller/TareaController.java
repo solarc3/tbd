@@ -13,8 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tarea")
-@CrossOrigin("*")
-//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
 public class TareaController {
 
     private final TareaService tareaService;

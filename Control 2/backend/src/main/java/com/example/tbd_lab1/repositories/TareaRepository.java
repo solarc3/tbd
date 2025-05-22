@@ -86,6 +86,11 @@ public class TareaRepository {
         return jdbcTemplate.query(sql, tareaRowMapper, estado);
     }
 
+    public List<TareaEntity> findByIdSector(Long idSector) {
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas WHERE id_sector = ?";
+        return jdbcTemplate.query(sql, tareaRowMapper, idSector);
+    }
+
     public TareaEntity save(TareaEntity tareaEntity) {
         if (tareaEntity.getId() == null) {
             String sql = "INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado) VALUES (?, ?, ?, ?, ?, ?)";

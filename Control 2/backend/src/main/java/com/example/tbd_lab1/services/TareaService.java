@@ -34,6 +34,10 @@ public class TareaService {
         return tareaRepository.findByEstado(estado);
     }
 
+    public List<TareaEntity> getTareasByIdSector(Long idSector) {
+        return tareaRepository.findByIdSector(idSector);
+    }
+
     public TareaEntity createTarea(TareaEntity tareaEntity) {
         return tareaRepository.save(tareaEntity);
     }

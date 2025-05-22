@@ -1,0 +1,77 @@
+package com.example.tbd_lab1.controller;
+
+import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.entities.SectorEntity;
+import com.example.tbd_lab1.services.SectorService;
+import com.example.tbd_lab1.services.TareaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/sector")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
+public class SectorController {
+    private final SectorService sectorService;
+    private final TareaService tareaService;
+
+    @Autowired
+    public SectorController(SectorService sectorService, TareaService tareaService) {
+        this.sectorService = sectorService;
+        this.tareaService = tareaService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<?> getAllSectors() {
+        List<SectorEntity> sectors = sectorService.getAllSectors();
+        return ResponseEntity.status(HttpStatus.OK).body(sectors);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getSectorById(@PathVariable Long id) {
+        Optional<SectorEntity> sector = sectorService.getSectorById(id);
+        if (sector.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(sector.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Sector no encontrado con ID: " + id));
+        }
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createSector(@RequestBody SectorEntity sectorEntity) {
+        try {
+            SectorEntity createdSector = sectorService.createSector(sectorEntity);
+            return ResponseEntity.status(HttpStatus.OK).body(createdSector);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error al crear sector: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteSector(@PathVariable Long id) {
+        if (!sectorService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Sector no encontrado con ID: " + id));
+        }
+
+        if (!tareaService.getTareasByIdSector(id).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Hay tareas asociadas al sector con ID: " + id));
+        }
+
+        boolean deleted = sectorService.deleteSector(id);
+        if (deleted) {
+            return ResponseEntity.ok(new MessageResponse("Sector eliminado correctamente"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error al eliminar sector"));
+        }
+    }
+
+}

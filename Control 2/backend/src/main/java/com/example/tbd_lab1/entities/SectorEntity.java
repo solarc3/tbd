@@ -1,10 +1,11 @@
 package com.example.tbd_lab1.entities;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.awt.*;
 
 @Data
 @Builder
@@ -13,6 +14,6 @@ import lombok.NoArgsConstructor;
 
 public class SectorEntity {
     private Long id;
-    private String nombreZona;
-    private String area;
+    private String nombreSector;
+    private String area; // Representación GeoJSON
 }
