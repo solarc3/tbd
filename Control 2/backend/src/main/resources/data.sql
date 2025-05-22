@@ -31,4 +31,14 @@ INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, id_usuario, id_secto
 ('Configurar entorno de desarrollo', 'Configurar el nuevo entorno de desarrollo para el equipo', '2025-05-26 10:00:00', 2, 2, 'EN_PROGRESO'),
 ('Reunión de equipo', 'Reunión semanal con el equipo de desarrollo', '2025-05-20 16:00:00', 3, 3, 'COMPLETADA'),
 ('Resolver tickets pendientes', 'Resolver los tickets pendientes en el sistema de seguimiento', '2025-05-28 13:00:00', 4, 4, 'PENDIENTE'),
-('Investigar nueva tecnología', 'Investigar sobre la nueva tecnología para posible implementación', '2025-05-29 09:30:00', 5, 5, 'PENDIENTE');
+('Investigar nueva tecnología', 'Investigar sobre la nueva tecnología para posible implementación', '2025-05-29 09:30:00', 5, 5, 'PENDIENTE'),
+('Llamada de seguimiento Cliente A', 'Confirmar detalles del proyecto con Cliente A', '2025-05-22 10:00:00', 1, 1, 'PENDIENTE'),
+('Finalizar borrador de diseño', 'Completar el borrador del diseño UI para la app móvil', '2025-05-22 18:00:00', 1, 2, 'EN_PROGRESO'),
+('Revisión de QA', 'Revisar los resultados de las pruebas de QA', '2025-05-23 11:00:00', 2, 3, 'PENDIENTE'),
+('Planificar sprint próximo', 'Definir tareas para el siguiente sprint', '2025-05-22 14:00:00', 3, 4, 'PENDIENTE'),
+('Capacitación nuevo software', 'Asistir a la capacitación del nuevo software CRM', '2025-05-24 09:00:00', 6, 5, 'PENDIENTE'),
+('Mantenimiento Servidor BD', 'Realizar mantenimiento programado del servidor de base de datos', '2025-05-22 23:00:00', 7, 1, 'PENDIENTE'),
+('Testear API de pagos', 'Probar la integración de la nueva API de pagos', '2025-05-22 16:45:00', 8, 2, 'EN_PROGRESO'),
+('Documentar endpoint X', 'Crear documentación para el endpoint /api/x', '2025-05-25 10:00:00', 9, 3, 'PENDIENTE'),
+('Feedback reunión pasada', 'Enviar feedback sobre la reunión de estrategia', '2025-05-22 12:30:00', 10, 4, 'COMPLETADA'),
+('Optimizar consulta SQL', 'Optimizar la consulta de usuarios activos', '2025-05-22 17:15:00', 1, 5, 'PENDIENTE');

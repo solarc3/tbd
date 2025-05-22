@@ -109,7 +109,6 @@ public class UserRepository {
 
 	public UserEntity save(UserEntity userEntity) {
 		if (userEntity.getId() == null) {
-			// Use ST_GeomFromText for location
 			String sql =
 					"INSERT INTO users (username, first_name, last_name, rut, password, email, location, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 4326), ?, ?)";
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -129,9 +128,10 @@ public class UserRepository {
 
 						Point location = userEntity.getLocation();
 						if (location != null) {
-							ps.setString(7, location.toText()); // Pass WKT string
+							// Pasasr como string WKT 
+							ps.setString(7, location.toText()); 
 						} else {
-							ps.setNull(7, Types.VARCHAR); // ST_GeomFromText(NULL, 4326) will be NULL
+							ps.setNull(7, Types.VARCHAR); 
 						}
 
 						ps.setString(8, userEntity.getRefreshToken());
@@ -148,14 +148,12 @@ public class UserRepository {
 			if (generatedId != null) {
 				userEntity.setId(generatedId.longValue());
 			} else {
-				// Consider logging or throwing an exception if ID generation fails
 				System.err.println(
-						"Failed to retrieve generated ID for user: " +
+						"No se pudo generar ID para el usuario: " +
 								userEntity.getUsername()
 				);
 			}
 		} else {
-			// Use ST_GeomFromText for location in UPDATE
 			String sql =
 					"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ?, location = ST_GeomFromText(?, 4326) WHERE id = ?";
 
@@ -176,9 +174,9 @@ public class UserRepository {
 
 				Point location = userEntity.getLocation();
 				if (location != null) {
-					ps.setString(9, location.toText()); // Pass WKT string
+					ps.setString(9, location.toText()); 
 				} else {
-					ps.setNull(9, Types.VARCHAR); // ST_GeomFromText(NULL, 4326) will be NULL
+					ps.setNull(9, Types.VARCHAR); 
 				}
 				ps.setLong(10, userEntity.getId());
 				return ps;

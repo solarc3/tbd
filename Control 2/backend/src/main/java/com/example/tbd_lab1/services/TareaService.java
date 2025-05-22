@@ -1,5 +1,6 @@
 package com.example.tbd_lab1.services;
 
+import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
 import com.example.tbd_lab1.entities.TareaEntity;
 import com.example.tbd_lab1.repositories.TareaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class TareaService {
     public List<TareaEntity> getTareasByIdSector(Long idSector) {
         return tareaRepository.findByIdSector(idSector);
     }
+
+    public List<TareaVencimientoDTO> getTareasPorVencerHoy(Long idUsuario) { return tareaRepository.findTareasPorVencerHoyByUsuario(idUsuario);}
 
     public TareaEntity createTarea(TareaEntity tareaEntity) {
         return tareaRepository.save(tareaEntity);

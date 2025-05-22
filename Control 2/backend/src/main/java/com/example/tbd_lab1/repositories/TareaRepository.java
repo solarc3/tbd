@@ -1,21 +1,21 @@
 package com.example.tbd_lab1.repositories;
 
+import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
 import com.example.tbd_lab1.entities.TareaEntity;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -42,22 +42,19 @@ public class TareaRepository {
         tarea.setEstado(rs.getString("estado"));
         tarea.setIdSector(rs.getLong("id_sector"));
 
-        // Handle Point data from PGgeometry
-//        try {
-//            Object pgObj = rs.getObject("sector");
-//            if (pgObj != null) {
-//                // Convert PostGIS geometry to WKT and then to JTS Point
-//                String wktText = pgObj.toString();
-//                if (wktText.startsWith("SRID=")) {
-//                    wktText = wktText.substring(wktText.indexOf(';') + 1);
-//                }
-//                tarea.setSector((Point) wktReader.read(wktText));
-//            }
-//        } catch (SQLException | ParseException e) {
-//            // Log error but continue
-//            System.err.println("Error parsing Point data: " + e.getMessage());
-//        }
 
+        if (rs.getObject("id_usuario") == null) {
+            tarea.setIdUsuario(null);
+        } else {
+            tarea.setIdUsuario(rs.getLong("id_usuario"));
+        }
+        tarea.setEstado(rs.getString("estado"));
+
+        if (rs.getObject("id_sector") == null) {
+            tarea.setIdSector(null);
+        } else {
+            tarea.setIdSector(rs.getLong("id_sector"));
+        }
         return tarea;
     };
 
@@ -89,6 +86,38 @@ public class TareaRepository {
     public List<TareaEntity> findByIdSector(Long idSector) {
         String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas WHERE id_sector = ?";
         return jdbcTemplate.query(sql, tareaRowMapper, idSector);
+    }
+
+    // Apartado de notificaciones
+    public List<TareaVencimientoDTO> findTareasPorVencerHoyByUsuario(Long idUsuario) {
+        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, id_sector " +
+                "FROM tareas " +
+                "WHERE id_usuario = ? AND DATE(fecha_vencimiento) = CURRENT_DATE";
+
+        List<TareaEntity> tareas = jdbcTemplate.query(sql, tareaRowMapper, idUsuario);
+        List<TareaVencimientoDTO> resultado = new ArrayList<>();
+        LocalDateTime ahora = LocalDateTime.now();
+
+        for (TareaEntity tarea : tareas) {
+            long horas = 0;
+            long minutos = 0;
+            long segundos = 0;
+
+            // Si tiene fecha de vencimiento
+            if (tarea.getFechaVencimiento() != null) {
+                // Y si es hoy LocalDateTime.now(), entonces
+                if (tarea.getFechaVencimiento().isAfter(ahora)) {
+                    Duration duracion = Duration.between(ahora, tarea.getFechaVencimiento());
+                    horas = duracion.toHours();
+                    minutos = duracion.toMinutesPart();
+                    segundos = duracion.toSecondsPart();
+                }
+
+            }
+            // queda marcado cómo notificación
+            resultado.add(new TareaVencimientoDTO(tarea, horas, minutos, segundos));
+        }
+        return resultado;
     }
 
     public TareaEntity save(TareaEntity tareaEntity) {

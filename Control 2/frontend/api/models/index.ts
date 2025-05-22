@@ -4,12 +4,14 @@ export interface LoginRequest {
 }
 
 export interface SignupRequest {
-	username: string;
-	firstName: string;
-	lastName: string;
-	rut: string;
-	email: string;
-	password: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    rut: string;
+    email: string;
+    password: string;
+    latitude?: number | null; 
+    longitude?: number | null;
 }
 
 // User data returned by el servidor

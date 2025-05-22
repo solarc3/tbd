@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
 import com.example.tbd_lab1.entities.TareaEntity;
 import com.example.tbd_lab1.services.TareaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,5 +90,12 @@ public class TareaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new MessageResponse("Error al eliminar la tarea"));
         }
+    }
+
+    // Respuesta notificaciones
+    @GetMapping("/due/usuario/{idUsuario}")
+    public ResponseEntity<List<TareaVencimientoDTO>> getTareasDueTodayByUsuario(@PathVariable Long idUsuario) {
+        List<TareaVencimientoDTO> tareas = tareaService.getTareasPorVencerHoy(idUsuario);
+        return ResponseEntity.ok(tareas);
     }
 }
