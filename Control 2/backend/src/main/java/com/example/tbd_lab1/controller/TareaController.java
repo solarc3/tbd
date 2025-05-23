@@ -1,6 +1,8 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.DTO.TareaCercanaDTO;
+import com.example.tbd_lab1.DTO.TareaCountBySectorDTO;
 import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
 import com.example.tbd_lab1.entities.TareaEntity;
 import com.example.tbd_lab1.services.TareaService;
@@ -97,5 +99,17 @@ public class TareaController {
     public ResponseEntity<List<TareaVencimientoDTO>> getTareasDueTodayByUsuario(@PathVariable Long idUsuario) {
         List<TareaVencimientoDTO> tareas = tareaService.getTareasPorVencerHoy(idUsuario);
         return ResponseEntity.ok(tareas);
+    }
+
+    @GetMapping("/usuario/{idUsuario}/count-by-sector")
+    public ResponseEntity<List<TareaCountBySectorDTO>> getTareaCountByUsuarioAndSector(@PathVariable Long idUsuario) {
+        List<TareaCountBySectorDTO> counts = tareaService.getTareaCountByUsuarioAndSector(idUsuario);
+        return ResponseEntity.ok(counts);
+    }
+
+    @GetMapping("/usuario/{idUsuario}/mas-cercana")
+    public ResponseEntity<List<TareaCercanaDTO>> getTareaPendienteMasCercana(@PathVariable Long idUsuario) {
+        List<TareaCercanaDTO> tareaOpt = tareaService.getTareaPendienteMasCercana(idUsuario);
+        return ResponseEntity.ok(tareaOpt);
     }
 }
