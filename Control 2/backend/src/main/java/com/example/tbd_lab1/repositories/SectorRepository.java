@@ -1,5 +1,6 @@
 package com.example.tbd_lab1.repositories;
 
+import com.example.tbd_lab1.DTO.SectorTareasResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -12,6 +13,7 @@ import com.example.tbd_lab1.entities.SectorEntity;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +34,21 @@ public class SectorRepository {
     public List<SectorEntity> findAll() {
         String sql = "SELECT id, nombre_sector, ST_AsGeoJSON(area) AS area FROM sectores ORDER BY id";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SectorEntity.class));
+    }
+
+    public List<SectorTareasResponse> findTareasPendientesBySector(){
+        String sql = "select sectores.nombre_sector, count(tareas.id_sector) as cantidad_tareas from tareas left join sectores on sectores.id = tareas.id_sector where tareas.estado = 'PENDIENTE' group by sectores.nombre_sector order by cantidad_tareas desc";
+        try {
+            return jdbcTemplate.query(sql, (rs, rowNum) -> SectorTareasResponse.builder()
+                    .cantidad_tareas(rs.getInt("cantidad_tareas"))
+                    .nombre_sector(rs.getString("nombre_sector")).build());
+        }catch(EmptyResultDataAccessException e) {
+            return new ArrayList<>();
+        } catch (Exception e) {
+            System.err.println("Error executing query: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public Optional<SectorEntity> findById(Long id) {

@@ -1,6 +1,7 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.DTO.SectorTareasResponse;
 import com.example.tbd_lab1.entities.SectorEntity;
 import com.example.tbd_lab1.services.SectorService;
 import com.example.tbd_lab1.services.TareaService;
@@ -72,6 +73,15 @@ public class SectorController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new MessageResponse("Error al eliminar sector"));
         }
+    }
+
+    @GetMapping("/SectoresTareasPendientes")
+    public ResponseEntity<?> TareasPendientesBySector() {
+        List<SectorTareasResponse> sectores = sectorService.TareasBySector();
+        if (sectores.isEmpty()) {
+            return ResponseEntity.ok().body(new MessageResponse("No existen sectores o tareas pendientes"));
+        }
+        return ResponseEntity.ok(sectores);
     }
 
 }

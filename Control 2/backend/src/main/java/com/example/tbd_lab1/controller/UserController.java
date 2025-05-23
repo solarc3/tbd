@@ -1,5 +1,6 @@
 package com.example.tbd_lab1.controller;
 
+import com.example.tbd_lab1.DTO.DistanciaTareaPromedioResponse;
 import com.example.tbd_lab1.DTO.MessageResponse;
 import com.example.tbd_lab1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,4 +30,17 @@ public class UserController {
 			return ResponseEntity.ok()
 				.body(new MessageResponse("No se pudo borrar el usuario"));
 		}
-	}}
+	}
+
+	@GetMapping("/tareaspromedio")
+	public ResponseEntity<?> DistanciaTareasPromedio() {
+		List<DistanciaTareaPromedioResponse> usuarios = userService.DistanciaPromedioTareasByUser();
+
+		if (usuarios.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.ok(usuarios);
+	}
+
+
+}

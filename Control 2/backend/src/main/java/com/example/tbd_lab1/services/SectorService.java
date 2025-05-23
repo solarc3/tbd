@@ -1,5 +1,6 @@
 package com.example.tbd_lab1.services;
 
+import com.example.tbd_lab1.DTO.SectorTareasResponse;
 import com.example.tbd_lab1.entities.SectorEntity;
 import com.example.tbd_lab1.repositories.SectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,9 @@ public class SectorService {
 
     public boolean deleteSector(Long id) {
         return sectorRepository.delete(id);
+    }
+
+    public List<SectorTareasResponse> TareasBySector() {
+        return sectorRepository.findTareasPendientesBySector();
     }
 }

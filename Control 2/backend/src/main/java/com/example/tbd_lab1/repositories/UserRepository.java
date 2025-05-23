@@ -1,7 +1,10 @@
 package com.example.tbd_lab1.repositories;
 
+import com.example.tbd_lab1.DTO.DistanciaTareaPromedioResponse;
 import com.example.tbd_lab1.entities.UserEntity;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -94,6 +97,23 @@ public class UserRepository {
 		);
 		return count != null && count > 0;
 	}
+
+
+	public List<DistanciaTareaPromedioResponse> FindDistanciaTareaPromedio() {
+		try {
+			String sql = "select Concat(users.first_name,' ',users.last_name) as nombre ,avg(st_distance(st_centroid(sectores.area),users.location)) as promedio_tareas from (select id_usuario, id_sector from tareas where tareas.estado = 'COMPLETADA') as tareas_completadas INNER JOIN sectores ON id_sector = sectores.id inner join users ON users.id = id_usuario group by users.first_name,users.last_name";
+			return jdbcTemplate.query(sql, (rs, rowNum) -> DistanciaTareaPromedioResponse.builder()
+					.distancia_promedio(rs.getDouble("promedio_tareas"))
+					.nombre_usuario(rs.getString("nombre")).build());
+		} catch(EmptyResultDataAccessException e) {
+				return new ArrayList<>();
+			} catch (Exception e) {
+				System.err.println("Error executing query: " + e.getMessage());
+				e.printStackTrace();
+				return new ArrayList<>();
+			}
+		}
+
 
 	public boolean existsByEmail(String email) {
 		String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
