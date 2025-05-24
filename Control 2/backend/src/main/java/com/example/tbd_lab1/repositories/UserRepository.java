@@ -6,10 +6,16 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.hibernate.dialect.PostgreSQLJsonPGObjectJsonType;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -21,6 +27,33 @@ import java.sql.Types;
 public class UserRepository {
 
 	private final JdbcTemplate jdbcTemplate;
+	private final WKTReader reader = new WKTReader();
+
+	private final RowMapper<UserEntity> userRowMapper = (rs, rowNum) -> {
+		UserEntity userEntity = new UserEntity();
+		userEntity.setId(rs.getLong("id"));
+		userEntity.setUsername(rs.getString("username"));
+		userEntity.setFirstName(rs.getString("first_name"));
+		userEntity.setLastName(rs.getString("last_name"));
+		userEntity.setRut(rs.getString("rut"));
+		userEntity.setEmail(rs.getString("email"));
+		userEntity.setPassword(rs.getString("password"));
+		userEntity.setRefreshToken(rs.getString("refresh_token"));
+		userEntity.setRefreshTokenExpiration(rs.getLong("refresh_token_expiration"));
+
+		// handle point data
+		String wkt = rs.getString("location");
+		if (wkt != null) {
+            try {
+                Geometry geom = reader.read(wkt);
+				userEntity.setLocation((Point) geom);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+		return userEntity;
+	};
 
 	@Autowired
 	public UserRepository(JdbcTemplate jdbcTemplate) {
@@ -29,11 +62,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findById(Long id) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					id
 			);
 			return Optional.ofNullable(userEntity);
@@ -44,11 +77,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByUsername(String username) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					username
 			);
 			return Optional.ofNullable(userEntity);
@@ -59,11 +92,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByEmail(String email) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE email = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE email = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					email
 			);
 			return Optional.ofNullable(userEntity);
@@ -74,11 +107,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByRefreshToken(String refreshToken) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					refreshToken
 			);
 			return Optional.ofNullable(userEntity);

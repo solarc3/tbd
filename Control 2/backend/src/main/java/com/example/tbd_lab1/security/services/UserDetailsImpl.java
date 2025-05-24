@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.example.tbd_lab1.entities.UserEntity;
+import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -41,10 +42,12 @@ public class UserDetailsImpl implements UserDetails {
     @Getter
     private String rut;
 
+    @Getter
+    private Point location;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(UserEntity userEntity) {
-
 
         return UserDetailsImpl.builder()
                 .id(userEntity.getId())
@@ -54,6 +57,7 @@ public class UserDetailsImpl implements UserDetails {
                 .lastName(userEntity.getLastName())
                 .rut(userEntity.getRut())
                 .password(userEntity.getPassword())
+                .location(userEntity.getLocation())
                 .authorities(Collections.emptyList())
                 .build();
     }

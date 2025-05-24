@@ -28,12 +28,11 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
-//@CrossOrigin(
-//        origins = "http://localhost:3000",
-//        allowCredentials = "true",
-//        maxAge = 3600
-//)
-@CrossOrigin("*")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        allowCredentials = "true",
+        maxAge = 3600
+)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -126,7 +125,9 @@ public class AuthController {
                                 "rut",
                                 userDetails.getRut(),
                                 "email",
-                                userDetails.getEmail()
+                                userDetails.getEmail(),
+                                "location",
+                                userDetails.getLocation().toText()
                         )
                 );
     }
@@ -293,6 +294,7 @@ public class AuthController {
                 .lastName(userDetails.getLastName())
                 .rut(userDetails.getRut())
                 .email(userDetails.getEmail())
+                .location(userDetails.getLocation().toText())
                 .build();
 
         return ResponseEntity.ok(dto);
