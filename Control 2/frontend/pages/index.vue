@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { ref } from "vue";
+import CrearTarea from "@/components/CrearTarea.vue";
+import type { Tarea } from "@/api/models";
 
 const router = useRouter();
 
@@ -8,14 +11,25 @@ function goToPendingTasks() {
   router.push("/gestor");
 }
 
-// este verlo,,
-function goToCreateTask() {
-  router.push("/gestor");
-}
-
 function goToStatisticsTasks() {
   router.push("/estadisticas");
 }
+
+const isModalOpen = ref(false);
+
+const openCreateModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
+const saveTask = (task: Tarea) => {
+  console.log("Nueva tarea creada:", task);
+  closeModal();
+};
+
 </script>
 
 <template>
@@ -38,10 +52,10 @@ function goToStatisticsTasks() {
         </p>
       </div>
 
-      <!-- crear tarea, hay que ver si modificarlo y dejar aca el nuevo formulario o solo dejarlo en el gestorrr -->
+      <!-- crear tarea, modificado para que cree tareas directamente desde este apartado! -->
       <div
-        class="bg-green-100 p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
-        @click="goToCreateTask"
+          class="bg-green-100 p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+          @click="openCreateModal"
       >
         <h2 class="text-2xl font-semibold text-green-800">Crear Nueva Tarea</h2>
         <p class="text-gray-600 mt-2">
@@ -61,6 +75,7 @@ function goToStatisticsTasks() {
       </div>
     </div>
 
+
     <!-- tareas cercanas -->
     <div class="mt-12">
       <h3 class="text-2xl font-bold text-gray-800 mb-4">Explora el Mapa</h3>
@@ -71,6 +86,17 @@ function goToStatisticsTasks() {
         <p class="text-gray-500">[Mapa interactivo para tareas cercanas ¿¿]</p>
       </div>
     </div>
+
+
+    <!-- modal -->
+    <div
+        v-if="isModalOpen"
+        class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
+        <CrearTarea @close="closeModal" @save="saveTask" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -79,8 +105,8 @@ h1 {
   font-family: "Poppins", sans-serif;
 }
 
-div:hover {
-  transform: scale(1.02);
-  transition: transform 0.2s ease-in-out;
+.fixed {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 </style>

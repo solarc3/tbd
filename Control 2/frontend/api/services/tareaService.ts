@@ -23,6 +23,8 @@ class TareaService {
 
   async createTarea(tarea: Partial<Tarea>): Promise<Tarea> {
     try {
+      console.log("Datos enviados en la solicitud POST:", tarea);
+
       const { data } = await apiClient.post<Tarea>("/tarea/", tarea);
       return data;
     } catch (error) {
