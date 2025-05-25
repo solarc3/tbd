@@ -1,5 +1,5 @@
 <template>
-  <TabsRoot>
+  <Tabs defaultValue="tasksBySector">
     <TabsList>
       <TabsTrigger value="tasksBySector">Tareas por Sector</TabsTrigger>
       <TabsTrigger value="closestPendingTask">Tarea Más Cercana</TabsTrigger>
@@ -9,7 +9,7 @@
       <Card>
         <CardHeader>
           <CardTitle>
-            <BarChart class="w-5 h-5 mr-2" />
+            <Icon name="lucide:bar-chart" class="w-5 h-5 mr-2" />
             Tareas por Sector
           </CardTitle>
         </CardHeader>
@@ -32,7 +32,7 @@
       <Card>
         <CardHeader>
           <CardTitle>
-            <MapPin class="w-5 h-5 mr-2" />
+            <Icon name="lucide:map-pin" class="w-5 h-5 mr-2" />
             Tarea Pendiente Más Cercana
           </CardTitle>
         </CardHeader>
@@ -46,13 +46,16 @@
         </CardContent>
       </Card>
     </TabsContent>
-  </TabsRoot>
+  </Tabs>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import EstadisticasService from "@/api/services/estadisticasService";
 import { useAuthStore } from "@/stores/auth";
+
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const authStore = useAuthStore();
 const tasksBySector = ref<SectorStats[]>([]);
@@ -79,7 +82,8 @@ const fetchStats = async () => {
     }
 
     tasksBySector.value = await EstadisticasService.getTasksBySector();
-    closestPendingTask.value = await EstadisticasService.getClosestPendingTask(userId); // Pasa el userId
+    closestPendingTask.value =
+      await EstadisticasService.getClosestPendingTask(userId);
   } catch (error) {
     console.error("Error al cargar estadísticas:", error);
   }
