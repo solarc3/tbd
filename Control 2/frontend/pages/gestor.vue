@@ -19,9 +19,9 @@
       <h2 class="text-xl font-semibold text-red-600 mb-4">Tareas Pendientes</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
-            v-for="task in pendientes"
-            :key="task.id"
-            class="p-4 border rounded-lg bg-red-100"
+          v-for="task in pendientes"
+          :key="task.id"
+          class="p-4 border rounded-lg bg-red-100"
         >
           <h2 class="text-lg font-semibold">{{ task.titulo }}</h2>
           <p class="text-sm text-gray-600">{{ task.descripcion }}</p>
@@ -30,9 +30,10 @@
           <div class="flex justify-between items-center mt-4">
             <div>
               <input
-                  type="checkbox"
-                  :checked="task.estado === 'EN_PROGRESO'"
-                  @change="toggleComplete(task)"
+                type="checkbox"
+                :checked="task.estado === 'EN_PROGRESO'"
+                :disabled="task.estado === 'COMPLETADA'"
+                @change="toggleComplete(task)"
               />
               <span class="ml-2">En Progreso</span>
             </div>
@@ -94,7 +95,7 @@
               <input
                   type="checkbox"
                   :checked="task.estado === 'COMPLETADA'"
-                  @change="toggleComplete(task)"
+                  :disabled="task.estado === 'COMPLETADA'"
               />
               <span class="ml-2">Completada</span>
             </div>
@@ -104,6 +105,21 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de edición -->
+    <div
+      v-if="isModalOpen"
+      class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
+        <gestorTareas
+          :task="selectedTask"
+          :isEdit="isEditMode"
+          @close="closeModal"
+          @save="saveTask"
+        />
       </div>
     </div>
   </div>
@@ -166,23 +182,22 @@ export default defineComponent({
     // vuelve a estar en progreso
     const toggleComplete = async (task: Tarea) => {
       try {
-        // dependiendo del estado actual, se define el siguiente
         let newEstado = "";
+
         if (task.estado === "PENDIENTE") {
           newEstado = "EN_PROGRESO";
         } else if (task.estado === "EN_PROGRESO") {
           newEstado = "COMPLETADA";
-        } else if (task.estado === "COMPLETADA") {
-          newEstado = "EN_PROGRESO";
+        } else {
+          console.warn("El estado COMPLETADA no puede ser modificado desde la casilla.");
+          return;
         }
 
-        // PUT backend
         await TareaService.updateTarea(task.id, {
           ...task,
           estado: newEstado,
         });
 
-        // y se actualiza para mostrarlo en el front filtrado!
         task.estado = newEstado;
       } catch (error) {
         console.error("Error al actualizar el estado de la tarea:", error);
