@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
     --radius: 0.625rem;
     --background: oklch(1 0 0);
@@ -11,7 +9,7 @@
     --card-foreground: oklch(0.13 0.028 261.692);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.13 0.028 261.692);
-    --primary: oklch(0.76 0.134 184.33);
+    --primary: oklch(0.36 0.146 264.036);
     --primary-foreground: oklch(0.985 0.002 247.839);
     --secondary: oklch(0.967 0.003 264.542);
     --secondary-foreground: oklch(0.21 0.034 264.665);
@@ -57,11 +55,6 @@
         background-color: var(--secondary);
         color: var(--secondary-foreground);
     }
-}
-
-@theme inline {
-    --animate-accordion-down: accordion-down 0.2s ease-out;
-    --animate-accordion-up: accordion-up 0.2s ease-out;
 }
 
 @layer base {
