@@ -16,4 +16,5 @@ public class UserInfoResponse {
     private String lastName;
     private String rut;
     private String email;
+    private String location;
 }

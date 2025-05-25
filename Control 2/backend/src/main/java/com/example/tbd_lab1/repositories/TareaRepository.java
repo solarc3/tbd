@@ -1,5 +1,7 @@
 package com.example.tbd_lab1.repositories;
 
+import com.example.tbd_lab1.DTO.TareaCercanaDTO;
+import com.example.tbd_lab1.DTO.TareaCountBySectorDTO;
 import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
 import com.example.tbd_lab1.entities.TareaEntity;
 import org.locationtech.jts.io.WKTReader;
@@ -213,5 +215,63 @@ public class TareaRepository {
         String sql = "SELECT COUNT(*) FROM tareas WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
+    }
+
+    // Inicio queries
+    // 1.- Obtener tareas por sector dado un usuario
+    public List<TareaCountBySectorDTO> countTareasByUsuarioAndSector(Long idUsuario) {
+        String sql = "SELECT s.id AS id_sector, s.nombre, COUNT(t.id) AS cantidad_tareas " +
+                "FROM tareas t " +
+                "JOIN sector s ON t.id_sector = s.id " +
+                "WHERE t.id_usuario = ? " +
+                "GROUP BY s.id, s.nombre " +
+                "ORDER BY s.nombre";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            TareaCountBySectorDTO dto = new TareaCountBySectorDTO();
+            dto.setIdSector(rs.getLong("id_sector"));
+            dto.setNombreSector(rs.getString("nombre"));
+            dto.setCantidadTareas(rs.getLong("cantidad_tareas"));
+            return dto;
+        }, idUsuario);
+    }
+
+    // 2.-
+    public List<TareaCercanaDTO> findTareaPendienteMasCercana(Long idUsuario) {
+        String sql = "SELECT " +
+                "    t.id AS id_tarea, " +
+                "    t.titulo AS titulo_tarea, " +
+                "    t.descripcion AS descripcion_tarea, " +
+                "    t.fecha_vencimiento, " +
+                "    t.estado AS estado_tarea, " +
+                "    s.id AS id_sector, " +
+                "    s.nombre, " +
+                "    ST_Distance(u.location::geography, s.area::geography) AS distancia_al_sector_metros " +
+                "FROM " +
+                "    tareas t " +
+                "INNER JOIN " +
+                "    sector s ON t.id_sector = s.id " +
+                "INNER JOIN " +
+                "    users u ON t.id_usuario = u.id " +
+                "WHERE " +
+                "    t.id_usuario = ? " +
+                "    AND t.estado = 'PENDIENTE' " +
+                "    AND u.location IS NOT NULL " +
+                "    AND s.area IS NOT NULL " +
+                "ORDER BY " +
+                "    distancia_al_sector_metros ASC, t.fecha_vencimiento ASC " +
+                "LIMIT 1;";
+
+        List<TareaCercanaDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> new TareaCercanaDTO(
+                rs.getLong("id_tarea"),
+                rs.getString("titulo_tarea"),
+                rs.getString("descripcion_tarea"),
+                rs.getTimestamp("fecha_vencimiento"),
+                rs.getString("estado_tarea"),
+                rs.getLong("id_sector"),
+                rs.getString("nombre"),
+                rs.getDouble("distancia_al_sector_metros")
+        ), idUsuario);
+        return results;
+        // return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 }

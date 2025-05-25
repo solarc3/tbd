@@ -1,14 +1,20 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
+import com.example.tbd_lab1.DTO.SectorTareasResponse;
 import com.example.tbd_lab1.entities.SectorEntity;
+import com.example.tbd_lab1.security.services.UserDetailsImpl;
 import com.example.tbd_lab1.services.SectorService;
 import com.example.tbd_lab1.services.TareaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,4 +80,34 @@ public class SectorController {
         }
     }
 
+    @GetMapping("/SectoresTareasPendientes")
+    public ResponseEntity<?> TareasPendientesBySector() {
+        List<SectorTareasResponse> sectores = sectorService.TareasBySector();
+        if (sectores.isEmpty()) {
+            return ResponseEntity.ok().body(new MessageResponse("No existen sectores o tareas pendientes"));
+        }
+        return ResponseEntity.ok(sectores);
+    }
+
+    @GetMapping("/most-completed-near-me/{radiusKm}")
+    public ResponseEntity<?> mostCompletedNearMe(@PathVariable BigDecimal radiusKm) {
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new MessageResponse("No authenticated")
+            );
+        }
+
+        // recuperar ubicacion del usuario logeado
+        UserDetailsImpl userDetails =
+                (UserDetailsImpl) authentication.getPrincipal();
+
+        List<SectorTareasResponse> sectores = sectorService.getByCompletedTasksWithin(
+                userDetails.getLocation(), radiusKm);
+        return ResponseEntity.ok(sectores);
+    }
 }
