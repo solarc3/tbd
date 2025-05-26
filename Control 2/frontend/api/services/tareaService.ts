@@ -10,6 +10,12 @@ export interface Tarea {
   idSector: number;
 }
 
+export interface TareaVencimiento extends Tarea {
+  horasRestantes: number;
+  minutosRestantes: number;
+  segundosRestantes: number;
+}
+
 class TareaService {
   async getAllTareas(): Promise<Tarea[]> {
     try {
@@ -48,6 +54,16 @@ class TareaService {
       await apiClient.delete(`/tarea/${id}`);
     } catch (error) {
       console.error("Error al eliminar la tarea:", error);
+      throw error;
+    }
+  }
+
+  async getTareasPorVencerHoy(idUsuario: number): Promise<TareaVencimiento[]> {
+    try {
+      const { data } = await apiClient.get<TareaVencimiento[]>(`/tarea/due/usuario/${idUsuario}`);
+      return data;
+    } catch (error) {
+      console.error("Error al obtener las tareas por vencer:", error);
       throw error;
     }
   }
