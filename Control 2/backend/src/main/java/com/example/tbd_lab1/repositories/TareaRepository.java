@@ -1,8 +1,8 @@
 package com.example.tbd_lab1.repositories;
 
-import com.example.tbd_lab1.DTO.TareaCercanaDTO;
-import com.example.tbd_lab1.DTO.TareaCountBySectorDTO;
-import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
+import com.example.tbd_lab1.DTO.TareaCercanaResponse;
+import com.example.tbd_lab1.DTO.TareaCountBySectorResponse;
+import com.example.tbd_lab1.DTO.TareaVencimientoResponse;
 import com.example.tbd_lab1.entities.TareaEntity;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,6 @@ import java.util.Optional;
 public class TareaRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final WKTReader wktReader = new WKTReader();
 
     @Autowired
     public TareaRepository(JdbcTemplate jdbcTemplate) {
@@ -91,13 +90,13 @@ public class TareaRepository {
     }
 
     // Apartado de notificaciones
-    public List<TareaVencimientoDTO> findTareasPorVencerHoyByUsuario(Long idUsuario) {
+    public List<TareaVencimientoResponse> findTareasPorVencerHoyByUsuario(Long idUsuario) {
         String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, estado, id_sector " +
                 "FROM tareas " +
                 "WHERE id_usuario = ? AND DATE(fecha_vencimiento) = CURRENT_DATE";
 
         List<TareaEntity> tareas = jdbcTemplate.query(sql, tareaRowMapper, idUsuario);
-        List<TareaVencimientoDTO> resultado = new ArrayList<>();
+        List<TareaVencimientoResponse> resultado = new ArrayList<>();
         LocalDateTime ahora = LocalDateTime.now();
 
         for (TareaEntity tarea : tareas) {
@@ -117,7 +116,7 @@ public class TareaRepository {
 
             }
             // queda marcado cómo notificación
-            resultado.add(new TareaVencimientoDTO(tarea, horas, minutos, segundos));
+            resultado.add(new TareaVencimientoResponse(tarea, horas, minutos, segundos));
         }
         return resultado;
     }
@@ -219,24 +218,41 @@ public class TareaRepository {
 
     // Inicio queries
     // 1.- Obtener tareas por sector dado un usuario
-    public List<TareaCountBySectorDTO> countTareasByUsuarioAndSector(Long idUsuario) {
-        String sql = "SELECT s.id AS id_sector, s.nombre, COUNT(t.id) AS cantidad_tareas " +
+    public List<TareaCountBySectorResponse> countTareasByUsuarioAndSector(Long idUsuario) {
+        String sql = "SELECT s.id AS id_sector, s.nombre_sector, COUNT(t.id) AS cantidad_tareas " +
                 "FROM tareas t " +
-                "JOIN sector s ON t.id_sector = s.id " +
+                "JOIN sectores s ON t.id_sector = s.id " +
                 "WHERE t.id_usuario = ? " +
-                "GROUP BY s.id, s.nombre " +
-                "ORDER BY s.nombre";
+                "GROUP BY s.id, s.nombre_sector " +
+                "ORDER BY s.nombre_sector";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            TareaCountBySectorDTO dto = new TareaCountBySectorDTO();
+            TareaCountBySectorResponse dto = new TareaCountBySectorResponse();
+            dto.setIdUsuario(idUsuario);
             dto.setIdSector(rs.getLong("id_sector"));
-            dto.setNombreSector(rs.getString("nombre"));
+            dto.setNombreSector(rs.getString("nombre_sector"));
             dto.setCantidadTareas(rs.getLong("cantidad_tareas"));
             return dto;
         }, idUsuario);
     }
 
+    public List<TareaCountBySectorResponse> countTareasForEachUsuarioBySector() {
+        String sql = "SELECT s.id AS id_sector, s.nombre_sector, COUNT(t.id) AS cantidad_tareas, t.id_usuario " +
+                "FROM tareas t " +
+                "JOIN sectores s ON t.id_sector = s.id " +
+                "GROUP BY t.id_usuario, s.id, s.nombre_sector " +
+                "ORDER BY s.nombre_sector";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            TareaCountBySectorResponse dto = new TareaCountBySectorResponse();
+            dto.setIdUsuario(rs.getLong("id_usuario"));
+            dto.setIdSector(rs.getLong("id_sector"));
+            dto.setNombreSector(rs.getString("nombre_sector"));
+            dto.setCantidadTareas(rs.getLong("cantidad_tareas"));
+            return dto;
+        });
+    }
+
     // 2.-
-    public List<TareaCercanaDTO> findTareaPendienteMasCercana(Long idUsuario) {
+    public List<TareaCercanaResponse> findTareaPendienteMasCercana(Long idUsuario) {
         String sql = "SELECT " +
                 "    t.id AS id_tarea, " +
                 "    t.titulo AS titulo_tarea, " +
@@ -244,12 +260,12 @@ public class TareaRepository {
                 "    t.fecha_vencimiento, " +
                 "    t.estado AS estado_tarea, " +
                 "    s.id AS id_sector, " +
-                "    s.nombre, " +
+                "    s.nombre_sector, " +
                 "    ST_Distance(u.location::geography, s.area::geography) AS distancia_al_sector_metros " +
                 "FROM " +
                 "    tareas t " +
                 "INNER JOIN " +
-                "    sector s ON t.id_sector = s.id " +
+                "    sectores s ON t.id_sector = s.id " +
                 "INNER JOIN " +
                 "    users u ON t.id_usuario = u.id " +
                 "WHERE " +
@@ -261,17 +277,16 @@ public class TareaRepository {
                 "    distancia_al_sector_metros ASC, t.fecha_vencimiento ASC " +
                 "LIMIT 1;";
 
-        List<TareaCercanaDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> new TareaCercanaDTO(
+        List<TareaCercanaResponse> results = jdbcTemplate.query(sql, (rs, rowNum) -> new TareaCercanaResponse(
                 rs.getLong("id_tarea"),
                 rs.getString("titulo_tarea"),
                 rs.getString("descripcion_tarea"),
                 rs.getTimestamp("fecha_vencimiento"),
                 rs.getString("estado_tarea"),
                 rs.getLong("id_sector"),
-                rs.getString("nombre"),
+                rs.getString("nombre_sector"),
                 rs.getDouble("distancia_al_sector_metros")
         ), idUsuario);
         return results;
-        // return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 }

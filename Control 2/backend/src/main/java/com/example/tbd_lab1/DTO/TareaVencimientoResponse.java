@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class TareaVencimientoDTO {
+public class TareaVencimientoResponse {
     private Long id;
     private String titulo;
     private String descripcion;
@@ -19,7 +19,7 @@ public class TareaVencimientoDTO {
     private long minutosRestantes;
     private long segundosRestantes;
 
-    public TareaVencimientoDTO(TareaEntity tarea, long horasRestantes, long minutosRestantes, long segundosRestantes) {
+    public TareaVencimientoResponse(TareaEntity tarea, long horasRestantes, long minutosRestantes, long segundosRestantes) {
         this.id = tarea.getId();
         this.titulo = tarea.getTitulo();
         this.descripcion = tarea.getDescripcion();

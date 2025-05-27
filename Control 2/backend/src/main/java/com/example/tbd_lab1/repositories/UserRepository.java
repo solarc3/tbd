@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.dialect.PostgreSQLJsonPGObjectJsonType;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -131,22 +129,34 @@ public class UserRepository {
 		return count != null && count > 0;
 	}
 
-
-	public List<DistanciaTareaPromedioResponse> FindDistanciaTareaPromedio() {
+	// 4.- Promedio distancia tareas completadas ~ ubicación usuario
+	public List<DistanciaTareaPromedioResponse> findDistanciaTareaPromedio() {
 		try {
-			String sql = "select Concat(users.first_name,' ',users.last_name) as nombre ,avg(st_distance(st_centroid(sectores.area),users.location)) as promedio_tareas from (select id_usuario, id_sector from tareas where tareas.estado = 'COMPLETADA') as tareas_completadas INNER JOIN sectores ON id_sector = sectores.id inner join users ON users.id = id_usuario group by users.first_name,users.last_name";
-			return jdbcTemplate.query(sql, (rs, rowNum) -> DistanciaTareaPromedioResponse.builder()
-					.distancia_promedio(rs.getDouble("promedio_tareas"))
-					.nombre_usuario(rs.getString("nombre")).build());
-		} catch(EmptyResultDataAccessException e) {
-				return new ArrayList<>();
-			} catch (Exception e) {
-				System.err.println("Error executing query: " + e.getMessage());
-				e.printStackTrace();
-				return new ArrayList<>();
-			}
-		}
+			String sql = """
+			SELECT users.id,
+			       CONCAT(users.first_name, ' ', users.last_name) AS nombre,
+			       AVG(ST_Distance(ST_Centroid(sectores.area), users.location)) AS promedio_tareas
+			FROM (SELECT id_usuario, id_sector
+			      FROM tareas WHERE tareas.estado = 'COMPLETADA') AS tareas_completadas
+			    INNER JOIN sectores ON id_sector = sectores.id
+			    INNER JOIN users ON users.id = id_usuario
+			GROUP BY users.id
+			""";
+			return jdbcTemplate.query(sql,
+					(rs, rowNum) -> DistanciaTareaPromedioResponse.builder()
+							.idUsuario(rs.getLong("id"))
+							.distanciaPromedio(rs.getDouble("promedio_tareas"))
+							.nombreUsuario(rs.getString("nombre")).build());
 
+		} catch (EmptyResultDataAccessException e) {
+			return new ArrayList<>();
+
+		} catch (Exception e) {
+			System.err.println("Error executing query: " + e.getMessage());
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
 
 	public boolean existsByEmail(String email) {
 		String sql = "SELECT COUNT(*) FROM users WHERE email = ?";

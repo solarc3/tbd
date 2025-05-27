@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 public class SectorTareasResponse {
-    private String nombre_sector;
-    private int cantidad_tareas;
+    private String nombreSector;
+    private Integer cantidadTareas;
 }

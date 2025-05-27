@@ -1,8 +1,8 @@
 package com.example.tbd_lab1.services;
 
-import com.example.tbd_lab1.DTO.TareaCercanaDTO;
-import com.example.tbd_lab1.DTO.TareaCountBySectorDTO;
-import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
+import com.example.tbd_lab1.DTO.TareaCercanaResponse;
+import com.example.tbd_lab1.DTO.TareaCountBySectorResponse;
+import com.example.tbd_lab1.DTO.TareaVencimientoResponse;
 import com.example.tbd_lab1.entities.TareaEntity;
 import com.example.tbd_lab1.repositories.TareaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class TareaService {
         return tareaRepository.findByIdSector(idSector);
     }
 
-    public List<TareaVencimientoDTO> getTareasPorVencerHoy(Long idUsuario) { return tareaRepository.findTareasPorVencerHoyByUsuario(idUsuario); }
+    public List<TareaVencimientoResponse> getTareasPorVencerHoy(Long idUsuario) { return tareaRepository.findTareasPorVencerHoyByUsuario(idUsuario); }
 
     public TareaEntity createTarea(TareaEntity tareaEntity) {
         return tareaRepository.save(tareaEntity);
@@ -59,7 +59,15 @@ public class TareaService {
         return tareaRepository.existsById(id);
     }
 
-    public List<TareaCountBySectorDTO> getTareaCountByUsuarioAndSector(Long idUsuario) { return tareaRepository.countTareasByUsuarioAndSector(idUsuario); }
+    public List<TareaCountBySectorResponse> getTareaCountByUsuarioAndSector(Long idUsuario) {
+        return tareaRepository.countTareasByUsuarioAndSector(idUsuario);
+    }
 
-    public List<TareaCercanaDTO> getTareaPendienteMasCercana(Long idUsuario) { return tareaRepository.findTareaPendienteMasCercana(idUsuario); }
+    public List<TareaCountBySectorResponse> getTareaCountForEachUsuarioBySector() {
+        return tareaRepository.countTareasForEachUsuarioBySector();
+    }
+
+    public List<TareaCercanaResponse> getTareaPendienteMasCercana(Long idUsuario) {
+        return tareaRepository.findTareaPendienteMasCercana(idUsuario);
+    }
 }

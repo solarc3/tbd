@@ -1,9 +1,9 @@
 package com.example.tbd_lab1.controller;
 
 import com.example.tbd_lab1.DTO.MessageResponse;
-import com.example.tbd_lab1.DTO.TareaCercanaDTO;
-import com.example.tbd_lab1.DTO.TareaCountBySectorDTO;
-import com.example.tbd_lab1.DTO.TareaVencimientoDTO;
+import com.example.tbd_lab1.DTO.TareaCercanaResponse;
+import com.example.tbd_lab1.DTO.TareaCountBySectorResponse;
+import com.example.tbd_lab1.DTO.TareaVencimientoResponse;
 import com.example.tbd_lab1.entities.TareaEntity;
 import com.example.tbd_lab1.services.TareaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,20 +96,26 @@ public class TareaController {
 
     // Respuesta notificaciones
     @GetMapping("/due/usuario/{idUsuario}")
-    public ResponseEntity<List<TareaVencimientoDTO>> getTareasDueTodayByUsuario(@PathVariable Long idUsuario) {
-        List<TareaVencimientoDTO> tareas = tareaService.getTareasPorVencerHoy(idUsuario);
+    public ResponseEntity<List<TareaVencimientoResponse>> getTareasDueTodayByUsuario(@PathVariable Long idUsuario) {
+        List<TareaVencimientoResponse> tareas = tareaService.getTareasPorVencerHoy(idUsuario);
         return ResponseEntity.ok(tareas);
     }
 
     @GetMapping("/usuario/{idUsuario}/count-by-sector")
-    public ResponseEntity<List<TareaCountBySectorDTO>> getTareaCountByUsuarioAndSector(@PathVariable Long idUsuario) {
-        List<TareaCountBySectorDTO> counts = tareaService.getTareaCountByUsuarioAndSector(idUsuario);
+    public ResponseEntity<List<TareaCountBySectorResponse>> getTareaCountByUsuarioAndSector(@PathVariable Long idUsuario) {
+        List<TareaCountBySectorResponse> counts = tareaService.getTareaCountByUsuarioAndSector(idUsuario);
+        return ResponseEntity.ok(counts);
+    }
+
+    @GetMapping("/count-by-sector")
+    public ResponseEntity<List<TareaCountBySectorResponse>> getTareaCountForEachUsuarioBySector() {
+        List<TareaCountBySectorResponse> counts = tareaService.getTareaCountForEachUsuarioBySector();
         return ResponseEntity.ok(counts);
     }
 
     @GetMapping("/usuario/{idUsuario}/mas-cercana")
-    public ResponseEntity<List<TareaCercanaDTO>> getTareaPendienteMasCercana(@PathVariable Long idUsuario) {
-        List<TareaCercanaDTO> tareaOpt = tareaService.getTareaPendienteMasCercana(idUsuario);
+    public ResponseEntity<List<TareaCercanaResponse>> getTareaPendienteMasCercana(@PathVariable Long idUsuario) {
+        List<TareaCercanaResponse> tareaOpt = tareaService.getTareaPendienteMasCercana(idUsuario);
         return ResponseEntity.ok(tareaOpt);
     }
 }

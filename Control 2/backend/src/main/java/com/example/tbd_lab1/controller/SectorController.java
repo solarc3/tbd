@@ -3,9 +3,11 @@ package com.example.tbd_lab1.controller;
 import com.example.tbd_lab1.DTO.MessageResponse;
 import com.example.tbd_lab1.DTO.SectorTareasResponse;
 import com.example.tbd_lab1.entities.SectorEntity;
+import com.example.tbd_lab1.entities.UserEntity;
 import com.example.tbd_lab1.security.services.UserDetailsImpl;
 import com.example.tbd_lab1.services.SectorService;
 import com.example.tbd_lab1.services.TareaService;
+import com.example.tbd_lab1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +26,13 @@ import java.util.Optional;
 public class SectorController {
     private final SectorService sectorService;
     private final TareaService tareaService;
+    private final UserService userService;
 
     @Autowired
-    public SectorController(SectorService sectorService, TareaService tareaService) {
+    public SectorController(SectorService sectorService, TareaService tareaService, UserService userService) {
         this.sectorService = sectorService;
         this.tareaService = tareaService;
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -80,9 +84,9 @@ public class SectorController {
         }
     }
 
-    @GetMapping("/SectoresTareasPendientes")
-    public ResponseEntity<?> TareasPendientesBySector() {
-        List<SectorTareasResponse> sectores = sectorService.TareasBySector();
+    @GetMapping("/tareas-pendientes")
+    public ResponseEntity<?> tareasPendientesBySector() {
+        List<SectorTareasResponse> sectores = sectorService.tareasBySector();
         if (sectores.isEmpty()) {
             return ResponseEntity.ok().body(new MessageResponse("No existen sectores o tareas pendientes"));
         }
@@ -108,6 +112,19 @@ public class SectorController {
 
         List<SectorTareasResponse> sectores = sectorService.getByCompletedTasksWithin(
                 userDetails.getLocation(), radiusKm);
+        return ResponseEntity.ok(sectores);
+    }
+
+    @GetMapping("/most-completed-near/{userId}/{radiusKm}")
+    public ResponseEntity<?> mostCompletedNearUser(@PathVariable Long userId, @PathVariable BigDecimal radiusKm) {
+        Optional<UserEntity> user = userService.getById(userId);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el usuario");
+        }
+
+        List<SectorTareasResponse> sectores = sectorService.getByCompletedTasksWithin(
+                user.get().getLocation(), radiusKm);
         return ResponseEntity.ok(sectores);
     }
 }

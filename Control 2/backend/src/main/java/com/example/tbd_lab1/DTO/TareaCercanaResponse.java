@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TareaCercanaDTO {
+public class TareaCercanaResponse {
     private Long idTarea;
     private String tituloTarea;
     private String descripcionTarea;
