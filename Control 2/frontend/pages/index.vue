@@ -1,3 +1,36 @@
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import { ref } from "vue";
+import CrearTarea from "@/components/CrearTarea.vue";
+import type { Tarea } from "@/api/models";
+
+const router = useRouter();
+
+// redireccion bloques colores
+function goToPendingTasks() {
+  router.push("/gestor");
+}
+
+function goToStatisticsTasks() {
+  router.push("/estadisticas");
+}
+
+const isModalOpen = ref(false);
+
+const openCreateModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
+const saveTask = (task: Tarea) => {
+  console.log("Nueva tarea creada:", task);
+  closeModal();
+};
+
+</script>
 <template>
   <div class="px-6 py-8">
     <div class="text-center mb-12">
