@@ -39,7 +39,7 @@ const saveTask = (task: any) => {
       </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-stretch">
       <!-- Controles -->
       <div class="lg:col-span-1 space-y-6">
         <NuxtLink to="/gestor" class="block">
@@ -61,7 +61,7 @@ const saveTask = (task: any) => {
       </div>
 
       <!-- Mapa al lado -->
-      <div class="lg:col-span-2 h-full flex items-center">
+      <div class="lg:col-span-3 h-full flex items-center">
         <div class=" h-full w-full h-[60vh]" :class="{ 'map-dimmed': isModalOpen }">
           <ClientOnly>
             <MapaTareas />
