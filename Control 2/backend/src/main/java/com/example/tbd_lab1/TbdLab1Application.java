@@ -17,5 +17,4 @@ public class TbdLab1Application {
 	public static void main(String[] args) {
 		SpringApplication.run(TbdLab1Application.class, args);
 	}
-
 }
