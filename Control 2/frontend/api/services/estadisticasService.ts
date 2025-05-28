@@ -1,61 +1,42 @@
 import apiClient from "@/api/axios";
 
 export interface SectorStats {
-  name: string;
-  tasks: number;
-  percentage: number;
+  nombreSector: string;
+  cantidadTareas: number;
 }
 
+// i
 export interface ClosestTask {
   title: string;
   description: string;
   distance: number;
 }
 
+export interface TareaCountBySectorDTO {
+  idSector: number;
+  nombreSector: string;
+  cantidadTareas: number;
+}
+
+export interface DistanciaTareaPromedioResponse {
+  userId: number;
+  promedioDistancia: number;
+}
+
 class EstadisticasService {
-  async getSectorStats(): Promise<SectorStats[]> {
+  async getTareaCountByUserAndSector(userId: number): Promise<TareaCountBySectorDTO[]> {
     try {
-      const { data } = await apiClient.get<SectorStats[]>("/estadisticas/sector");
+      const { data } = await apiClient.get<TareaCountBySectorDTO[]>(`/tarea/usuario/${userId}/count-by-sector`);
       return data;
     } catch (error) {
-      console.error("Error al obtener estadísticas por sector:", error);
+      console.error("Error al obtener conteo de tareas por sector:", error);
       throw error;
     }
   }
 
-  async getCompletedTasks(): Promise<number> {
+  async getClosestPendingTask(userId: number): Promise<ClosestTask[]> {
     try {
-      const { data } = await apiClient.get<number>("/estadisticas/completed");
-      return data;
-    } catch (error) {
-      console.error("Error al obtener tareas completadas:", error);
-      throw error;
-    }
-  }
-
-  async getPendingTasks(): Promise<number> {
-    try {
-      const { data } = await apiClient.get<number>("/estadisticas/pending");
-      return data;
-    } catch (error) {
-      console.error("Error al obtener tareas pendientes:", error);
-      throw error;
-    }
-  }
-
-  async getTasksBySector(): Promise<SectorStats[]> {
-    try {
-      const { data } = await apiClient.get<SectorStats[]>("/estadisticas/tareas-por-sector");
-      return data;
-    } catch (error) {
-      console.error("Error al obtener tareas por sector:", error);
-      throw error;
-    }
-  }
-
-  async getClosestPendingTask(userId: number): Promise<ClosestTask> {
-    try {
-      const { data } = await apiClient.get<ClosestTask>(`/tarea-pendiente-cercana/${userId}`);
+      const { data } = await apiClient.get<ClosestTask[]>(`/tarea/usuario/${userId}/mas-cercana`);
       return data;
     } catch (error) {
       console.error("Error al obtener la tarea pendiente más cercana:", error);
@@ -63,22 +44,42 @@ class EstadisticasService {
     }
   }
 
-  async getSectorWithMostCompletedTasks(userId: number, radius: number): Promise<SectorStats> {
+  async getMostCompletedNearMe(userId: number, radiusKm: number): Promise<SectorStats[]> {
     try {
-      const { data } = await apiClient.get<SectorStats>(`/sector-completadas-radio/${userId}/${radius}`);
+      const { data } = await apiClient.get<SectorStats[]>(`/sector/most-completed-near-me/${radiusKm}`);
       return data;
     } catch (error) {
-      console.error("Error al obtener el sector con más tareas completadas:", error);
+      console.error("Error al obtener sectores con más tareas completadas:", error);
       throw error;
     }
   }
 
-  async getAverageDistanceOfCompletedTasks(userId: number): Promise<number> {
+  async getAverageDistanceOfCompletedTasks(userId: number): Promise<DistanciaTareaPromedioResponse[]> {
     try {
-      const { data } = await apiClient.get<number>(`/promedio-distancia-completadas/${userId}`);
+      const { data } = await apiClient.get<DistanciaTareaPromedioResponse[]>(`/users/promedio-distancia-completadas/${userId}`);
       return data;
     } catch (error) {
-      console.error("Error al calcular el promedio de distancia:", error);
+      console.error("Error al obtener promedio de distancia de tareas completadas:", error);
+      throw error;
+    }
+  }
+
+  async getTasksBySector(): Promise<SectorStats[]> {
+    try {
+      const { data } = await apiClient.get<SectorStats[]>("/sector/tareas-pendientes");
+      return data;
+    } catch (error) {
+      console.error("Error al obtener sectores con tareas pendientes:", error);
+      throw error;
+    }
+  }
+
+  async getMostCompletedNearUser(userId: number, radiusKm: number): Promise<SectorStats[]> {
+    try {
+      const { data } = await apiClient.get<SectorStats[]>(`/sector/most-completed-near/${userId}/${radiusKm}`);
+      return data;
+    } catch (error) {
+      console.error("Error al obtener sectores con más tareas completadas cerca del usuario:", error);
       throw error;
     }
   }
