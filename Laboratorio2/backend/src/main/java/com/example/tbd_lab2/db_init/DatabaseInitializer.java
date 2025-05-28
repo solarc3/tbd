@@ -25,6 +25,15 @@ public class DatabaseInitializer {
             Path procedurePath = Paths.get(getClass().getClassLoader().getResource("procedures.sql").toURI());
             String sql = new String(Files.readAllBytes(procedurePath));
             jdbcTemplate.execute(sql);
+            // cargar 'resources/zonas.sql'
+            Path zonePath = Paths.get(getClass().getClassLoader().getResource("zonas.sql").toURI());
+            String sql_zona = new String(Files.readAllBytes(zonePath));
+            jdbcTemplate.execute(sql_zona);
+            // cargar 'resources/datos.sql'
+            Path dataPath = Paths.get(getClass().getClassLoader().getResource("datos.sql").toURI());
+            String sql_data = new String(Files.readAllBytes(dataPath));
+            jdbcTemplate.execute(sql_data);
+
 
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Error al inicializar procedimientos almacenados: ", e);

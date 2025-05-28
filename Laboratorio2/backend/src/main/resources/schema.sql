@@ -1,4 +1,5 @@
--- Drop tables in the correct order to avoid foreign key constraint issues
+DROP TABLE IF EXISTS sectores CASCADE;
+
 DROP TABLE IF EXISTS producto_pedido CASCADE;
 
 DROP TABLE IF EXISTS farmacia_repartidor CASCADE;
@@ -32,7 +33,12 @@ CREATE TYPE estado_pedido AS ENUM (
 	'CANCELADO'
 );
 
--- Create tables
+CREATE TABLE sectores (
+    id SERIAL PRIMARY KEY,
+    nombre_sector VARCHAR(100) NOT NULL,
+    area GEOMETRY(Polygon, 4326)
+);
+
 CREATE TABLE users (
 	id BIGSERIAL PRIMARY KEY,
 	username VARCHAR(255) NOT NULL UNIQUE,
