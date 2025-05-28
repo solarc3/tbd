@@ -135,7 +135,7 @@ public class UserRepository {
 			String sql = """
 			SELECT users.id,
 			       CONCAT(users.first_name, ' ', users.last_name) AS nombre,
-			       AVG(ST_Distance(ST_Centroid(sectores.area), users.location)) AS promedio_tareas
+			       AVG(ST_Distance(sectores.area::geography, users.location::geography)) AS promedio_tareas
 			FROM (SELECT id_usuario, id_sector
 			      FROM tareas WHERE tareas.estado = 'COMPLETADA') AS tareas_completadas
 			    INNER JOIN sectores ON id_sector = sectores.id

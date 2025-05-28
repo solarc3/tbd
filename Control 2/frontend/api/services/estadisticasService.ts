@@ -7,9 +7,10 @@ export interface SectorStats {
 
 // i
 export interface ClosestTask {
-  title: string;
-  description: string;
-  distance: number;
+  tituloTarea: string;
+  descripcionTarea: string;
+  nombreSector: string;
+  distanciaAlSectorMetros: number;
 }
 
 export interface TareaCountBySectorDTO {
@@ -19,8 +20,8 @@ export interface TareaCountBySectorDTO {
 }
 
 export interface DistanciaTareaPromedioResponse {
-  userId: number;
-  promedioDistancia: number;
+  idUsuario: number;
+  distanciaPromedio: number; // también en metros
 }
 
 class EstadisticasService {
