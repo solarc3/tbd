@@ -26,6 +26,8 @@ const saveTask = (task: any) => {
   console.log('Nueva tarea creada:', task)
   closeModal()
 }
+
+const mapRef = ref(null)
 </script>
 
 <template>
@@ -40,7 +42,6 @@ const saveTask = (task: any) => {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-stretch">
-      <!-- Controles -->
       <div class="lg:col-span-1 space-y-6">
         <NuxtLink to="/gestor" class="block">
           <div class="bg-blue-100 p-6 rounded-lg shadow-md hover:shadow-lg transition h-32 flex flex-col justify-center">
@@ -59,18 +60,19 @@ const saveTask = (task: any) => {
           <p class="text-gray-600 mt-2">Descubre las estadísticas y valoraciones en base a tus tareas completadas.</p>
         </div>
       </div>
-
-      <!-- Mapa al lado -->
       <div class="lg:col-span-3 h-full flex items-center">
-        <div class=" h-full w-full h-[60vh]" :class="{ 'map-dimmed': isModalOpen }">
+        <div class="h-full w-full h-[60vh]" :class="{ 'map-dimmed': isModalOpen }">
           <ClientOnly>
-            <MapaTareas />
+            <MapaTareas
+                ref="mapRef"
+                :initial-lat="-33.45"
+                :initial-lng="-70.6667"
+                :initial-zoom="12"
+            />
           </ClientOnly>
         </div>
       </div>
     </div>
-
-    <!-- Modal -->
     <Teleport to="body">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">

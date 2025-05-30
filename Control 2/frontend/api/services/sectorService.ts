@@ -1,7 +1,13 @@
 import apiClient from "@/api/axios";
 
+export interface SectorEntity {
+  id: number;
+  nombreSector: string;
+  area: string;
+}
+
 class SectorService {
-  async getAllSectores(): Promise<{ id: number; nombreSector: string }[]> {
+  async getAllSectores(): Promise<SectorEntity[]> {
     try {
       const { data } = await apiClient.get("/sector/");
       return data;
