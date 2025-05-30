@@ -1,3 +1,83 @@
+<template>
+  <Card class="mx-auto max-w-4xl my-8">
+    <CardHeader>
+      <CardTitle class="text-xl">Registrate</CardTitle>
+      <CardDescription>Ingresa tu información para crear una cuenta nueva.</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <form @submit.prevent="handleRegister" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="space-y-2">
+            <label for="firstName" class="text-sm font-medium">Nombre</label>
+            <Input id="firstName" v-model="form.firstName" placeholder="Juan" required />
+          </div>
+          <div class="space-y-2">
+            <label for="lastName" class="text-sm font-medium">Apellido</label>
+            <Input id="lastName" v-model="form.lastName" placeholder="Pérez" required />
+          </div>
+          <div class="space-y-2">
+            <label for="rut" class="text-sm font-medium">RUT</label>
+            <Input id="rut" v-model="form.rut" placeholder="12.345.678-9" required :maxlength="12" />
+            <p v-if="rutError" class="text-sm text-red-500 mt-1">{{ rutError }}</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label for="email" class="text-sm font-medium">Correo electrónico</label>
+          <Input id="email" v-model="form.email" type="email" placeholder="correo@ejemplo.com" required />
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-80">
+          <div class="flex flex-col h-full">
+            <label class="text-sm font-medium">Ubicación</label>
+            <p class="text-xs text-gray-500 mb-2">Haz clic en el mapa para seleccionar tu ubicación.</p>
+            <div class="flex-1 border rounded-md overflow-hidden bg-gray-100">
+              <MapaSelector
+                  ref="mapComponentRef"
+                  :initialLat="-33.4562"
+                  :initialLng="-70.6483"
+                  :initialZoom="12"
+                  :selectedLatitude="form.latitude"
+                  :selectedLongitude="form.longitude"
+                  @location-selected="handleLocationSelected"
+              />
+            </div>
+            <div v-if="form.latitude !== null && form.longitude !== null" class="text-xs text-gray-600 mt-2 h-4">
+              Lat: {{ form.latitude.toFixed(5) }}, Lng: {{ form.longitude.toFixed(5) }}
+            </div>
+            <div v-else class="h-4 mt-2"></div>
+          </div>
+          <div class="flex flex-col justify-between h-full">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label for="password" class="text-sm font-medium">Contraseña</label>
+                <Input id="password" v-model="form.password" type="password" required />
+              </div>
+
+              <div class="space-y-2">
+                <label for="confirmPassword" class="text-sm font-medium">Confirmar Contraseña</label>
+                <Input id="confirmPassword" v-model="form.confirmPassword" type="password" required />
+              </div>
+            </div>
+            <div class="mt-auto">
+              <Button
+                  type="submit"
+                  class="w-full bg-[var(--primary)] transition-colors duration-200 ease-in-out hover:bg-[var(--secondary)]/90 text-white"
+                  :disabled="isLoading"
+              >
+                {{ isLoading ? "Creando cuenta..." : "Crear cuenta" }}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="mt-6 text-center text-sm">
+        ¿Ya tienes una cuenta?
+        <router-link to="/login" class="underline">Iniciar sesión</router-link>
+      </div>
+    </CardContent>
+  </Card>
+</template>
+
 <script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
 import { useRouter } from "vue-router";
@@ -108,13 +188,12 @@ const validateForm = () => {
     rutError.value = "RUT inválido";
     return false;
   }
-   if (form.value.latitude === null || form.value.longitude === null) {
-     error.value = "Por favor, selecciona tu ubicación en el mapa.";
+  if (form.value.latitude === null || form.value.longitude === null) {
+    error.value = "Por favor, selecciona tu ubicación en el mapa.";
     return false;
   }
   return true;
 };
-
 
 const handleLocationSelected = (coords: { latitude: number; longitude: number }) => {
   form.value.latitude = coords.latitude;
@@ -168,75 +247,3 @@ const handleRegister = async () => {
   }
 };
 </script>
-
-<template>
-  <Card class="mx-auto max-w-sm my-8"> <CardHeader>
-    <CardTitle class="text-xl">Registrate</CardTitle>
-    <CardDescription>Ingresa tu información para crear una cuenta nueva.</CardDescription>
-  </CardHeader>
-    <CardContent>
-      <form @submit.prevent="handleRegister" class="grid gap-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <label for="firstName" class="text-sm font-medium">Nombre</label>
-            <Input id="firstName" v-model="form.firstName" placeholder="Juan" required />
-          </div>
-          <div class="space-y-2">
-            <label for="lastName" class="text-sm font-medium">Apellido</label>
-            <Input id="lastName" v-model="form.lastName" placeholder="Pérez" required />
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label for="rut" class="text-sm font-medium">RUT</label>
-          <Input id="rut" v-model="form.rut" placeholder="12.345.678-9" required />
-          <p v-if="rutError" class="text-sm text-red-500 mt-1">{{ rutError }}</p>
-        </div>
-
-        <div class="space-y-2">
-          <label for="email" class="text-sm font-medium">Correo electrónico</label>
-          <Input id="email" v-model="form.email" type="email" placeholder="correo@ejemplo.com" required />
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-medium">Ubicacion</label>
-          <p class="text-xs text-gray-500 mb-2">Haz clic en el mapa para seleccionar tu ubicacion.</p>
-          <div class="h-64 w-full border rounded-md overflow-hidden bg-gray-100">
-            <MapaSelector
-                ref="mapComponentRef"
-                :initialLat="-33.4562" لهواء :initialLng="-70.6483"
-                :initialZoom="12"
-                :selectedLatitude="form.latitude"
-                :selectedLongitude="form.longitude"
-                @location-selected="handleLocationSelected"
-            />
-          </div>
-          <div v-if="form.latitude !== null && form.longitude !== null" class="text-xs text-gray-600 mt-1">
-            Lat: {{ form.latitude.toFixed(5) }}, Lng: {{ form.longitude.toFixed(5) }}
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label for="password" class="text-sm font-medium">Contraseña</label>
-          <Input id="password" v-model="form.password" type="password" required />
-        </div>
-
-        <div class="space-y-2">
-          <label for="confirmPassword" class="text-sm font-medium">Confirmar Contraseña</label>
-          <Input id="confirmPassword" v-model="form.confirmPassword" type="password" required />
-        </div>
-
-        <Button
-            type="submit"
-            class="w-full bg-[var(--primary)] transition-colors duration-200 ease-in-out hover:bg-[var(--secondary)]/90 text-white"
-            :disabled="isLoading"
-        >
-          {{ isLoading ? "Creando cuenta..." : "Crear cuenta" }}
-        </Button>
-      </form>
-      <div class="mt-4 text-center text-sm">
-        ¿Ya tienes una cuenta?
-        <router-link to="/login" class="underline">Iniciar sesión</router-link> </div>
-    </CardContent>
-  </Card>
-</template>
