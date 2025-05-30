@@ -1,13 +1,15 @@
 package com.example.tbd_lab2.repositories;
 
+import com.example.tbd_lab2.DTO.FarmaciaClosestDeliveryResponse;
 import com.example.tbd_lab2.DTO.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab2.DTO.FarmaciaPuntoEntregaLejanaResponse;
 import com.example.tbd_lab2.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +24,41 @@ public class FarmaciaRepository {
     }
 
     public Optional<FarmaciaEntity> findById(Long id) {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ubicacion FROM farmacia WHERE id_farmacia = ?";
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia WHERE id_farmacia = ?";
         try {
-            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-                FarmaciaEntity entity = new FarmaciaEntity();
-                entity.setIdFarmacia(rs.getLong("id_farmacia"));
-                entity.setNombreFarmacia(rs.getString("nombre_farmacia"));
-                entity.setDireccion(rs.getString("direccion"));
-                entity.setUbicacion((Point) rs.getObject("ubicacion"));
-                return entity;
-            }, id);
+            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class), id);
             return Optional.ofNullable(farmacia);
-        } catch (EmptyResultDataAccessException e) {
+        }
+        catch (EmptyResultDataAccessException e){
             return Optional.empty();
+        }
+    }
+    public List<FarmaciaClosestDeliveryResponse> listUsersFarmaciaClosestDelivery(Long id){
+        try {
+            String sql = "SELECT concat(usuarios.first_name,' ',usuarios.last_name) AS nombre_usuario ,st_distance(usuarios.location::geography,farm.ubicacion::geography) AS distancia FROM (SELECT pedido.id_farmacia, pedido.id_cliente FROM pedido WHERE pedido.id_farmacia = ?) AS usuariofarmacia INNER JOIN users AS usuarios ON usuarios.id = usuariofarmacia.id_cliente INNER JOIN farmacia AS farm ON farm.id_farmacia = usuariofarmacia.id_farmacia group by usuarios.location, farm.ubicacion,nombre_usuario ORDER BY distancia ASC";
+                    return jdbcTemplate.query(sql,(rs,rowNum )-> FarmaciaClosestDeliveryResponse.builder()
+                            .distanciaEntrega(rs.getDouble("distancia"))
+                            .nombreUsuario(rs.getString("nombre_usuario"))
+                            .build(),id);
+            }catch(EmptyResultDataAccessException e){
+                return new ArrayList<>();
+            }catch (Exception e) {
+                e.printStackTrace();
+                return new ArrayList<>();
+            }
+    }
+    public List<FarmaciaPuntoEntregaLejanaResponse> listbyFarmaciaFurthestPoint(){
+        try {
+            String sql = "select nombre_farmacia, max(distancia) as entrega_lejana from (SELECT farm.id_farmacia ,farm.nombre_farmacia, concat(usuarios.first_name,' ',usuarios.last_name) AS nombre_usuario ,st_distance(usuarios.location::geography,farm.ubicacion::geography) AS distancia FROM (SELECT pedido.id_farmacia, pedido.id_cliente FROM pedido) AS usuariofarmacia INNER JOIN users AS usuarios ON usuarios.id = usuariofarmacia.id_cliente INNER JOIN farmacia AS farm ON farm.id_farmacia = usuariofarmacia.id_farmacia group by farm.id_farmacia, farm.nombre_farmacia ,usuarios.location, farm.ubicacion,nombre_usuario ORDER BY id_farmacia, distancia DESC) as distacia_entregas group by nombre_farmacia";
+            return jdbcTemplate.query(sql,(rs,RowNum)-> FarmaciaPuntoEntregaLejanaResponse.builder()
+                    .distanciaEntrega(rs.getDouble("entrega_lejana"))
+                    .nombreFarmacia(rs.getString("nombre_farmacia"))
+                    .build());
+        } catch(EmptyResultDataAccessException e){
+            return new ArrayList<>();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 
@@ -76,14 +100,7 @@ public class FarmaciaRepository {
     }
 
     public List<FarmaciaEntity> findAll() {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ubicacion FROM farmacia";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            FarmaciaEntity entity = new FarmaciaEntity();
-            entity.setIdFarmacia(rs.getLong("id_farmacia"));
-            entity.setNombreFarmacia(rs.getString("nombre_farmacia"));
-            entity.setDireccion(rs.getString("direccion"));
-            entity.setUbicacion((Point) rs.getObject("ubicacion"));
-            return entity;
-        });
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class));
     }
 }

@@ -1,6 +1,8 @@
 package com.example.tbd_lab2.services;
 
+import com.example.tbd_lab2.DTO.FarmaciaClosestDeliveryResponse;
 import com.example.tbd_lab2.DTO.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab2.DTO.FarmaciaPuntoEntregaLejanaResponse;
 import com.example.tbd_lab2.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.repositories.FarmaciaRepository;
@@ -18,10 +20,14 @@ public class FarmaciaService {
 		this.farmaciaRepository = farmaciaRepository;
 	}
 
-	public List<
-		FarmaciaPedidoFallidoResponse
-	> getFarmaciasWithMostCancelledPedidos() {
+	public List<FarmaciaPedidoFallidoResponse> getFarmaciasWithMostCancelledPedidos() {
 		return farmaciaRepository.listFarmaciaByCantPedidoCancelado();
+	}
+	public List<FarmaciaPuntoEntregaLejanaResponse> getFarmaciasFarthestDeliveryPoint(){
+		return farmaciaRepository.listbyFarmaciaFurthestPoint();
+	}
+	public List<FarmaciaClosestDeliveryResponse>  getFarmaciasClosestDeliveryPoint(Long id){
+		return farmaciaRepository.listUsersFarmaciaClosestDelivery(id);
 	}
 
 	public List<RankingFarmaciaPedidoResponse> rankingFarmaciaPedidos() {
