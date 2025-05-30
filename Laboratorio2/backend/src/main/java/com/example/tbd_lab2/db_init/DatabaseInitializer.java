@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 public class DatabaseInitializer {
@@ -21,22 +23,21 @@ public class DatabaseInitializer {
     @PostConstruct
     public void initProcedures() {
         try {
-            // cargar 'resources/procedures.sql'
-            Path procedurePath = Paths.get(getClass().getClassLoader().getResource("procedures.sql").toURI());
-            String sql = new String(Files.readAllBytes(procedurePath));
-            jdbcTemplate.execute(sql);
-            // cargar 'resources/zonas.sql'
-            Path zonePath = Paths.get(getClass().getClassLoader().getResource("zonas.sql").toURI());
-            String sql_zona = new String(Files.readAllBytes(zonePath));
-            jdbcTemplate.execute(sql_zona);
-            // cargar 'resources/datos.sql'
-            Path dataPath = Paths.get(getClass().getClassLoader().getResource("datos.sql").toURI());
-            String sql_data = new String(Files.readAllBytes(dataPath));
-            jdbcTemplate.execute(sql_data);
+            List<String> filenames = List.of(
+                    "procedures.sql", "zonas.sql", "datos.sql"
+            );
 
+            // Ejecutar scripts SQL en orden.
+            // schema.sql lo ejecuta Spring automaticamente.
+            for (String filename : filenames) {
+                Path path = Paths.get(Objects.requireNonNull(
+                        getClass().getClassLoader().getResource(filename)).toURI());
+                String sql = new String(Files.readAllBytes(path));
+                jdbcTemplate.execute(sql);
+            }
 
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException("Error al inicializar procedimientos almacenados: ", e);
+            throw new RuntimeException("Error al inicializar scripts SQL: ", e);
         }
     }
 }

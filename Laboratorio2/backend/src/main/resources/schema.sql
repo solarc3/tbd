@@ -48,13 +48,15 @@ CREATE TABLE users (
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password VARCHAR(255) NOT NULL,
 	refresh_token VARCHAR(500),
-	refresh_token_expiration BIGINT
+	refresh_token_expiration BIGINT,
+    location GEOMETRY(Point, 4326)
 );
 
 CREATE TABLE farmacia (
 	id_farmacia BIGSERIAL PRIMARY KEY,
 	nombre_farmacia VARCHAR(255) NOT NULL,
-	direccion TEXT NOT NULL
+	direccion TEXT NOT NULL,
+    ubicacion GEOMETRY(Point, 4326)
 );
 
 CREATE TABLE producto (
@@ -73,7 +75,8 @@ CREATE TABLE pedido (
 	es_urgente BOOLEAN NOT NULL,
 	estado_pedido estado_pedido NOT NULL,
 	id_cliente BIGINT REFERENCES users (id) ON DELETE CASCADE,
-	id_farmacia BIGINT REFERENCES farmacia (id_farmacia) ON DELETE CASCADE
+	id_farmacia BIGINT REFERENCES farmacia (id_farmacia) ON DELETE CASCADE,
+    ruta_estimada GEOMETRY(LineString, 4326)
 );
 
 CREATE TABLE detalle_pedido (
@@ -94,7 +97,8 @@ CREATE TABLE producto_farmacia (
 CREATE TABLE repartidor (
 	id_repartidor BIGSERIAL PRIMARY KEY,
 	nombre_repartidor VARCHAR(255),
-	fecha_contratacion DATE NOT NULL
+	fecha_contratacion DATE NOT NULL,
+    ubicacion GEOMETRY(Point, 4326)
 );
 
 CREATE TABLE calificacion (

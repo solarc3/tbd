@@ -1,23 +1,22 @@
--- Replace the existing users INSERT statement with this updated version
-INSERT INTO users (username, email, password, first_name, last_name, rut) VALUES
-('cliente1', 'cliente1@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Juan', 'González', '12.345.678-9'),
-('cliente2', 'cliente2@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'María', 'Rodríguez', '11.987.654-3'),
-('cliente3', 'cliente3@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Carlos', 'Pérez', '15.678.901-2'),
-('cliente4', 'cliente4@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Ana', 'López', '17.432.765-K'),
-('cliente5', 'cliente5@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Diego', 'Martínez', '14.765.238-5'),
-('cliente6', 'cliente6@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Valentina', 'Hernández', '16.543.219-8'),
-('cliente7', 'cliente7@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Sebastián', 'Torres', '13.987.654-1'),
-('cliente8', 'cliente8@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Camila', 'Sánchez', '18.234.567-7'),
-('cliente9', 'cliente9@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Matías', 'Fernández', '19.876.543-4'),
-('cliente10', 'cliente10@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Javiera', 'Muñoz', '10.543.876-6');
+INSERT INTO users (username, email, password, first_name, last_name, rut, location) VALUES
+('cliente1', 'cliente1@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Juan', 'González', '12.345.678-9', ST_SetSRID(ST_MakePoint(-70.6215, -33.4785), 4326)),
+('cliente2', 'cliente2@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'María', 'Rodríguez', '11.987.654-3', ST_SetSRID(ST_MakePoint(-70.6370, -33.5187), 4326)),
+('cliente3', 'cliente3@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Carlos', 'Pérez', '15.678.901-2', ST_SetSRID(ST_MakePoint(-70.6345, -33.5330), 4326)),
+('cliente4', 'cliente4@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Ana', 'López', '17.432.765-K', ST_SetSRID(ST_MakePoint(-70.6540, -33.4050), 4326)),
+('cliente5', 'cliente5@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Diego', 'Martínez', '14.765.238-5', ST_SetSRID(ST_MakePoint(-70.6520, -33.5300), 4326)),
+('cliente6', 'cliente6@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Valentina', 'Hernández', '16.543.219-8', ST_SetSRID(ST_MakePoint(-70.5420, -33.4900), 4326)),
+('cliente7', 'cliente7@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Sebastián', 'Torres', '13.987.654-1', ST_SetSRID(ST_MakePoint(-70.6140, -33.4370), 4326)),
+('cliente8', 'cliente8@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Camila', 'Sánchez', '18.234.567-7', ST_SetSRID(ST_MakePoint(-70.5450, -33.4500), 4326)),
+('cliente9', 'cliente9@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Matías', 'Fernández', '19.876.543-4', ST_SetSRID(ST_MakePoint(-70.7650, -33.5750), 4326)),
+('cliente10', 'cliente10@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Javiera', 'Muñoz', '10.543.876-6', ST_SetSRID(ST_MakePoint(-70.6800, -33.2000), 4326));
 
-INSERT INTO farmacia (nombre_farmacia, direccion)VALUES
-('Farmacia Salud', 'Av. Principal 123'),
-('Farmacia Cruz Verde', 'Av. Los Leones 2345'),
-('Farmacia Ahumada', 'Calle Providencia 768'),
-('Farmacia Dr. Simi', 'Av. Macul 1234'),
-('Farmacia Bienestar', 'Av. Irarrázaval 5678'),
-('Farmacia SanaSana', 'Av. Vicuña Mackenna 4321');
+INSERT INTO farmacia (nombre_farmacia, direccion, ubicacion) VALUES
+('Farmacia Salud', 'Gral. Körner 824', ST_SetSRID(ST_MakePoint(-70.68211, -33.54934), 4326)),
+('Farmacia Cruz Verde', 'Las Bellotas 182, Local 2', ST_SetSRID(ST_MakePoint(-70.60817, -33.42212), 4326)),
+('Farmacia Ahumada', 'Av. Los Leones 1160', ST_SetSRID(ST_MakePoint(-70.60227, -33.43013), 4326)),
+('Farmacia Dr. Simi', 'Av. Providencia 2327', ST_SetSRID(ST_MakePoint(-70.60751, -33.42064), 4326)),
+('Farmacia Bienestar', 'Gran Av. José Miguel Carrera 8766', ST_SetSRID(ST_MakePoint(-70.66394, -33.53659), 4326)),
+('Farmacia SanaSana', 'Av. Domingo Sta. María 3465', ST_SetSRID(ST_MakePoint(-70.69291, -33.40899), 4326));
 
 INSERT INTO
 	producto (
@@ -671,28 +670,108 @@ VALUES
         'https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/-/Sites-ahumada-master-catalog/default/dwe74a2eed/images/products/49937/49937.jpg'
     );
 
-INSERT INTO pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia)
+INSERT INTO pedido (monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ruta_estimada)
 VALUES
-    (0, '2025-05-09 14:30:00', false, 'POR_CONFIRMAR', 1, 1),
-    (15600, '2025-05-09 14:30:00', false, 'POR_CONFIRMAR', 3, 2),
-    (9800, '2025-05-08 10:15:00', false, 'CONFIRMADO', 5, 3),
-    (23500, '2025-05-07 16:45:00', true, 'ENTREGADO', 2, 1),
-    (7900, '2025-05-07 09:20:00', false, 'CANCELADO', 4, 6),
-    (31200, '2025-05-06 13:10:00', true, 'ENTREGADO', 1, 4),
-    (12400, '2025-05-06 11:25:00', false, 'CONFIRMADO', 7, 5),
-    (18900, '2025-05-05 15:50:00', false, 'ENTREGADO', 6, 2),
-    (27500, '2025-05-04 08:40:00', true, 'ENTREGADO', 3, 1),
-    (14300, '2025-05-03 17:15:00', false, 'CANCELADO', 9, 3),
-    (19800, '2025-05-02 12:30:00', false, 'ENTREGADO', 8, 4),
-    (8700, '2025-05-01 14:45:00', false, 'ENTREGADO', 10, 6),
-    (22100, '2025-04-30 11:20:00', true, 'CONFIRMADO', 2, 5),
-    (16700, '2025-04-29 09:35:00', false, 'ENTREGADO', 4, 2),
-    (29400, '2025-04-28 16:10:00', true, 'ENTREGADO', 7, 3),
-    (11200, '2025-04-27 13:50:00', false, 'CANCELADO', 1, 1),
-    (21800, '2025-04-26 10:25:00', false, 'ENTREGADO', 5, 6),
-    (13500, '2025-04-25 15:40:00', false, 'ENTREGADO', 9, 4),
-    (26300, '2025-04-24 08:15:00', true, 'CONFIRMADO', 6, 5),
-    (17900, '2025-04-23 14:55:00', false, 'ENTREGADO', 8, 2);
+    (0, '2025-05-09 14:30:00', false, 'POR_CONFIRMAR', 1, 1,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 1),
+             (SELECT location FROM users WHERE id = 1)
+     )),
+    (15600, '2025-05-09 14:30:00', false, 'POR_CONFIRMAR', 3, 2,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 2),
+             (SELECT location FROM users WHERE id = 3)
+     )),
+    (9800, '2025-05-08 10:15:00', false, 'CONFIRMADO', 5, 3,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 3),
+             (SELECT location FROM users WHERE id = 5)
+     )),
+    (23500, '2025-05-07 16:45:00', true, 'ENTREGADO', 2, 1,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 1),
+             (SELECT location FROM users WHERE id = 2)
+     )),
+    (7900, '2025-05-07 09:20:00', false, 'CANCELADO', 4, 6,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 6),
+             (SELECT location FROM users WHERE id = 4)
+     )),
+    (31200, '2025-05-06 13:10:00', true, 'ENTREGADO', 1, 4,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 4),
+             (SELECT location FROM users WHERE id = 1)
+     )),
+    (12400, '2025-05-06 11:25:00', false, 'CONFIRMADO', 7, 5,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 5),
+             (SELECT location FROM users WHERE id = 7)
+     )),
+    (18900, '2025-05-05 15:50:00', false, 'ENTREGADO', 6, 2,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 2),
+             (SELECT location FROM users WHERE id = 6)
+     )),
+    (27500, '2025-05-04 08:40:00', true, 'ENTREGADO', 3, 1,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 1),
+             (SELECT location FROM users WHERE id = 3)
+     )),
+    (14300, '2025-05-03 17:15:00', false, 'CANCELADO', 9, 3,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 3),
+             (SELECT location FROM users WHERE id = 9)
+     )),
+    (19800, '2025-05-02 12:30:00', false, 'ENTREGADO', 8, 4,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 4),
+             (SELECT location FROM users WHERE id = 8)
+     )),
+    (8700, '2025-05-01 14:45:00', false, 'ENTREGADO', 10, 6,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 6),
+             (SELECT location FROM users WHERE id = 10)
+     )),
+    (22100, '2025-04-30 11:20:00', true, 'CONFIRMADO', 2, 5,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 5),
+             (SELECT location FROM users WHERE id = 2)
+     )),
+    (16700, '2025-04-29 09:35:00', false, 'ENTREGADO', 4, 2,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 2),
+             (SELECT location FROM users WHERE id = 4)
+     )),
+    (29400, '2025-04-28 16:10:00', true, 'ENTREGADO', 7, 3,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 3),
+             (SELECT location FROM users WHERE id = 7)
+     )),
+    (11200, '2025-04-27 13:50:00', false, 'CANCELADO', 1, 1,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 1),
+             (SELECT location FROM users WHERE id = 1)
+     )),
+    (21800, '2025-04-26 10:25:00', false, 'ENTREGADO', 5, 6,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 6),
+             (SELECT location FROM users WHERE id = 5)
+     )),
+    (13500, '2025-04-25 15:40:00', false, 'ENTREGADO', 9, 4,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 4),
+             (SELECT location FROM users WHERE id = 9)
+     )),
+    (26300, '2025-04-24 08:15:00', true, 'CONFIRMADO', 6, 5,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 5),
+             (SELECT location FROM users WHERE id = 6)
+     )),
+    (17900, '2025-04-23 14:55:00', false, 'ENTREGADO', 8, 2,
+     ST_MakeLine(
+             (SELECT ubicacion FROM farmacia WHERE id_farmacia = 2),
+             (SELECT location FROM users WHERE id = 8)
+     ));
 
 INSERT INTO producto_farmacia (id_producto, id_farmacia, stock_producto)
 VALUES
@@ -999,17 +1078,17 @@ VALUES
     (76, 6, 60),
     (78, 6, 75);
 
-INSERT INTO repartidor (nombre_repartidor, fecha_contratacion) VALUES
-('María González', '2022-03-10'),
-('Carlos Rodríguez', '2022-02-05'),
-('Ana Martínez', '2022-06-15'),
-('Diego Sánchez', '2022-04-22'),
-('Valeria Muñoz', '2022-05-18'),
-('Roberto Fernández', '2022-07-01'),
-('Camila Torres', '2022-03-28'),
-('José Hernández', '2022-02-12'),
-('Lucía Flores', '2022-08-05'),
-('Andrés López', '2022-09-11');
+INSERT INTO repartidor (nombre_repartidor, fecha_contratacion, ubicacion) VALUES
+('María González', '2022-03-10', ST_SetSRID(ST_MakePoint(-70.6500, -33.4500), 4326)),       -- Santiago Centro
+('Carlos Rodríguez', '2022-02-05', ST_SetSRID(ST_MakePoint(-70.6000, -33.4200), 4326)),     -- Providencia
+('Ana Martínez', '2022-06-15', ST_SetSRID(ST_MakePoint(-70.7000, -33.4800), 4326)),         -- Quinta Normal
+('Diego Sánchez', '2022-04-22', ST_SetSRID(ST_MakePoint(-70.5500, -33.5000), 4326)),        -- La Florida
+('Valeria Muñoz', '2022-05-18', ST_SetSRID(ST_MakePoint(-70.7500, -33.5300), 4326)),        -- Maipú
+('Roberto Fernández', '2022-07-01', ST_SetSRID(ST_MakePoint(-70.6200, -33.4600), 4326)),    -- Ñuñoa
+('Camila Torres', '2022-03-28', ST_SetSRID(ST_MakePoint(-70.5800, -33.5800), 4326)),        -- Puente Alto
+('José Hernández', '2022-02-12', ST_SetSRID(ST_MakePoint(-70.7200, -33.3800), 4326)),       -- Las Condes
+('Lucía Flores', '2022-08-05', ST_SetSRID(ST_MakePoint(-70.6700, -33.5200), 4326)),         -- San Miguel
+('Andrés López', '2022-09-11', ST_SetSRID(ST_MakePoint(-70.7800, -33.4300), 4326));         -- Cerrillos
 
 INSERT INTO farmacia_repartidor (id_farmacia, id_repartidor) VALUES
 -- Farmacia Salud (id=1)
