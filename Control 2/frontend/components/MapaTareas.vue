@@ -78,7 +78,6 @@ const addSectoresToMap = () => {
       geoJsonLayer.bindPopup(`
         <div class="sector-popup">
           <h3 style="font-weight: bold; margin-bottom: 5px;">${sector.nombreSector}</h3>
-          <p>ID: ${sector.id}</p>
         </div>
       `);
       sectorLayers.push(geoJsonLayer);
@@ -103,8 +102,6 @@ const addSectoresToMap = () => {
       fallbackCircle.bindPopup(`
         <div class="sector-popup">
           <h3 style="font-weight: bold; margin-bottom: 5px;">${sector.nombreSector}</h3>
-          <p>ID: ${sector.id}</p>
-          <p><em>Nota: Representación aproximada (error en datos GeoJSON)</em></p>
         </div>
       `);
 
