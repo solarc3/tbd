@@ -31,8 +31,11 @@ const loading = ref(true);
 
 const sectorColors = [
   '#FF5733', '#33FF57', '#3357FF', '#F033FF', '#FF33A8',
-  '#33FFF6', '#FFD133', '#8C33FF', '#FF8C33', '#33FFBD'
+  '#33FFF6', '#FFD133', '#8C33FF', '#FF8C33', '#33FFBD',
+  '#BD33FF', '#33BDFF', '#FF3333', '#33FF33', '#3333FF',
+  '#FF33FF', '#33FFFF', '#FFFF33', '#FF6633', '#33FF66'
 ];
+
 
 const fetchSectores = async () => {
   try {
