@@ -1,25 +1,54 @@
 package com.example.tbd_lab2.repositories;
 
-import com.example.tbd_lab2.DTO.ClienteGastoResponse;
-import com.example.tbd_lab2.DTO.TopClienteResponse;
 import com.example.tbd_lab2.entities.UserEntity;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.locationtech.jts.geom.Point;
+
+import java.sql.PreparedStatement;
+import java.util.Optional;
+
+import java.sql.Types;
 
 @Repository
 public class UserRepository {
 
 	private final JdbcTemplate jdbcTemplate;
+	private final WKTReader reader = new WKTReader();
+
+	private final RowMapper<UserEntity> userRowMapper = (rs, rowNum) -> {
+		UserEntity userEntity = new UserEntity();
+		userEntity.setId(rs.getLong("id"));
+		userEntity.setUsername(rs.getString("username"));
+		userEntity.setFirstName(rs.getString("first_name"));
+		userEntity.setLastName(rs.getString("last_name"));
+		userEntity.setRut(rs.getString("rut"));
+		userEntity.setEmail(rs.getString("email"));
+		userEntity.setPassword(rs.getString("password"));
+		userEntity.setRefreshToken(rs.getString("refresh_token"));
+		userEntity.setRefreshTokenExpiration(rs.getLong("refresh_token_expiration"));
+
+		// handle point data
+		String wkt = rs.getString("location");
+		if (wkt != null) {
+			try {
+				Geometry geom = reader.read(wkt);
+				userEntity.setLocation((Point) geom);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return userEntity;
+	};
 
 	@Autowired
 	public UserRepository(JdbcTemplate jdbcTemplate) {
@@ -28,11 +57,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findById(Long id) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE id = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					id
 			);
 			return Optional.ofNullable(userEntity);
@@ -43,11 +72,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByUsername(String username) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE username = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					username
 			);
 			return Optional.ofNullable(userEntity);
@@ -58,11 +87,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByEmail(String email) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE email = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE email = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					email
 			);
 			return Optional.ofNullable(userEntity);
@@ -73,11 +102,11 @@ public class UserRepository {
 
 	public Optional<UserEntity> findByRefreshToken(String refreshToken) {
 		String sql =
-				"SELECT id, username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
+				"SELECT id, username, first_name, last_name, rut, password, email, ST_AsText(location) AS location, refresh_token, refresh_token_expiration FROM users WHERE refresh_token = ?";
 		try {
 			UserEntity userEntity = jdbcTemplate.queryForObject(
 					sql,
-					new BeanPropertyRowMapper<>(UserEntity.class),
+					userRowMapper,
 					refreshToken
 			);
 			return Optional.ofNullable(userEntity);
@@ -97,6 +126,7 @@ public class UserRepository {
 		return count != null && count > 0;
 	}
 
+
 	public boolean existsByEmail(String email) {
 		String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
 		Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
@@ -109,44 +139,10 @@ public class UserRepository {
 		return count != null && count > 0;
 	}
 
-	// Inicio querys
-	// Buscar cliente que haya gastado mas
-	public TopClienteResponse findClienteWithMostSpending() {
-		try {
-			String sql =
-					"SELECT u.id, u.username, SUM(p.monto) as total_gastado " +
-							"FROM users u " +
-							"JOIN pedido p ON u.id = p.id_cliente " +
-							"WHERE p.estado_pedido::text = 'ENTREGADO' " +
-							"GROUP BY u.id, u.username " +
-							"ORDER BY total_gastado DESC " +
-							"LIMIT 1";
-
-			Map<String, Object> result = jdbcTemplate.queryForMap(sql);
-			if (result != null) {
-				return TopClienteResponse.builder()
-						.id(((Number) result.get("id")).longValue())
-						.username((String) result.get("username"))
-						.totalGastado(
-								((Number) result.get("total_gastado")).intValue()
-						)
-						.build();
-			}
-			return null;
-		} catch (EmptyResultDataAccessException e) {
-			System.out.println("No results found");
-			return null;
-		} catch (Exception e) {
-			System.err.println("Error con query: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public UserEntity save(UserEntity userEntity) {
 		if (userEntity.getId() == null) {
 			String sql =
-					"INSERT INTO users (username, first_name, last_name, rut, password, email, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+					"INSERT INTO users (username, first_name, last_name, rut, password, email, location, refresh_token, refresh_token_expiration) VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 4326), ?, ?)";
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 
 			jdbcTemplate.update(
@@ -161,11 +157,20 @@ public class UserRepository {
 						ps.setString(4, userEntity.getRut());
 						ps.setString(5, userEntity.getPassword());
 						ps.setString(6, userEntity.getEmail());
-						ps.setString(7, userEntity.getRefreshToken());
-						if (userEntity.getRefreshTokenExpiration() != null) {
-							ps.setLong(8, userEntity.getRefreshTokenExpiration());
+
+						Point location = userEntity.getLocation();
+						if (location != null) {
+							// Pasasr como string WKT
+							ps.setString(7, location.toText());
 						} else {
-							ps.setNull(8, java.sql.Types.BIGINT);
+							ps.setNull(7, Types.VARCHAR);
+						}
+
+						ps.setString(8, userEntity.getRefreshToken());
+						if (userEntity.getRefreshTokenExpiration() != null) {
+							ps.setLong(9, userEntity.getRefreshTokenExpiration());
+						} else {
+							ps.setNull(9, java.sql.Types.BIGINT);
 						}
 						return ps;
 					},
@@ -176,26 +181,38 @@ public class UserRepository {
 				userEntity.setId(generatedId.longValue());
 			} else {
 				System.err.println(
-						"no hay id luego intentando recuperar al usuario " +
+						"No se pudo generar ID para el usuario: " +
 								userEntity.getUsername()
 				);
-				// throw new org.springframework.dao.DataRetrievalFailureException("Failed to retrieve ID for user: " + user.getUsername());
 			}
 		} else {
 			String sql =
-					"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ? WHERE id = ?";
-			jdbcTemplate.update(
-					sql,
-					userEntity.getUsername(),
-					userEntity.getFirstName(),
-					userEntity.getLastName(),
-					userEntity.getRut(),
-					userEntity.getPassword(),
-					userEntity.getEmail(),
-					userEntity.getRefreshToken(),
-					userEntity.getRefreshTokenExpiration(),
-					userEntity.getId()
-			);
+					"UPDATE users SET username = ?, first_name = ?, last_name = ?, rut = ?, password = ?, email = ?, refresh_token = ?, refresh_token_expiration = ?, location = ST_GeomFromText(?, 4326) WHERE id = ?";
+
+			jdbcTemplate.update(connection -> {
+				PreparedStatement ps = connection.prepareStatement(sql);
+				ps.setString(1, userEntity.getUsername());
+				ps.setString(2, userEntity.getFirstName());
+				ps.setString(3, userEntity.getLastName());
+				ps.setString(4, userEntity.getRut());
+				ps.setString(5, userEntity.getPassword());
+				ps.setString(6, userEntity.getEmail());
+				ps.setString(7, userEntity.getRefreshToken());
+				if (userEntity.getRefreshTokenExpiration() != null) {
+					ps.setLong(8, userEntity.getRefreshTokenExpiration());
+				} else {
+					ps.setNull(8, Types.BIGINT);
+				}
+
+				Point location = userEntity.getLocation();
+				if (location != null) {
+					ps.setString(9, location.toText());
+				} else {
+					ps.setNull(9, Types.VARCHAR);
+				}
+				ps.setLong(10, userEntity.getId());
+				return ps;
+			});
 		}
 		return userEntity;
 	}
@@ -220,29 +237,5 @@ public class UserRepository {
 		Object[] args = new Object[] { id };
 		return jdbcTemplate.update(sql, args) == 1;
 	}
-	public List<ClienteGastoResponse> findAllClientsWithSpending() {
-		try {
-			String sql =
-					"SELECT u.id, u.username, u.email, COALESCE(SUM(p.monto), 0) as total_gastado " +
-							"FROM users u " +
-							"LEFT JOIN pedido p ON u.id = p.id_cliente " +
-							"GROUP BY u.id, u.username, u.email " +
-							"ORDER BY u.username";
 
-			return jdbcTemplate.query(sql, (rs, rowNum) -> {
-				ClienteGastoResponse cliente = new ClienteGastoResponse();
-				cliente.setId(rs.getLong("id"));
-				cliente.setUsername(rs.getString("username"));
-				cliente.setEmail(rs.getString("email"));
-				cliente.setTotalGastado(rs.getInt("total_gastado"));
-				return cliente;
-			});
-		} catch (Exception e) {
-			System.err.println(
-					"Error retrieving clients with spending: " + e.getMessage()
-			);
-			e.printStackTrace();
-			return new ArrayList<>();
-		}
-	}
 }

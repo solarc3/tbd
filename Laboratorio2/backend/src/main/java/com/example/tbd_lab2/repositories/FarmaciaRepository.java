@@ -3,11 +3,11 @@ package com.example.tbd_lab2.repositories;
 import com.example.tbd_lab2.DTO.FarmaciaPedidoFallidoResponse;
 import com.example.tbd_lab2.DTO.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +22,18 @@ public class FarmaciaRepository {
     }
 
     public Optional<FarmaciaEntity> findById(Long id) {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia WHERE id_farmacia = ?";
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ubicacion FROM farmacia WHERE id_farmacia = ?";
         try {
-            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class), id);
+            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+                FarmaciaEntity entity = new FarmaciaEntity();
+                entity.setIdFarmacia(rs.getLong("id_farmacia"));
+                entity.setNombreFarmacia(rs.getString("nombre_farmacia"));
+                entity.setDireccion(rs.getString("direccion"));
+                entity.setUbicacion((Point) rs.getObject("ubicacion"));
+                return entity;
+            }, id);
             return Optional.ofNullable(farmacia);
-        }
-        catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
@@ -70,7 +76,14 @@ public class FarmaciaRepository {
     }
 
     public List<FarmaciaEntity> findAll() {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class));
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ubicacion FROM farmacia";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            FarmaciaEntity entity = new FarmaciaEntity();
+            entity.setIdFarmacia(rs.getLong("id_farmacia"));
+            entity.setNombreFarmacia(rs.getString("nombre_farmacia"));
+            entity.setDireccion(rs.getString("direccion"));
+            entity.setUbicacion((Point) rs.getObject("ubicacion"));
+            return entity;
+        });
     }
 }

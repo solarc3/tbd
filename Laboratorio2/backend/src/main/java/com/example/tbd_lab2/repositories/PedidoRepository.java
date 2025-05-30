@@ -4,6 +4,7 @@ import com.example.tbd_lab2.DTO.PagoMasUsadoUrgenteResponse;
 import com.example.tbd_lab2.DTO.ProductoPedidoRequest;
 import com.example.tbd_lab2.DTO.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.PedidoEntity;
+import org.locationtech.jts.geom.Geometry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -35,8 +36,9 @@ public class PedidoRepository {
                             .fechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime())
                             .esUrgente(rs.getBoolean("es_urgente"))
                             .estadoPedido(PedidoEntity.EstadoPedido.valueOf(rs.getString("estado_pedido")))
-                            .idCliente(rs.getObject("id_cliente", Long.class))
-                            .idFarmacia(rs.getObject("id_farmacia", Long.class))
+                            .idCliente(rs.getObject("id_cliente", Long.class)) // getObject is safer for nullable FKs
+                            .idFarmacia(rs.getObject("id_farmacia", Long.class)) // getObject is safer for nullable FKs
+                            .rutaEstimada(rs.getObject("ruta_estimada", Geometry.class)) // Added
                             .build()
             );
         } catch (Exception e) {
@@ -47,7 +49,7 @@ public class PedidoRepository {
 
     public Optional<PedidoEntity> findById(Long id) {
         try {
-            String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia FROM pedido WHERE id_pedido = ?";
+            String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ruta_estimada FROM pedido WHERE id_pedido = ?";
             PedidoEntity pedidoEntity = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(PedidoEntity.class), id);
             return Optional.ofNullable(pedidoEntity);
         } catch (EmptyResultDataAccessException e) {

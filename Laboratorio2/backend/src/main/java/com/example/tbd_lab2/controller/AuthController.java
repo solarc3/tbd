@@ -23,6 +23,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+// lab 2
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
 @CrossOrigin(
         origins = "http://localhost:3000",
         allowCredentials = "true",
@@ -176,6 +181,15 @@ public class AuthController {
                 .email(signUpRequest.getEmail())
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .build();
+
+        if (signUpRequest.getLatitude() != null && signUpRequest.getLongitude() != null) {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Point point = geometryFactory.createPoint(
+                    new Coordinate(signUpRequest.getLongitude(), signUpRequest.getLatitude())
+            );
+            point.setSRID(4326);
+            userEntity.setLocation(point);
+        }
 
         userRepository.save(userEntity);
 

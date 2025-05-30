@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
 
 import java.time.LocalDateTime;
 
@@ -27,4 +28,5 @@ public class PedidoEntity {
     private EstadoPedido estadoPedido;
     private Long idCliente;
     private Long idFarmacia;
+    private Geometry rutaEstimada;
 }

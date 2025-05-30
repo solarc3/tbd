@@ -8,12 +8,10 @@ import org.locationtech.jts.geom.Geometry;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class FarmaciaRepartidorEntity {
-    private Long idFarmaciaRepartidor;
-    private Long idFarmacia;
-    private Long idRepartidor;
-    private Geometry ubicacion;
-
+@AllArgsConstructor
+public class SectorEntity {
+    private Long id;
+    private String nombreSector;
+    private String area;
 }

@@ -10,4 +10,6 @@ public class SignupRequest {
     private String rut;
     private String email;
     private String password;
+    private Double latitude;
+    private Double longitude;
 }
