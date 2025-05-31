@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import TareaService from "@/api/services/tareaService";
 import type { Tarea } from "@/api/services/tareaService";
-import gestorTareas from "@/components/gestorTareas.vue";
+import CrearTarea from "@/components/CrearTarea.vue";
 
 interface Task {
   id: number;
@@ -33,7 +33,7 @@ const openEditModal = (task: Tarea) => {
     title: task.titulo || "",
     description: task.descripcion || "",
     dueDate: task.fechaVencimiento || "",
-    sector: task.idSector ? task.idSector.toString() : "1", // Default to sector 1 if not provided
+    sector: task.idSector ? task.idSector.toString() : "1",
     estado: task.estado || "PENDIENTE",
   };
   isEditMode.value = true;
@@ -60,24 +60,22 @@ const closeModal = () => {
 const saveTask = async (task: Partial<Task>) => {
   try {
     if (isEditMode.value && task.id) {
-      // Convertir de Task (componente) a Tarea (API)
       const tareaToUpdate = {
         id: task.id,
         titulo: task.title || "",
         descripcion: task.description || "",
         fechaVencimiento: task.dueDate || "",
-        idSector: task.sector ? parseInt(task.sector) : 1, // Default to sector 1 if not provided
+        idSector: task.sector ? parseInt(task.sector) : 1,
         estado: task.estado || "PENDIENTE",
       };
 
       await TareaService.updateTarea(task.id, tareaToUpdate);
     } else {
-      // Convertir de Task (componente) a Tarea (API)
       const nuevaTarea = {
         titulo: task.title || "",
         descripcion: task.description || "",
         fechaVencimiento: task.dueDate || "",
-        idSector: task.sector ? parseInt(task.sector) : 1, // Default to sector 1 if not provided
+        idSector: task.sector ? parseInt(task.sector) : 1,
         estado: "PENDIENTE",
       };
 
@@ -100,8 +98,6 @@ const deleteTask = async (id: number) => {
   }
 };
 
-// Función para manejar el filtrado de tareas
-// Esta hecho para que el flujo sea PENDIENTE -> EN_PROGRESO -> COMPLETADA
 const toggleComplete = async (task: Tarea) => {
   try {
     let newEstado = "";
@@ -117,14 +113,13 @@ const toggleComplete = async (task: Tarea) => {
       return;
     }
 
-    // Asegurar que todos los campos requeridos estén presentes para evitar error de not-null constraint
     await TareaService.updateTarea(task.id, {
       id: task.id,
       titulo: task.titulo || "",
       descripcion: task.descripcion || "",
       fechaVencimiento: task.fechaVencimiento || "",
-      idUsuario: task.idUsuario || 1, // Default to user 1 if not provided
-      idSector: task.idSector || 1, // Default to sector 1 if not provided
+      idUsuario: task.idUsuario || 1,
+      idSector: task.idSector || 1,
       estado: newEstado,
     });
 
@@ -337,7 +332,7 @@ onMounted(() => {
     <Teleport to="body">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-          <gestorTareas
+          <CrearTarea
             :task="selectedTask"
             :is-edit="isEditMode"
             @close="closeModal"
