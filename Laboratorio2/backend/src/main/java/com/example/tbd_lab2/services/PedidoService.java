@@ -1,8 +1,8 @@
 package com.example.tbd_lab2.services;
 
 import com.example.tbd_lab2.DTO.PagoMasUsadoUrgenteResponse;
-import com.example.tbd_lab2.DTO.ProductoPedidoResponse;
-import com.example.tbd_lab2.DTO.RegistrarPedidoCompletoRequest;
+import com.example.tbd_lab2.DTO.producto.ProductoPedidoResponse;
+import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.entities.ProductoPedidoEntity;
 import com.example.tbd_lab2.repositories.PedidoRepository;

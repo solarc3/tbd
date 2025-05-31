@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.farmacia;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductoPedidoRequest {
-    private Long idProducto;
-    private Integer cantidad;
-    private Boolean recetaValidada;
+public class RankingFarmaciaPedidoResponse {
+    String nombreFarmacia;
+    int cantPedidosEntregados;
 }

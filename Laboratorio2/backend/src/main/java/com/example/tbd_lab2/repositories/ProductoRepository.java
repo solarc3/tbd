@@ -1,6 +1,6 @@
 package com.example.tbd_lab2.repositories;
 
-import com.example.tbd_lab2.DTO.TopProductosPorCategoriaResponse;
+import com.example.tbd_lab2.DTO.producto.TopProductosPorCategoriaResponse;
 import com.example.tbd_lab2.entities.ProductoEntity;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;

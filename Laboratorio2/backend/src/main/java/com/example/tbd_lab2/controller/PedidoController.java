@@ -1,6 +1,9 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
+import com.example.tbd_lab2.DTO.pedido.DetallePedidoRequest;
+import com.example.tbd_lab2.DTO.pedido.EstadoPedidoRequest;
+import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.DetallePedidoEntity;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.services.DetallePedidoService;

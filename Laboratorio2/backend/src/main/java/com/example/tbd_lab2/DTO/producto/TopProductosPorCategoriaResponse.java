@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.producto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductoPedidoResponse {
+public class TopProductosPorCategoriaResponse {
+    private String categoria;
     private String nombreProducto;
-    private Integer cantidad;
-    private Boolean recetaValidada;
+    private Long cantidadPedidos;
 }

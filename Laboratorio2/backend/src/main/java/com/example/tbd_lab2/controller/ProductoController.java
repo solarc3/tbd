@@ -1,7 +1,7 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.MessageResponse;
-import com.example.tbd_lab2.DTO.TopProductosPorCategoriaResponse;
+import com.example.tbd_lab2.DTO.producto.TopProductosPorCategoriaResponse;
 import com.example.tbd_lab2.entities.ProductoEntity;
 import com.example.tbd_lab2.services.ProductoService;
 import java.util.List;

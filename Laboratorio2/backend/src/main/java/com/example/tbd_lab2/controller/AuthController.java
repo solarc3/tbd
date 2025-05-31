@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
+import com.example.tbd_lab2.DTO.auth.*;
 import com.example.tbd_lab2.entities.UserEntity;
 import com.example.tbd_lab2.repositories.UserRepository;
 import com.example.tbd_lab2.security.JwtUtils;

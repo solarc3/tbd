@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.pedido;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetallePedidoRequest {
-    private Long idRepartidor;
-    private String metodoPago;
+public class EstadoPedidoRequest {
+    private Long idPedido;
+    private String nuevoEstado;
 }

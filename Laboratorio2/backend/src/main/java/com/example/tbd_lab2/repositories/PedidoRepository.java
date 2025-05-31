@@ -1,15 +1,18 @@
 package com.example.tbd_lab2.repositories;
 
 import com.example.tbd_lab2.DTO.PagoMasUsadoUrgenteResponse;
-import com.example.tbd_lab2.DTO.ProductoPedidoRequest;
-import com.example.tbd_lab2.DTO.RegistrarPedidoCompletoRequest;
+import com.example.tbd_lab2.DTO.producto.ProductoPedidoRequest;
+import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +23,32 @@ import java.util.*;
 @Repository
 public class PedidoRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final WKTReader reader = new WKTReader();
+
+    private final RowMapper<PedidoEntity> pedidoRowMapper = (rs, rowNum) -> {
+        PedidoEntity pedidoEntity = PedidoEntity.builder()
+                .idPedido(rs.getLong("id_pedido"))
+                .monto(rs.getInt("monto"))
+                .fechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime())
+                .esUrgente(rs.getBoolean("es_urgente"))
+                .estadoPedido(PedidoEntity.EstadoPedido.valueOf(rs.getString("estado_pedido")))
+                .idCliente(rs.getObject("id_cliente", Long.class)) // getObject is safer for nullable FKs
+                .idFarmacia(rs.getObject("id_farmacia", Long.class))
+                .build();
+
+        // handle linestring data
+        String wkt = rs.getString("ruta_estimada");
+        if (wkt != null && !wkt.isEmpty()) {
+            try {
+                Geometry geometry = reader.read(wkt);
+                pedidoEntity.setRutaEstimada((LineString) geometry);
+
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return pedidoEntity;
+    };
 
     @Autowired
     public PedidoRepository(JdbcTemplate jdbcTemplate) {
@@ -28,19 +57,8 @@ public class PedidoRepository {
 
     public List<PedidoEntity> getPedidos() {
         try {
-            String sql = "SELECT * FROM pedido";
-            return jdbcTemplate.query(sql, (rs, rowNum) ->
-                    PedidoEntity.builder()
-                            .idPedido(rs.getLong("id_pedido"))
-                            .monto(rs.getInt("monto"))
-                            .fechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime())
-                            .esUrgente(rs.getBoolean("es_urgente"))
-                            .estadoPedido(PedidoEntity.EstadoPedido.valueOf(rs.getString("estado_pedido")))
-                            .idCliente(rs.getObject("id_cliente", Long.class)) // getObject is safer for nullable FKs
-                            .idFarmacia(rs.getObject("id_farmacia", Long.class)) // getObject is safer for nullable FKs
-                            .rutaEstimada(rs.getObject("ruta_estimada", Geometry.class)) // Added
-                            .build()
-            );
+            String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ST_AsText(ruta_estimada) AS ruta_estimada FROM pedido";
+            return jdbcTemplate.query(sql, pedidoRowMapper);
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
@@ -49,8 +67,8 @@ public class PedidoRepository {
 
     public Optional<PedidoEntity> findById(Long id) {
         try {
-            String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ruta_estimada FROM pedido WHERE id_pedido = ?";
-            PedidoEntity pedidoEntity = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(PedidoEntity.class), id);
+            String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ST_AsText(ruta_estimada) AS ruta_estimada FROM pedido WHERE id_pedido = ?";
+            PedidoEntity pedidoEntity = jdbcTemplate.queryForObject(sql, pedidoRowMapper, id);
             return Optional.ofNullable(pedidoEntity);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -58,14 +76,14 @@ public class PedidoRepository {
     }
 
     public List<PedidoEntity> findByIdCliente(Long idCliente) {
-        String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia FROM pedido WHERE id_cliente = ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PedidoEntity.class), idCliente);
+        String sql = "SELECT id_pedido, monto, fecha_pedido, es_urgente, estado_pedido, id_cliente, id_farmacia, ST_AsText(ruta_estimada) AS ruta_estimada FROM pedido WHERE id_cliente = ?";
+        return jdbcTemplate.query(sql, pedidoRowMapper, idCliente);
     }
 
     public List<PagoMasUsadoUrgenteResponse> findMostUsedPaymentMethodWhenUrgent(){
         try{
-            String sql = "Select count(detalle_pedido.metodo_pago) as Cantidad_pagos, metodo_pago FROM pedido RIGHT JOIN detalle_pedido ON pedido.id_pedido = detalle_pedido.id_pedido WHERE pedido.es_urgente = 'true'\n" +
-                    "GROUP BY detalle_pedido.metodo_pago ORDER BY Cantidad_pagos";
+            String sql = "SELECT COUNT(detalle_pedido.metodo_pago) AS cantidad_pagos, metodo_pago FROM pedido RIGHT JOIN detalle_pedido ON pedido.id_pedido = detalle_pedido.id_pedido WHERE pedido.es_urgente = 'true'\n" +
+                    "GROUP BY detalle_pedido.metodo_pago ORDER BY cantidad_pagos";
             return  jdbcTemplate.query(sql, (rs, rowNum) ->
                     PagoMasUsadoUrgenteResponse.builder()
                             .metodoPago(rs.getString("metodo_pago"))

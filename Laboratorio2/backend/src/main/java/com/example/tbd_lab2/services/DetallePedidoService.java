@@ -1,6 +1,6 @@
 package com.example.tbd_lab2.services;
 
-import com.example.tbd_lab2.DTO.DetallePedidoResponse;
+import com.example.tbd_lab2.DTO.pedido.DetallePedidoResponse;
 import com.example.tbd_lab2.entities.DetallePedidoEntity;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.entities.ProductoPedidoEntity;

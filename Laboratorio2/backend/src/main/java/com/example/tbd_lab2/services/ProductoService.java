@@ -1,6 +1,6 @@
 package com.example.tbd_lab2.services;
 
-import com.example.tbd_lab2.DTO.TopProductosPorCategoriaResponse;
+import com.example.tbd_lab2.DTO.producto.TopProductosPorCategoriaResponse;
 import com.example.tbd_lab2.entities.ProductoEntity;
 import com.example.tbd_lab2.repositories.ProductoRepository;
 import java.util.List;

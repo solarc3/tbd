@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.cliente;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

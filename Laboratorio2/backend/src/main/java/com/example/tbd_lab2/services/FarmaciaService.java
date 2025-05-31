@@ -1,9 +1,9 @@
 package com.example.tbd_lab2.services;
 
-import com.example.tbd_lab2.DTO.FarmaciaClosestDeliveryResponse;
-import com.example.tbd_lab2.DTO.FarmaciaPedidoFallidoResponse;
-import com.example.tbd_lab2.DTO.FarmaciaPuntoEntregaLejanaResponse;
-import com.example.tbd_lab2.DTO.RankingFarmaciaPedidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaClosestDeliveryResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPuntoEntregaLejanaResponse;
+import com.example.tbd_lab2.DTO.farmacia.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.repositories.FarmaciaRepository;
 import java.util.List;

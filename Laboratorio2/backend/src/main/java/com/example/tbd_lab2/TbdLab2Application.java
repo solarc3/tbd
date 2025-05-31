@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class TbdLab1Application {
+public class TbdLab2Application {
 	@Bean
 	public ModelMapper modelMapper() {
 		ModelMapper modelMapper = new ModelMapper();
@@ -15,7 +15,7 @@ public class TbdLab1Application {
 		return modelMapper;
 	}
 	public static void main(String[] args) {
-		SpringApplication.run(TbdLab1Application.class, args);
+		SpringApplication.run(TbdLab2Application.class, args);
 	}
 
 }

@@ -104,7 +104,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_verificar_receta
+CREATE TRIGGER trg_verificar_receta
     AFTER INSERT ON producto_pedido
     FOR EACH ROW
 EXECUTE FUNCTION verificar_receta();
@@ -145,7 +145,27 @@ BEGIN
 END;
 $func$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trig_update_calificacion
+CREATE TRIGGER trg_update_calificacion
     AFTER UPDATE ON pedido
     FOR EACH ROW
 EXECUTE FUNCTION update_calificacion_after_delivery();
+
+-- Trigger para insertar automáticamente la ruta estimada al crear un pedido.
+CREATE OR REPLACE FUNCTION insert_estimated_route()
+    RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE pedido
+    -- basta con unir los puntos de ubicacion entre farmacia y cliente.
+    SET ruta_estimada = ST_MakeLine(
+            (SELECT ubicacion FROM farmacia WHERE id_farmacia = NEW.id_farmacia),
+            (SELECT location FROM users WHERE id = NEW.id_cliente)
+    )
+    WHERE id_pedido = NEW.id_pedido;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_insert_estimated_route
+    AFTER INSERT ON pedido
+    FOR EACH ROW
+EXECUTE FUNCTION insert_estimated_route();

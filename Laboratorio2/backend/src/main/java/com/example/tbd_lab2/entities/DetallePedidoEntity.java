@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,7 @@ public class DetallePedidoEntity {
     // llave foranea
     private Long idRepartidor;
     private String metodoPago;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaEntrega;
 }

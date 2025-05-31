@@ -1,15 +1,19 @@
 package com.example.tbd_lab2.repositories;
 
-import com.example.tbd_lab2.DTO.FarmaciaClosestDeliveryResponse;
-import com.example.tbd_lab2.DTO.FarmaciaPedidoFallidoResponse;
-import com.example.tbd_lab2.DTO.FarmaciaPuntoEntregaLejanaResponse;
-import com.example.tbd_lab2.DTO.RankingFarmaciaPedidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaClosestDeliveryResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPuntoEntregaLejanaResponse;
+import com.example.tbd_lab2.DTO.farmacia.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +21,40 @@ import java.util.Optional;
 
 @Repository
 public class FarmaciaRepository {
+
     private final JdbcTemplate jdbcTemplate;
+    private final WKTReader reader = new WKTReader();
+
+    private final RowMapper<FarmaciaEntity> farmaciaRowMapper = (rs, rowNum) -> {
+        FarmaciaEntity farmaciaEntity = FarmaciaEntity.builder()
+                .idFarmacia(rs.getLong("id_farmacia"))
+                .nombreFarmacia(rs.getString("nombre_farmacia"))
+                .direccion(rs.getString("direccion"))
+                .build();
+
+        // handle point data
+        String wkt = rs.getString("ubicacion");
+        if (wkt != null && !wkt.isEmpty()) {
+            try {
+                Geometry geom = reader.read(wkt);
+                farmaciaEntity.setUbicacion((Point) geom);
+            } catch (ParseException e) {
+                System.out.println("====> Error parsing ubicacion = " + wkt);
+                throw new RuntimeException(e);
+            }
+        }
+        return farmaciaEntity;
+    };
+
     @Autowired
     public FarmaciaRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public Optional<FarmaciaEntity> findById(Long id) {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia WHERE id_farmacia = ?";
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ST_AsText(ubicacion) AS ubicacion FROM farmacia WHERE id_farmacia = ?";
         try {
-            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class), id);
+            FarmaciaEntity farmacia = jdbcTemplate.queryForObject(sql, farmaciaRowMapper, id);
             return Optional.ofNullable(farmacia);
         }
         catch (EmptyResultDataAccessException e){
@@ -100,7 +128,7 @@ public class FarmaciaRepository {
     }
 
     public List<FarmaciaEntity> findAll() {
-        String sql = "SELECT id_farmacia, nombre_farmacia, direccion FROM farmacia";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(FarmaciaEntity.class));
+        String sql = "SELECT id_farmacia, nombre_farmacia, direccion, ST_AsText(ubicacion) AS ubicacion FROM farmacia";
+        return jdbcTemplate.query(sql, farmaciaRowMapper);
     }
 }

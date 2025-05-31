@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class PedidoEntity {
 
     private Long idPedido;
     private Integer monto;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaPedido;
     private Boolean esUrgente;
     private EstadoPedido estadoPedido;

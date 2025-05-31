@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.farmacia;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FarmaciaClosestDeliveryResponse {
-    private String nombreUsuario;
+public class FarmaciaPuntoEntregaLejanaResponse {
+    private String nombreFarmacia;
     private double distanciaEntrega;
 }

@@ -1,8 +1,8 @@
 package com.example.tbd_lab2.services;
 
-import com.example.tbd_lab2.DTO.RepartidorInfoResponse;
-import com.example.tbd_lab2.DTO.RepartidorMejorRendimientoResponse;
-import com.example.tbd_lab2.DTO.RepartidorTiempoPromedioResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorInfoResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorMejorRendimientoResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorTiempoPromedioResponse;
 import com.example.tbd_lab2.entities.RepartidorEntity;
 import com.example.tbd_lab2.repositories.RepartidorRepository;
 import org.springframework.beans.factory.annotation.Autowired;

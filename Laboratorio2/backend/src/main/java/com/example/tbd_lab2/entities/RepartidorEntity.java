@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,8 @@ import java.util.Date;
 public class RepartidorEntity {
     private Long idRepartidor;
     private String nombreRepartidor;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fechaContratacion;
 
     @JdbcTypeCode(SqlTypes.GEOMETRY)

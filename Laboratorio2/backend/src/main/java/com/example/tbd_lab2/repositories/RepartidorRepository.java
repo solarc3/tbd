@@ -1,22 +1,50 @@
 package com.example.tbd_lab2.repositories;
 
-import com.example.tbd_lab2.DTO.RepartidorInfoResponse;
-import com.example.tbd_lab2.DTO.RepartidorMejorRendimientoResponse;
-import com.example.tbd_lab2.DTO.RepartidorTiempoPromedioResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorInfoResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorMejorRendimientoResponse;
+import com.example.tbd_lab2.DTO.repartidor.RepartidorTiempoPromedioResponse;
 import com.example.tbd_lab2.entities.RepartidorEntity;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class RepartidorRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final WKTReader reader = new WKTReader();
+
+    private final RowMapper<RepartidorEntity> repartidorRowMapper = (rs, rowNum) -> {
+        RepartidorEntity repartidorEntity = RepartidorEntity.builder()
+                .idRepartidor(rs.getLong("id_repartidor"))
+                .nombreRepartidor(rs.getString("nombre_repartidor"))
+                .fechaContratacion(rs.getDate("fecha_contratacion"))
+                .build();
+
+        // handle point data
+        String wkt = rs.getString("ubicacion");
+        if (wkt != null && !wkt.isEmpty()) {
+            try {
+                Geometry geom = reader.read(wkt);
+                repartidorEntity.setUbicacion((Point) geom);
+            } catch (ParseException e) {
+                System.out.println("====> Error parsing ubicacion = " + wkt);
+                throw new RuntimeException(e);
+            }
+        }
+        return repartidorEntity;
+    };
+
 
     @Autowired
     public RepartidorRepository(JdbcTemplate jdbcTemplate) {
@@ -25,15 +53,8 @@ public class RepartidorRepository {
 
     public Optional<RepartidorEntity> findById(Long id) {
         try {
-            String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ubicacion FROM repartidor WHERE id_repartidor = ?";
-            RepartidorEntity repartidorEntity = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-                RepartidorEntity entity = new RepartidorEntity();
-                entity.setIdRepartidor(rs.getLong("id_repartidor"));
-                entity.setNombreRepartidor(rs.getString("nombre_repartidor"));
-                entity.setFechaContratacion(rs.getDate("fecha_contratacion"));
-                entity.setUbicacion((Point) rs.getObject("ubicacion"));
-                return entity;
-            }, id);
+            String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ST_AsText(ubicacion) AS ubicacion FROM repartidor WHERE id_repartidor = ?";
+            RepartidorEntity repartidorEntity = jdbcTemplate.queryForObject(sql, repartidorRowMapper, id);
             return Optional.ofNullable(repartidorEntity);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -41,26 +62,19 @@ public class RepartidorRepository {
     }
 
     public List<RepartidorEntity> findAll() {
-        String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ubicacion FROM repartidor";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            RepartidorEntity entity = new RepartidorEntity();
-            entity.setIdRepartidor(rs.getLong("id_repartidor"));
-            entity.setNombreRepartidor(rs.getString("nombre_repartidor"));
-            entity.setFechaContratacion(rs.getDate("fecha_contratacion"));
-            entity.setUbicacion((Point) rs.getObject("ubicacion"));
-            return entity;
-        });
+        String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ST_AsText(ubicacion) AS ubicacion FROM repartidor";
+        return jdbcTemplate.query(sql, repartidorRowMapper);
     }
 
     public List<RepartidorInfoResponse> findAllRepartidorInfo() {
-        try{
-            String sql = "Select repartidor.nombre_repartidor ,count(detalle_pedido.id_repartidor) as cantidad_entregas from detalle_pedido inner Join repartidor ON repartidor.id_repartidor=detalle_pedido.id_repartidor GROUP BY nombre_repartidor";
+        try {
+            String sql = "SELECT repartidor.nombre_repartidor, COUNT(detalle_pedido.id_repartidor) AS cantidad_entregas FROM detalle_pedido INNER JOIN repartidor ON repartidor.id_repartidor=detalle_pedido.id_repartidor GROUP BY nombre_repartidor";
 
             return jdbcTemplate.query(sql, (rs, rowNum) ->
                     RepartidorInfoResponse.builder().nombre(rs.getString("nombre_repartidor"))
                             .cantPaquetesEntregados(rs.getInt("cantidad_entregas")).build());
 
-        }catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             System.out.println("No hay resultados para repartidores por tiempo promedio: "
                     + e.getMessage());
             return new ArrayList<>();

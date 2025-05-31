@@ -1,4 +1,4 @@
-package com.example.tbd_lab2.DTO;
+package com.example.tbd_lab2.DTO.repartidor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class RepartidorMejorRendimientoResponse {
+public class RepartidorTiempoPromedioResponse {
     Long idRepartidor;
     String nombreRepartidor;
-    Long pedidos;
-    Double puntuacionPromedio;
-    Double indiceRendimiento;
+    Double promedioHoras;
 }

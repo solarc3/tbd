@@ -1,6 +1,10 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaClosestDeliveryResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPedidoFallidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPuntoEntregaLejanaResponse;
+import com.example.tbd_lab2.DTO.farmacia.RankingFarmaciaPedidoResponse;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.services.FarmaciaService;
 import java.util.List;
@@ -48,7 +52,7 @@ public class FarmaciaController {
 		}
 		return ResponseEntity.ok(ranking);
 	}
-	@GetMapping("entregas-cercana/{id_farmacia}")
+	@GetMapping("/entregas-cercanas/{id_farmacia}")
 	public ResponseEntity<?> entregasCercana(@PathVariable Long id_farmacia) {
 		List<FarmaciaClosestDeliveryResponse> usuarios = farmaciaService.getFarmaciasClosestDeliveryPoint(id_farmacia);
 		if (usuarios.isEmpty()) {
