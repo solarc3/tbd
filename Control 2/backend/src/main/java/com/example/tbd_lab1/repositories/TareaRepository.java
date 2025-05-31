@@ -4,7 +4,6 @@ import com.example.tbd_lab1.DTO.TareaCercanaResponse;
 import com.example.tbd_lab1.DTO.TareaCountBySectorResponse;
 import com.example.tbd_lab1.DTO.TareaVencimientoResponse;
 import com.example.tbd_lab1.entities.TareaEntity;
-import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -70,8 +69,24 @@ public class TareaRepository {
     }
 
     public List<TareaEntity> findAll() {
-        String sql = "SELECT id, titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado FROM tareas";
-        return jdbcTemplate.query(sql, tareaRowMapper);
+        String sql = "SELECT t.id, t.titulo, t.descripcion, t.fecha_vencimiento, t.id_usuario, " +
+                "t.estado, t.id_sector, s.nombre_sector " +
+                "FROM tareas t " +
+                "LEFT JOIN sectores s ON t.id_sector = s.id";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            TareaEntity tarea = new TareaEntity();
+            tarea.setId(rs.getLong("id"));
+            tarea.setTitulo(rs.getString("titulo"));
+            tarea.setDescripcion(rs.getString("descripcion"));
+            tarea.setFechaVencimiento(rs.getTimestamp("fecha_vencimiento") != null ?
+                    rs.getTimestamp("fecha_vencimiento").toLocalDateTime() : null);
+            tarea.setIdUsuario(rs.getLong("id_usuario"));
+            tarea.setEstado(rs.getString("estado"));
+            tarea.setIdSector(rs.getLong("id_sector"));
+            tarea.setNombreSector(rs.getString("nombre_sector"));
+            return tarea;
+        });
     }
 
     public List<TareaEntity> findByUsuario(Long idUsuario) {
