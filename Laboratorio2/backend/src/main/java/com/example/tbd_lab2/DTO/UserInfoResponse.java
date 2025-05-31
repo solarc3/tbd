@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 @Data
 @Builder
@@ -16,4 +17,5 @@ public class UserInfoResponse {
     private String lastName;
     private String rut;
     private String email;
+    private Point location;
 }

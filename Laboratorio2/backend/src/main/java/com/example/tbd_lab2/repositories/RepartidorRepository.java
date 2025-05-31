@@ -4,9 +4,9 @@ import com.example.tbd_lab2.DTO.RepartidorInfoResponse;
 import com.example.tbd_lab2.DTO.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab2.DTO.RepartidorTiempoPromedioResponse;
 import com.example.tbd_lab2.entities.RepartidorEntity;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -25,8 +25,15 @@ public class RepartidorRepository {
 
     public Optional<RepartidorEntity> findById(Long id) {
         try {
-            String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion FROM repartidor WHERE id_repartidor = ?";
-            RepartidorEntity repartidorEntity = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(RepartidorEntity.class), id);
+            String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ubicacion FROM repartidor WHERE id_repartidor = ?";
+            RepartidorEntity repartidorEntity = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+                RepartidorEntity entity = new RepartidorEntity();
+                entity.setIdRepartidor(rs.getLong("id_repartidor"));
+                entity.setNombreRepartidor(rs.getString("nombre_repartidor"));
+                entity.setFechaContratacion(rs.getDate("fecha_contratacion"));
+                entity.setUbicacion((Point) rs.getObject("ubicacion"));
+                return entity;
+            }, id);
             return Optional.ofNullable(repartidorEntity);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -34,8 +41,15 @@ public class RepartidorRepository {
     }
 
     public List<RepartidorEntity> findAll() {
-        String sql = "select * from repartidor";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(RepartidorEntity.class));
+        String sql = "SELECT id_repartidor, nombre_repartidor, fecha_contratacion, ubicacion FROM repartidor";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            RepartidorEntity entity = new RepartidorEntity();
+            entity.setIdRepartidor(rs.getLong("id_repartidor"));
+            entity.setNombreRepartidor(rs.getString("nombre_repartidor"));
+            entity.setFechaContratacion(rs.getDate("fecha_contratacion"));
+            entity.setUbicacion((Point) rs.getObject("ubicacion"));
+            return entity;
+        });
     }
 
     public List<RepartidorInfoResponse> findAllRepartidorInfo() {

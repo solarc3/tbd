@@ -28,4 +28,11 @@ public class UserEntity {
     private String refreshToken;
     private Long refreshTokenExpiration;
 
+    public Double getLatitude() {
+        return location != null ? location.getY() : null;
+    }
+
+    public Double getLongitude() {
+        return location != null ? location.getX() : null;
+    }
 }

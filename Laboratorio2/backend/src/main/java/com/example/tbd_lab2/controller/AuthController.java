@@ -293,6 +293,7 @@ public class AuthController {
                 .lastName(userDetails.getLastName())
                 .rut(userDetails.getRut())
                 .email(userDetails.getEmail())
+                .location(userDetails.getLocation())
                 .build();
 
         return ResponseEntity.ok(dto);

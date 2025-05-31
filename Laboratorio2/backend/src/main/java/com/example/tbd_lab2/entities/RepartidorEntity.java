@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Geometry;
+
+import org.locationtech.jts.geom.Point;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Date;
 
@@ -16,5 +19,7 @@ public class RepartidorEntity {
     private Long idRepartidor;
     private String nombreRepartidor;
     private Date fechaContratacion;
-    private Geometry ubicacion;
+
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
+    private Point ubicacion;
 }
