@@ -22,46 +22,64 @@
     <div v-if="activeTab === 'tareas'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
 
       <!-- tareas por sector -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Tareas por Sector</h2>
-        <div v-if="userTasksBySector.length">
-          <div v-for="item in sortedTasksBySector" :key="item.idSector" class="mb-4">
-            <div class="flex justify-between items-center mb-2">
-              <p class="font-medium text-sm">{{ item.nombreSector }}</p>
-              <p class="text-xs text-gray-600">{{ item.cantidadTareas }} / {{ maxTasks }}</p>
-            </div>
-            <div class="w-full bg-gray-200 h-4 rounded-full relative">
-              <div
-                  class="bg-blue-500 h-4 rounded-full"
-                  :style="{ width: (item.cantidadTareas / maxTasks * 100) + '%' }"
-              ></div>
-            </div>
+      <div v-if="userTasksBySector.length" class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Tareas por Sector del Usuario</h2>
+        <div v-for="item in sortedTasksBySector" :key="item.idSector" class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <p class="font-medium text-sm">{{ item.nombreSector }}</p>
+            <p class="text-xs text-gray-600">{{ item.cantidadTareas }} / {{ maxTasks }}</p>
+          </div>
+          <div class="w-full bg-gray-200 h-4 rounded-full relative">
+            <div
+                class="bg-blue-500 h-4 rounded-full"
+                :style="{ width: (item.cantidadTareas / maxTasks * 100) + '%' }"
+            ></div>
           </div>
         </div>
-        <p v-else>No hay datos disponibles.</p>
+      </div>
+      <div v-else class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+        <h2 class="text-lg font-semibold text-gray-500 mb-2">Sin Tareas por Sector</h2>
+        <p class="text-gray-400">No hay datos de tareas por sector disponibles.</p>
       </div>
 
       <!-- tarea pendiente mas cercana -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Tarea Pendiente Más Cercana</h2>
-        <div>
-          <p v-if="closestPendingTask">
-            {{ closestPendingTask.title }}
-            Distancia: {{ closestPendingTask.distance }} km
-          </p>
-          <p v-else>No hay tareas pendientes cercanas.</p>
+      <div v-if="closestPendingTask" class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Tarea Pendiente Más Cercana del Usuario</h2>
+        <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
+          <div class="text-gray-500">Nombre: </div>
+          <div>{{ closestPendingTask.tituloTarea }}</div>
+          <div class="text-gray-500">ID:  </div>
+          <div>{{ closestPendingTask.idTarea }}</div>
+          <div class="text-gray-500">Descripción: </div>
+          <div>{{ closestPendingTask.descripcionTarea }}</div>
+          <div class="text-gray-500">Sector: </div>
+          <div>{{ closestPendingTask.nombreSector }}</div>
+          <div class="text-gray-500">Distancia: </div>
+          <div class="font-medium text-blue-600">
+            {{ (closestPendingTask.distanciaAlSectorMetros / 1000).toFixed(2) }} km
+          </div>
         </div>
+      </div>
+      <div v-else class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+        <h2 class="text-lg font-semibold text-gray-500 mb-2">Sin Tareas Pendientes</h2>
+        <p class="text-gray-400">No hay tareas pendientes en este momento.</p>
       </div>
 
       <!-- distancia promedio -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Distancia Promedio Tareas Completadas</h2>
-        <div>
-          <p v-if="promDistancia !== null">
-            {{ promDistancia }} km
-          </p>
-          <p v-else>No hay datos.</p>
+      <div v-if="promDistancia.length > 0" class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Distancia Promedio Tareas Completadas del Usuario</h2>
+
+        <div class="text-center">
+          <div class="text-7xl font-bold text-blue-600 leading-none tracking-tight">
+            {{ (promDistancia.at(0)?.distanciaPromedio / 1000).toFixed(2) }}
+          </div>
+          <div class="text-xl text-gray-500 mt-2">kilómetros</div>
         </div>
+
+      </div>
+      <div v-else class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+        <h2 class="text-lg font-semibold text-gray-500 mb-2">Sin Datos de Distancia</h2>
+        <p class="text-gray-400">No hay datos de distancia promedio disponibles.</p>
       </div>
     </div>
 
@@ -90,15 +108,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
+import {computed, onMounted, ref} from 'vue';
+import {useAuthStore} from '@/stores/auth';
+import {use} from 'echarts/core';
+import {CanvasRenderer} from 'echarts/renderers';
+import {BarChart} from 'echarts/charts';
+import {GridComponent, TitleComponent, TooltipComponent} from 'echarts/components';
 import VChart from 'vue-echarts'
-import EstadisticasService from '@/api/services/estadisticasService';
-import type { TareaCountBySectorDTO, SectorStats, ClosestTask } from '@/api/services/estadisticasService';
+import type {ClosestTask, SectorStats, TareaCountBySectorDTO} from '@/api/services/estadisticasService';
+import EstadisticasService, {type DistanciaTareaPromedioResponse} from '@/api/services/estadisticasService';
 
 use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, TitleComponent]);
 
@@ -174,7 +192,7 @@ const sectores5kmOptions = ref({
 });
 
 // distancia promedio, nse creo q tenian q verla pq tenia un tema¿¿¿ consultarrr
-const promDistancia = ref<number | null>(null);
+let promDistancia = ref<DistanciaTareaPromedioResponse[]>([]);
 
 // tareas pendientes por sector
 const sectoresPendientes = ref<SectorStats[]>([]);
@@ -231,11 +249,9 @@ onMounted(async () => {
       loadingSectores5km.value = false;
       console.log("Sectores con mas tareas completadas (5 km):", data5km);
 
-      const distancias = await EstadisticasService.getAverageDistanceOfCompletedTasks(userId);
-      if (distancias.length && distancias[0].promedioDistancia) {
-        promDistancia.value = distancias[0].promedioDistancia;
-      }
-      console.log("Promedio de distancia:", promDistancia.value);
+      promDistancia.value = await EstadisticasService.getAverageDistanceOfCompletedTasks(userId);
+
+      console.log("Promedio de distancia:", promDistancia);
 
       sectoresPendientes.value = await EstadisticasService.getTasksBySector();
       console.log("Sectores con tareas pendientes:", sectoresPendientes.value);

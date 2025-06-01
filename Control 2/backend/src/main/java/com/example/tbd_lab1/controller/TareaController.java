@@ -5,10 +5,14 @@ import com.example.tbd_lab1.DTO.TareaCercanaResponse;
 import com.example.tbd_lab1.DTO.TareaCountBySectorResponse;
 import com.example.tbd_lab1.DTO.TareaVencimientoResponse;
 import com.example.tbd_lab1.entities.TareaEntity;
+import com.example.tbd_lab1.security.services.UserDetailsImpl;
 import com.example.tbd_lab1.services.TareaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,12 +72,28 @@ public class TareaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTarea(@PathVariable Long id, @RequestBody TareaEntity tareaEntity) {
+        Authentication authentication = SecurityContextHolder.getContext()
+            .getAuthentication();
+
+        if (authentication == null ||
+            !authentication.isAuthenticated() ||
+            authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new MessageResponse("No authenticated")
+                                                                      );
+        }
+
+        // recuperar ubicacion del usuario logeado
+        UserDetailsImpl userDetails =
+            (UserDetailsImpl) authentication.getPrincipal();
+
         if (!tareaService.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new MessageResponse("Tarea no encontrada con ID: " + id));
         }
 
-        tareaEntity.setId(id);
+        //tareaEntity.setId(id);
+        tareaEntity.setIdUsuario(userDetails.getId());
         TareaEntity updatedTarea = tareaService.updateTarea(tareaEntity);
         return ResponseEntity.ok(updatedTarea);
     }

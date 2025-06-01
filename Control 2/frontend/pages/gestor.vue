@@ -3,6 +3,8 @@ import { ref, computed, onMounted } from "vue";
 import TareaService from "@/api/services/tareaService";
 import type { Tarea } from "@/api/services/tareaService";
 import CrearTarea from "@/components/CrearTarea.vue";
+import SectorService from "@/api/services/sectorService";
+import type { SectorEntity } from "@/api/services/sectorService";
 
 interface Task {
   id: number;
@@ -14,6 +16,7 @@ interface Task {
 }
 
 const tasks = ref<Tarea[]>([]);
+const sectores = ref<SectorEntity[]>([]);
 const searchQuery = ref("");
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
@@ -24,6 +27,42 @@ const fetchTasks = async () => {
     tasks.value = await TareaService.getAllTareas();
   } catch (error) {
     console.error("Error al cargar las tareas:", error);
+  }
+};
+
+const fetchSectores = async () => {
+  try {
+    sectores.value = await SectorService.getAllSectores();
+  } catch (error) {
+    console.error("Error al cargar los sectores:", error);
+  }
+};
+
+const getSectorName = (idSector: number) => {
+  const sector = sectores.value.find(s => s.id === idSector);
+  return sector ? sector.nombreSector : `Sector ${idSector}`;
+};
+
+// Función para formatear la fecha y hora
+const formatFechaHora = (fechaString: string): string => {
+  if (!fechaString) return "No definida";
+
+  try {
+    const fecha = new Date(fechaString);
+
+    // Formatear fecha: DD/MM/YYYY
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const año = fecha.getFullYear();
+
+    // Formatear hora: HH:MM
+    const hora = fecha.getHours().toString().padStart(2, '0');
+    const minutos = fecha.getMinutes().toString().padStart(2, '0');
+
+    return `${dia}/${mes}/${año} a las ${hora}:${minutos}`;
+  } catch (error) {
+    console.error("Error al formatear fecha:", error);
+    return fechaString || "Fecha inválida";
   }
 };
 
@@ -108,7 +147,7 @@ const toggleComplete = async (task: Tarea) => {
       newEstado = "COMPLETADA";
     } else {
       console.warn(
-        "El estado COMPLETADA no puede ser modificado desde la casilla.",
+          "El estado COMPLETADA no puede ser modificado desde la casilla.",
       );
       return;
     }
@@ -130,40 +169,41 @@ const toggleComplete = async (task: Tarea) => {
 };
 
 const pendientes = computed(() =>
-  tasks.value.filter(
-    (task) =>
-      task.estado === "PENDIENTE" &&
-      (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        task.descripcion
-          .toLowerCase()
-          .includes(searchQuery.value.toLowerCase())),
-  ),
+    tasks.value.filter(
+        (task) =>
+            task.estado === "PENDIENTE" &&
+            (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                task.descripcion
+                    .toLowerCase()
+                    .includes(searchQuery.value.toLowerCase())),
+    ),
 );
 
 const enProgreso = computed(() =>
-  tasks.value.filter(
-    (task) =>
-      task.estado === "EN_PROGRESO" &&
-      (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        task.descripcion
-          .toLowerCase()
-          .includes(searchQuery.value.toLowerCase())),
-  ),
+    tasks.value.filter(
+        (task) =>
+            task.estado === "EN_PROGRESO" &&
+            (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                task.descripcion
+                    .toLowerCase()
+                    .includes(searchQuery.value.toLowerCase())),
+    ),
 );
 
 const completadas = computed(() =>
-  tasks.value.filter(
-    (task) =>
-      task.estado === "COMPLETADA" &&
-      (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        task.descripcion
-          .toLowerCase()
-          .includes(searchQuery.value.toLowerCase())),
-  ),
+    tasks.value.filter(
+        (task) =>
+            task.estado === "COMPLETADA" &&
+            (task.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                task.descripcion
+                    .toLowerCase()
+                    .includes(searchQuery.value.toLowerCase())),
+    ),
 );
 
-onMounted(() => {
-  fetchTasks();
+onMounted(async () => {
+  await fetchSectores();
+  await fetchTasks();
 });
 </script>
 
@@ -172,8 +212,8 @@ onMounted(() => {
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-2xl font-bold">Gestor de Tareas</h1>
       <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-        @click="openCreateModal"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+          @click="openCreateModal"
       >
         Crear Tarea
       </button>
@@ -182,10 +222,10 @@ onMounted(() => {
     <!-- Barra de búsqueda -->
     <div class="flex gap-4 mb-6">
       <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Buscar por palabra clave..."
-        class="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+          v-model="searchQuery"
+          type="text"
+          placeholder="Buscar por palabra clave..."
+          class="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
     <!-- Tareas pendientes -->
@@ -193,38 +233,42 @@ onMounted(() => {
       <h2 class="text-xl font-semibold text-red-600 mb-4">Tareas Pendientes</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         <div
-          v-for="task in pendientes"
-          :key="task.id"
-          class="p-4 border rounded-lg bg-red-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
+            v-for="task in pendientes"
+            :key="task.id"
+            class="p-4 border rounded-lg bg-red-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
         >
           <div class="flex-grow">
             <h2 class="text-lg font-semibold">{{ task.titulo }}</h2>
             <p class="text-sm text-gray-600">{{ task.descripcion }}</p>
-            <p class="text-sm text-gray-500 mt-2">
-              Vence: {{ task.fechaVencimiento }}
+            <p class="text-sm font-medium text-red-500 mt-2 flex items-center">
+              <span class="mr-1">📅</span>
+              {{ formatFechaHora(task.fechaVencimiento) }}
             </p>
-            <p class="text-sm text-gray-500">Sector: {{ task.idSector }}</p>
+            <p class="text-sm text-gray-500 mt-1 flex items-center">
+              <span class="mr-1">📍</span>
+              {{ getSectorName(task.idSector) }}
+            </p>
           </div>
           <div class="flex justify-between items-center mt-4 pt-3 border-t">
             <div>
               <input
-                type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                :checked="task.estado === 'EN_PROGRESO'"
-                :disabled="task.estado === 'COMPLETADA'"
-                @change="toggleComplete(task)">
+                  type="checkbox"
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  :checked="task.estado === 'EN_PROGRESO'"
+                  :disabled="task.estado === 'COMPLETADA'"
+                  @change="toggleComplete(task)">
               <span class="ml-2 text-sm">En Progreso</span>
             </div>
             <div class="flex gap-2">
               <button
-                class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
-                @click="openEditModal(task)"
+                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
+                  @click="openEditModal(task)"
               >
                 Editar
               </button>
               <button
-                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
-                @click="deleteTask(task.id)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
+                  @click="deleteTask(task.id)"
               >
                 Eliminar
               </button>
@@ -241,37 +285,41 @@ onMounted(() => {
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         <div
-          v-for="task in enProgreso"
-          :key="task.id"
-          class="p-4 border rounded-lg bg-blue-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
+            v-for="task in enProgreso"
+            :key="task.id"
+            class="p-4 border rounded-lg bg-blue-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
         >
           <div class="flex-grow">
             <h2 class="text-lg font-semibold">{{ task.titulo }}</h2>
             <p class="text-sm text-gray-600">{{ task.descripcion }}</p>
-            <p class="text-sm text-gray-500 mt-2">
-              Vence: {{ task.fechaVencimiento }}
+            <p class="text-sm font-medium text-blue-500 mt-2 flex items-center">
+              <span class="mr-1">📅</span>
+              {{ formatFechaHora(task.fechaVencimiento) }}
             </p>
-            <p class="text-sm text-gray-500">Sector: {{ task.idSector }}</p>
+            <p class="text-sm text-gray-500 mt-1 flex items-center">
+              <span class="mr-1">📍</span>
+              {{ getSectorName(task.idSector) }}
+            </p>
           </div>
           <div class="flex justify-between items-center mt-4 pt-3 border-t">
             <div>
               <input
-                type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                :checked="task.estado === 'COMPLETADA'"
-                @change="toggleComplete(task)">
+                  type="checkbox"
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  :checked="task.estado === 'COMPLETADA'"
+                  @change="toggleComplete(task)">
               <span class="ml-2 text-sm">Completada</span>
             </div>
             <div class="flex gap-2">
               <button
-                class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
-                @click="openEditModal(task)"
+                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
+                  @click="openEditModal(task)"
               >
                 Editar
               </button>
               <button
-                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
-                @click="deleteTask(task.id)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
+                  @click="deleteTask(task.id)"
               >
                 Eliminar
               </button>
@@ -288,37 +336,41 @@ onMounted(() => {
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         <div
-          v-for="task in completadas"
-          :key="task.id"
-          class="p-4 border rounded-lg bg-green-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
+            v-for="task in completadas"
+            :key="task.id"
+            class="p-4 border rounded-lg bg-green-50 shadow-sm hover:shadow-md transition flex flex-col h-full"
         >
           <div class="flex-grow">
             <h2 class="text-lg font-semibold">{{ task.titulo }}</h2>
             <p class="text-sm text-gray-600">{{ task.descripcion }}</p>
-            <p class="text-sm text-gray-500 mt-2">
-              Vence: {{ task.fechaVencimiento }}
+            <p class="text-sm font-medium text-green-500 mt-2 flex items-center">
+              <span class="mr-1">📅</span>
+              {{ formatFechaHora(task.fechaVencimiento) }}
             </p>
-            <p class="text-sm text-gray-500">Sector: {{ task.idSector }}</p>
+            <p class="text-sm text-gray-500 mt-1 flex items-center">
+              <span class="mr-1">📍</span>
+              {{ getSectorName(task.idSector) }}
+            </p>
           </div>
           <div class="flex justify-between items-center mt-4 pt-3 border-t">
             <div>
               <input
-                type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                :checked="task.estado === 'COMPLETADA'"
-                :disabled="task.estado === 'COMPLETADA'">
+                  type="checkbox"
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  :checked="task.estado === 'COMPLETADA'"
+                  :disabled="task.estado === 'COMPLETADA'">
               <span class="ml-2 text-sm">Completada</span>
             </div>
             <div class="flex gap-2">
               <button
-                class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
-                @click="openEditModal(task)"
+                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
+                  @click="openEditModal(task)"
               >
                 Editar
               </button>
               <button
-                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
-                @click="deleteTask(task.id)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-sm"
+                  @click="deleteTask(task.id)"
               >
                 Eliminar
               </button>
@@ -333,10 +385,10 @@ onMounted(() => {
       <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
           <CrearTarea
-            :task="selectedTask"
-            :is-edit="isEditMode"
-            @close="closeModal"
-            @save="saveTask"
+              :task="selectedTask"
+              :is-edit="isEditMode"
+              @close="closeModal"
+              @save="saveTask"
           />
         </div>
       </div>
@@ -363,8 +415,8 @@ onMounted(() => {
   width: 100%;
   max-width: 28rem;
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
   max-height: 90vh;
   overflow-y: auto;
 }

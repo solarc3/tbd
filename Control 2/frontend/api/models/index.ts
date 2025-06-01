@@ -22,6 +22,7 @@ export interface User {
 	lastName: string;
 	rut: string;
 	email: string;
+	location: string;
 }
 
 export interface Product {
