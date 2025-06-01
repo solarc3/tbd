@@ -11,6 +11,7 @@ export interface ClosestTask {
   descripcionTarea: string;
   nombreSector: string;
   distanciaAlSectorMetros: number;
+  idTarea: number;
 }
 
 export interface TareaCountBySectorDTO {
@@ -21,6 +22,7 @@ export interface TareaCountBySectorDTO {
 
 export interface DistanciaTareaPromedioResponse {
   idUsuario: number;
+  nombreUsuario: string;
   distanciaPromedio: number; // también en metros
 }
 

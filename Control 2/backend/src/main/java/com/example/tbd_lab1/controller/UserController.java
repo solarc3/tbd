@@ -42,6 +42,7 @@ public class UserController {
 		if (usuariosDistancias.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
+		System.out.println("Distancia promedio completadas: " + usuariosDistancias);
 		return ResponseEntity.ok(usuariosDistancias);
 	}
 
@@ -49,7 +50,7 @@ public class UserController {
 	public ResponseEntity<?> distanciaTareasPromedio(@PathVariable Long userId) {
 		List<DistanciaTareaPromedioResponse> usuariosDistancias =
 				userService.distanciaPromedioTareas(userId);
-
+		System.out.println("Distancia promedio completadas: " + usuariosDistancias);
 		return ResponseEntity.ok(usuariosDistancias);
 	}
 }
