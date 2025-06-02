@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.services;
 
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
+import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
 import com.example.tbd_lab2.DTO.cliente.TopClienteResponse;
 import com.example.tbd_lab2.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,4 +30,8 @@ public class UserService {
 	public List<ClienteGastoResponse> getAllClientsWithSpending() {
 		return userRepository.findAllClientsWithSpending();
 	}
-}
+
+	// servicios lab 2
+	public ClienteZonaCoberturaDTO getZonaCoberturaByCliente(Long id_cliente) {
+		return userRepository.findByZonaCobertura(id_cliente);
+	}}

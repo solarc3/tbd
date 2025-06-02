@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.services;
 
+import com.example.tbd_lab2.DTO.repartidor.RepartidorDistanciaTotalDTO;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorInfoResponse;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorTiempoPromedioResponse;
@@ -36,4 +37,6 @@ public class RepartidorService {
         if (top != null) return reps.subList(0, top);
         return reps;
     }
+
+    public List<RepartidorDistanciaTotalDTO> getRepartidorDistanciaTotal() { return repartidorRepository.findDistanciaTotal(); }
 }

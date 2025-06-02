@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.repositories;
 
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
+import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
 import com.example.tbd_lab2.DTO.cliente.TopClienteResponse;
 import com.example.tbd_lab2.entities.UserEntity;
 import org.locationtech.jts.geom.Geometry;
@@ -299,6 +300,35 @@ public class UserRepository {
 			);
 			e.printStackTrace();
 			return new ArrayList<>();
+		}
+	}
+
+	// Queries Laboratorio 2
+	public ClienteZonaCoberturaDTO findByZonaCobertura(Long id_cliente) {
+		try{
+			String sql =
+					"SELECT u.id, u.first_name, u.last_name, s.nombre_sector\n" +
+							"FROM users as u, sectores as s\n" +
+							"WHERE u.id = ? AND st_within(u.location, s.area)";
+			return jdbcTemplate.queryForObject(sql, new Object[]{id_cliente}, (rs, rowNum) ->
+					new ClienteZonaCoberturaDTO(
+							rs.getLong("id"),
+							rs.getString("first_name"),
+							rs.getString("last_name"),
+							rs.getString("nombre_sector")
+					)
+			);
+		} catch (EmptyResultDataAccessException e) {
+			System.out.println("No se encontró zona de cobertura para el cliente con id: " + id_cliente);
+			return null; // O puedes retornar un DTO vacío o lanzar una excepción personalizada
+		}
+		catch(Exception e){
+			System.err.println(
+					"Error obteniendo zona de cobertura del usuario... " + e.getMessage()
+			);
+			e.printStackTrace();
+			// Considerar lanzar una excepción personalizada aquí también
+			return null;
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.example.tbd_lab2.DTO.repartidor;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RepartidorInfoResponse {
-    String nombre;
-    int cantPaquetesEntregados;
+public class RepartidorDistanciaTotalDTO {
+    private Long id;
+    private String nombreRepartidor;
+    private double distanciaTotalKm;
 }

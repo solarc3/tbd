@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.repositories;
 
+import com.example.tbd_lab2.DTO.repartidor.RepartidorDistanciaTotalDTO;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorInfoResponse;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorMejorRendimientoResponse;
 import com.example.tbd_lab2.DTO.repartidor.RepartidorTiempoPromedioResponse;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,6 +138,32 @@ public class RepartidorRepository {
             System.out.println("No hay resultados para mejores repartidores: " + e.getMessage());
             return new ArrayList<>();
         } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<RepartidorDistanciaTotalDTO> findDistanciaTotal() {
+        try{
+            String sql =
+                    "SELECT r.id_repartidor, r.nombre_repartidor, SUM(ST_LENGTH(p.ruta_estimada::GEOGRAPHY))/1000 as distancia_total_km\n" +
+                    "FROM repartidor AS r, detalle_pedido AS pd, pedido AS p\n" +
+                    "WHERE r.id_repartidor = pd.id_repartidor AND p.id_pedido = pd.id_pedido\n" +
+                    "GROUP BY r.id_repartidor, r.nombre_repartidor\n" +
+                    "ORDER BY r.id_repartidor";
+            return jdbcTemplate.query(sql, (rs, rowNum) ->
+                    RepartidorDistanciaTotalDTO.builder()
+                            .id(rs.getLong("id_repartidor"))
+                            .nombreRepartidor(rs.getString("nombre_repartidor"))
+                            .distanciaTotalKm(rs.getDouble("distancia_total_km"))
+                            .build());
+        }
+        catch (EmptyResultDataAccessException e) {
+            System.out.println("No hay resultados para distancia total por repartidor: " + e.getMessage());
+            return new ArrayList<>();
+        }
+        catch (Exception e) {
+            System.err.println("Error obteniendo distancia total por repartidor: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
         }
