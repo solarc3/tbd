@@ -8,7 +8,8 @@ services:
     networks:
       - control2_tbd
     depends_on:
-      - postgis
+      postgis:
+        condition: service_healthy
 
   postgis:
     image: postgis/postgis:15-3.3
@@ -22,6 +23,12 @@ services:
       - POSTGRES_DB=tbd_control2
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "tbd_control2" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
   frontend:
     build:
@@ -32,7 +39,8 @@ services:
     networks:
       - control2_tbd
     depends_on:
-      - backend
+      - postgis
+
 
 volumes:
   postgis_data:
