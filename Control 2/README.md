@@ -35,10 +35,23 @@ Docker Desktop, se procede a escribir ```sudo docker compose up``` o ```docker c
 **Posibles errores**:
 - **Puerto ya utilizado:** Es posible que el puerto esté ya esté utilizado por la actual instalación de PostgreSQL localmente, por lo que dependiendo del sistema operativo se debe matar el proceso que esté escuchando en ese puerto. En este caso seguramente este chocando en el puerto 5432 por lo que el siguiente comando (en linux) resuelve el error
 ``` sudo systemctl stop postgresql ```.
-- **No se encuentran las variables de entorno:** Es posible que no se encuentre en la carpeta backend el archivo `.env`, que contiene los parámetros para la base de datos.
+- **No se encuentran las variables de entorno:** Es posible que no se encuentre en la carpeta backend el archivo `.env`, que contiene los parámetros para la base de datos. En ese caso, se debe de crear el archivo e ingresar los siguientes parámetros:
+```
+POSTGRES_USER:postgres
+POSTGRES_PASSWORD:postgres
+POSTGRES_DB:tbd_control2
+```
 
 #### Backend
 - Desde IntelliJ, abrir la carpeta dentro del proyecto `Control 2/backend`.
+- **IMPORTANTE**: Cómo se configuró inicialmente para correr con Docker Compose, se debe de modificar el archivo `application.properties`, puesto que el URL datasource de Spring originalmente debería ser `spring.datasource.url=jdbc:postgresql://localhost:5432/tbd_control2`, por lo que application properties debería ser:
+```
+# ...
+spring.datasource.url=jdbc:postgresql://localhost:5432/tbd_control2
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+# ...
+```
 - En su defecto, se puede obtener de VCS Git con el énlace corresponediente al repositorio (`https://github.com/solarc3/tbd.git`).
 - Hacer click en el botón de "play", osease "Run TbdLab1Application", o Shift + F10.
 
