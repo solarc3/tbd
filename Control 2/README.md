@@ -59,20 +59,23 @@ iniciar sesión en el sistema"*
 
 Con el proyecto ya iniciado, se redirigirá inmediatamente al login, en caso de tener cuenta se puede iniciar sesión normalmente.
 En cualquier otro caso, el usuario debe registrarse ingresando nombre, apellido, RUT, correo, ubicación en el mapa y contraseña.
-    **img**
+![registro](https://github.com/user-attachments/assets/f63f59dc-2b25-4bbd-8d02-5218c1c0c507)
+
 
 Luego, se le será redirigido al mismo apartado de inicio de sesión, donde se debe ingresar correo y contraseña, paso seguido será enviado al home page.
-    **img**
+![inicio_sesion](https://github.com/user-attachments/assets/5bf0d1a3-9668-4676-b79c-f12d8eb909cb)
+
 
 ### Gestión de Tareas
 
 Luego de iniciar sesión, el usuario puede acceder al sistema gestor de tareas.
+![home_page](https://github.com/user-attachments/assets/4d54d76f-ba31-4726-8691-63170c17c1ad)
 
 **Crear una tarea:**
 Habiendo iniciado sesión, en la página principal se tiene la opción de crear una tarea, haciendo click a este apartado 
 se mostrará un formulario donde se ingresará el título, descripción, fecha de vencimiento y sector al cual se desea asociar.
 
-    **imagen tarea**
+![crear_tarea](https://github.com/user-attachments/assets/8accc53b-1b4e-474b-9abb-51cf35b08c4e)
 
 Luego, para poder visualizar la tarea creada y todas las demás se debe acceder al apartado de 'Gestor'.
 
