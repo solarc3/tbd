@@ -1,50 +1,55 @@
 
 # Control 2 - Bases de Datos Avanzadas
 
-## Prerequisitos
-- **Docker Desktop/Engine** -> Docker/Docker Desktop y Docker Compose
-- **IntelliJ**: Java 17
-- **Node**: Node Package Manager (npm)
-
 ## Pasos a seguir para ejecutar
 
 Existen dos formas de hacer funcionar nuestra app.
 
-> Se ejecutan 3 componentes en simultaneo
+### 1) Usando Docker Compose para todas las componentes
 
-### Base de Datos
-- En una terminal dentro del directorio `Control 2/backend`, levantar el correspondiente `docker-compose.yaml` con el comando
-```docker compose up -d```
-- El contenedor de PostrgeSQL quedaría levantado y listo para uso.
+#### Prerequisitos
+- **Docker Desktop/Engine** -> Docker/Docker Desktop y Docker Compose
 
-#### Posibles errores:
-- **Puerto ya utilizado:** Es posible que el puerto esté ya esté utilizado por la actual instalación de PostgreSQL localmente, por lo que dependiendo del sistema operativo se debe matar el proceso que esté escuchando en ese puerto. En este caso seguramente este chocando en el puerto 5432 por lo que el siguiente comando (en linux) resuelve el error
-``` sudo systemctl stop postgresql ```.
-- **No se encuentran las variables de entorno:** Es posible que no se encuentre en la carpeta backend el archivo `.env`, que contiene los parámetros para la base de datos.
-
-### Backend
-- Desde IntelliJ, abrir la carpeta dentro del proyecto `Control 2/backend`.
-- En su defecto, se puede obtener de VCS Git con el énlace corresponediente al repositorio (`https://github.com/solarc3/tbd.git`).
-- Hacer click en el botón de "play", osease "Run TbdLab1Application", o Shift + F10.
-
-### Frontend
-- Desde una terminal, acceder al directorio `Control 2/frontend`.
-- En este, ingresar el comando para instalar los paquetes y dependencias:
-```npm install```
-- Finalmente, abrir el proyecto en modo developer con el comando:
-```npm run dev```
-
-#### Si se siguieron correctamente los pasos en el órden establecido, la aplicación será accesible desde cualquier navegador con el URL `http://localhost:3000`
-
-### A traves de Docker-compose
-
-Dirigiendose a la carpeta de Control2, se abre la terminal en linux o nos dirigimos al directorio desde 
+Dirigiendose a la carpeta raíz `Control2`, se abre la terminal en linux o nos dirigimos al directorio desde 
 Docker Desktop, se procede a escribir ```sudo docker compose up``` o ```docker compose up``` respectivamente.
 
 #### Se procede a esperar a que termine la ejecución y nos dirigimos a ```http://localhost:3000/```.
 
 #### Posibles Errores durante la ejecución:
 - **Componentes no cargan:** En caso de que se haya ejecutado por Docker Compose y no se estén cargando apropiadamente los componentes dentro del frontend, se debe de recargar la página.
+
+### 2) Usando Docker Compose para la Base de Datos y el resto manualmente
+
+#### Prerequisitos
+- **Docker Desktop/Engine** -> Docker/Docker Desktop y Docker Compose
+- **IntelliJ**: Java 17
+- **Node**: Node Package Manager (npm)
+
+> Se ejecutan 3 componentes en simultaneo
+
+#### Base de Datos
+- En una terminal dentro del directorio `Control 2/backend`, levantar el correspondiente `docker-compose.yaml` con el comando
+```docker compose up -d```
+- El contenedor de PostrgeSQL quedaría levantado y listo para uso.
+
+**Posibles errores**:
+- **Puerto ya utilizado:** Es posible que el puerto esté ya esté utilizado por la actual instalación de PostgreSQL localmente, por lo que dependiendo del sistema operativo se debe matar el proceso que esté escuchando en ese puerto. En este caso seguramente este chocando en el puerto 5432 por lo que el siguiente comando (en linux) resuelve el error
+``` sudo systemctl stop postgresql ```.
+- **No se encuentran las variables de entorno:** Es posible que no se encuentre en la carpeta backend el archivo `.env`, que contiene los parámetros para la base de datos.
+
+#### Backend
+- Desde IntelliJ, abrir la carpeta dentro del proyecto `Control 2/backend`.
+- En su defecto, se puede obtener de VCS Git con el énlace corresponediente al repositorio (`https://github.com/solarc3/tbd.git`).
+- Hacer click en el botón de "play", osease "Run TbdLab1Application", o Shift + F10.
+
+#### Frontend
+- Desde una terminal, acceder al directorio `Control 2/frontend`.
+- En este, ingresar el comando para instalar los paquetes y dependencias:
+```npm install```
+- Finalmente, abrir el proyecto en modo developer con el comando:
+```npm run dev```
+
+### Si se siguieron correctamente los pasos en el órden establecido, la aplicación será accesible desde cualquier navegador con el URL `http://localhost:3000`
 
 ---
 
@@ -217,21 +222,3 @@ WHERE tareas.estado = 'PENDIENTE'
 GROUP BY sectores.nombre_sector
 ORDER BY cantidad_tareas DESC
 ```
-
-
-##### ¿Cuántas tareas ha realizado cada usuario por sector?
-
-[Imagen frontend pls]
-
-No utiliza nada de postgis, recupera el usuario, el id del sector y el nombre respectivo, después
-procede a agruparlas por id de usuario e id y nombre de la zona.
-
-```sql
-SELECT s.id AS id_sector, s.nombre_sector, COUNT(t.id) 
-    AS cantidad_tareas, t.id_usuario
-    FROM tareas t 
-    JOIN sectores s ON t.id_sector = s.id 
-    GROUP BY t.id_usuario, s.id, s.nombre_sector 
-    ORDER BY s.nombre_sector
-```
-
