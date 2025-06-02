@@ -28,11 +28,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
-@CrossOrigin(
-        origins = "http://localhost:3000",
-        allowCredentials = "true",
-        maxAge = 3600
-)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

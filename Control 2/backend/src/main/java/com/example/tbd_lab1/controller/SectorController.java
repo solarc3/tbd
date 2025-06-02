@@ -22,7 +22,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sector")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
 public class SectorController {
     private final SectorService sectorService;
     private final TareaService tareaService;

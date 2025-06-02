@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - control2_tbd
+    depends_on:
+      - postgis
+
+  postgis:
+    image: postgis/postgis:15-3.3
+    container_name: postgis-container
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - control2_tbd
+    environment:
+      - POSTGRES_DB=tbd_control2
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - control2_tbd
+    depends_on:
+      - backend
+
+volumes:
+  postgis_data:
+
+networks:
+  control2_tbd:
+    driver: bridge

@@ -2,13 +2,15 @@
 # Control 2 - Bases de Datos Avanzadas
 
 ## Prerequisitos
-- **Docker Desktop/Engine** -> Docker y Docker Compose
+- **Docker Desktop/Engine** -> Docker/Docker Desktop y Docker Compose
 - **IntelliJ**: Java 17
 - **Node**: Node Package Manager (npm)
 
 ## Pasos a seguir para ejecutar
-> Se ejecutan 3 componentes en simultaneo
 
+Existen dos formas de hacer funcionar nuestra app.
+
+> Se ejecutan 3 componentes en simultaneo
 
 ### Base de Datos
 - En una terminal dentro del directorio `Control 2/backend`, levantar el correspondiente `docker-compose.yaml` con el comando
@@ -16,7 +18,8 @@
 - El contenedor de PostrgeSQL quedaría levantado y listo para uso.
 
 #### Posibles errores:
-- **Puerto ya utilizado:** Es posible que el puerto esté ya esté utilizado por la actual instalación de PostgreSQL localmente, por lo que dependiendo del sistema operativo se debe matar el proceso que esté escuchando en ese puerto.
+- **Puerto ya utilizado:** Es posible que el puerto esté ya esté utilizado por la actual instalación de PostgreSQL localmente, por lo que dependiendo del sistema operativo se debe matar el proceso que esté escuchando en ese puerto. En este caso seguramente este chocando en el puerto 5432 por lo que el siguiente comando (en linux) resuelve el error
+``` sudo systemctl stop postgresql ```.
 - **No se encuentran las variables de entorno:** Es posible que no se encuentre en la carpeta backend el archivo `.env`, que contiene los parámetros para la base de datos.
 
 ### Backend
@@ -31,7 +34,14 @@
 - Finalmente, abrir el proyecto en modo developer con el comando:
 ```npm run dev```
 
-#### SI se siguieron correctamente los pasos en el órden establecido, la aplicación será accesible desde cualquier navegador con el URL `http://localhost:3000`
+#### Si se siguieron correctamente los pasos en el órden establecido, la aplicación será accesible desde cualquier navegador con el URL `http://localhost:3000`
+
+### A traves de Docker-compose
+
+Dirigiendose a la carpeta de Control2, se abre la terminal en linux o nos dirigimos al directorio desde 
+Docker Desktop, se procede a escribir ```sudo docker compose up``` o ```docker compose up``` respectivamente.
+
+#### Se procede a esperar a que termine la ejecución y nos dirigimos a ```http://localhost:3000/```.
 
 ---
 
@@ -39,9 +49,59 @@
 
 ### Registro de Usuarios
 
+> *"Los usuarios deben poder registrarse en el sistema utilizando un nombre de usuario
+y una contraseña. Además, deben ingresar su dirección geográfica, guardando un
+punto geoespacial en la base de datos utilizando PostGIS. Posteriormente, podrán
+iniciar sesión en el sistema"*
+
+Con el proyecto ya iniciado, se redirigirá inmediatamente al login, en caso de tener cuenta se puede iniciar sesión normalmente.
+En cualquier otro caso, el usuario debe registrarse ingresando nombre, apellido, RUT, correo, ubicación en el mapa y contraseña.
+    **img**
+
+Luego, se le será redirigido al mismo apartado de inicio de sesión, donde se debe ingresar correo y contraseña, paso seguido será enviado al home page.
+    **img**
+
 ### Gestión de Tareas
 
+Luego de iniciar sesión, el usuario puede acceder al sistema gestor de tareas.
+
+**Crear una tarea:**
+Habiendo iniciado sesión, en la página principal se tiene la opción de crear una tarea, haciendo click a este apartado 
+se mostrará un formulario donde se ingresará el título, descripción, fecha de vencimiento y sector al cual se desea asociar.
+
+    **imagen tarea**
+
+Luego, para poder visualizar la tarea creada y todas las demás se debe acceder al apartado de 'Gestor'.
+
+**Ver lista de tareas**
+Habiendo accedido al apartado 'Gestor', se listan todas las tareas posibles, separadas por su estado: Pendientes, En Progreso y Completadas.
+
+    **imagen gestor**
+
+Aquí se muestran todos los detalles para cada tarea, y las opciones disponibles para interactuar con estas. 
+
+**Marcar tarea como en progreso / completada**
+Simplemente presionando el checkbox se puede cambiar una tarea al siguiente estado, siguiendo el orden de Pendiente -> En Progreso -> Completada.
+
+**Editar una tarea**
+Presionando el botón 'Editar', se desplegará nuevamente un formulario con los datos de la tarea, los cuales pueden ser modificados a gusto.
+
+    **imagen editar**
+
+Además, también se puede cambiar el estado de una tarea manualmente, la utilidad de esto puede ser si cambiar una tarea directamente desde el estado Pendiente hacia Completada. 
+
+    **imagen opciones desplegables estadotarea**
+
+**Eliminar una tarea**
+
+
 ### Notificaciones
+> Los usuarios deben recibir notificaciones cuando se acerque la fecha de vencimiento de una tarea.
+
+Las notificaciones solamente aparecen si es que la tarea no se encuentra completada y tiene la misma fecha de vencimiento (DD/MM/YY) que el día actual.
+
+Tomando en consideración la tarea previamente creada, que a contar del día de la confección del README (01/06/2025), vence a las 21:00, se encontrará en el header de la aplicación
+
 
 ### Consultas
 
@@ -151,3 +211,21 @@ WHERE tareas.estado = 'PENDIENTE'
 GROUP BY sectores.nombre_sector
 ORDER BY cantidad_tareas DESC
 ```
+
+
+##### ¿Cuántas tareas ha realizado cada usuario por sector?
+
+[Imagen frontend pls]
+
+No utiliza nada de postgis, recupera el usuario, el id del sector y el nombre respectivo, después
+procede a agruparlas por id de usuario e id y nombre de la zona.
+
+```sql
+SELECT s.id AS id_sector, s.nombre_sector, COUNT(t.id) 
+    AS cantidad_tareas, t.id_usuario
+    FROM tareas t 
+    JOIN sectores s ON t.id_sector = s.id 
+    GROUP BY t.id_usuario, s.id, s.nombre_sector 
+    ORDER BY s.nombre_sector
+```
+
