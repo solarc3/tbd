@@ -59,46 +59,45 @@ iniciar sesión en el sistema"*
 
 Con el proyecto ya iniciado, se redirigirá inmediatamente al login, en caso de tener cuenta se puede iniciar sesión normalmente.
 En cualquier otro caso, el usuario debe registrarse ingresando nombre, apellido, RUT, correo, ubicación en el mapa y contraseña.
+
 ![registro](https://github.com/user-attachments/assets/f63f59dc-2b25-4bbd-8d02-5218c1c0c507)
 
-
 Luego, se le será redirigido al mismo apartado de inicio de sesión, donde se debe ingresar correo y contraseña, paso seguido será enviado al home page.
-![inicio_sesion](https://github.com/user-attachments/assets/5bf0d1a3-9668-4676-b79c-f12d8eb909cb)
 
+![inicio_sesion](https://github.com/user-attachments/assets/5bf0d1a3-9668-4676-b79c-f12d8eb909cb)
 
 ### Gestión de Tareas
 
 Luego de iniciar sesión, el usuario puede acceder al sistema gestor de tareas.
 ![home_page](https://github.com/user-attachments/assets/4d54d76f-ba31-4726-8691-63170c17c1ad)
 
-**Crear una tarea:**
-Habiendo iniciado sesión, en la página principal se tiene la opción de crear una tarea, haciendo click a este apartado 
+- **Crear una tarea:** Habiendo iniciado sesión, en la página principal se tiene la opción de crear una tarea, haciendo click a este apartado 
 se mostrará un formulario donde se ingresará el título, descripción, fecha de vencimiento y sector al cual se desea asociar.
 
 ![crear_tarea](https://github.com/user-attachments/assets/8accc53b-1b4e-474b-9abb-51cf35b08c4e)
 
 Luego, para poder visualizar la tarea creada y todas las demás se debe acceder al apartado de 'Gestor'.
 
-**Ver lista de tareas**
-Habiendo accedido al apartado 'Gestor', se listan todas las tareas posibles, separadas por su estado: Pendientes, En Progreso y Completadas.
+- **Ver lista de tareas**: Habiendo accedido al apartado 'Gestor', se listan todas las tareas posibles, separadas por su estado: Pendientes, En Progreso y Completadas.
 
-    **imagen gestor**
+![gestor](https://github.com/user-attachments/assets/10f253ef-b8a9-42ff-9f4f-6e9f092623eb)
 
 Aquí se muestran todos los detalles para cada tarea, y las opciones disponibles para interactuar con estas. 
 
-**Marcar tarea como en progreso / completada**
-Simplemente presionando el checkbox se puede cambiar una tarea al siguiente estado, siguiendo el orden de Pendiente -> En Progreso -> Completada.
+- **Marcar tarea como en progreso / completada:** Simplemente presionando el checkbox se puede cambiar una tarea al siguiente estado, siguiendo el orden de Pendiente -> En Progreso -> Completada.
 
-**Editar una tarea**
-Presionando el botón 'Editar', se desplegará nuevamente un formulario con los datos de la tarea, los cuales pueden ser modificados a gusto.
+- **Editar una tarea** Presionando el botón 'Editar', se desplegará nuevamente un formulario con los datos de la tarea, los cuales pueden ser modificados a gusto.
 
-    **imagen editar**
+![image](https://github.com/user-attachments/assets/280340af-8b3c-408d-b4dd-e9e3e4c776b4)
+
 
 Además, también se puede cambiar el estado de una tarea manualmente, la utilidad de esto puede ser si cambiar una tarea directamente desde el estado Pendiente hacia Completada. 
 
-    **imagen opciones desplegables estadotarea**
+![image](https://github.com/user-attachments/assets/c126bf45-5bdb-43ae-a295-d2f73a11159f)
 
-**Eliminar una tarea**
+- **Eliminar una tarea:** Parte de gestionar tareas es la capacidad de eliminarlas en caso de que no sean deseadas, notar que **no existe un mensaje de confirmación** así que al presionarse eliminar desaparecerá inmediatamente la tarea.
+
+![image](https://github.com/user-attachments/assets/05a35638-9b7f-4bd6-b61c-09d6fbc36aee)
 
 
 ### Notificaciones
@@ -108,6 +107,7 @@ Las notificaciones solamente aparecen si es que la tarea no se encuentra complet
 
 Tomando en consideración la tarea previamente creada, que a contar del día de la confección del README (01/06/2025), vence a las 21:00, se encontrará en el header de la aplicación
 
+![image](https://github.com/user-attachments/assets/039efcc3-8400-4172-84f0-8de055efae89)
 
 ### Consultas
 
