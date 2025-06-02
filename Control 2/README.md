@@ -43,6 +43,9 @@ Docker Desktop, se procede a escribir ```sudo docker compose up``` o ```docker c
 
 #### Se procede a esperar a que termine la ejecución y nos dirigimos a ```http://localhost:3000/```.
 
+#### Posibles Errores durante la ejecución:
+- **Componentes no cargan:** En caso de que se haya ejecutado por Docker Compose y no se estén cargando apropiadamente los componentes dentro del frontend, se debe de recargar la página.
+
 ---
 
 ## Funcionalidades
