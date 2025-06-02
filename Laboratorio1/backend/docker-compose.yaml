@@ -4,12 +4,10 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    #se usa bridge asi que es necesario!!
     ports:
-      - "5432:5432"
-    # se puede definir un volumen pero como es solo prueba, no es necesario
+      - "5433:5433"
     networks:
-        - postgres_network
+      - postgres_network
 networks:
   postgres_network:
     driver: bridge
