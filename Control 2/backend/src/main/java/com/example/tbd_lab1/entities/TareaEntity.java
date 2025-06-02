@@ -22,4 +22,5 @@ public class TareaEntity {
     private Long idUsuario;
     private String estado;
     private Long idSector;
+    private String nombreSector;
 }

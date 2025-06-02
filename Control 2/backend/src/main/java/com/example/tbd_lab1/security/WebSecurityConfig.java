@@ -66,7 +66,7 @@ public class WebSecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> // para proposito de testing se añaden rutas
-                                       auth.requestMatchers("/api/auth/**","/api/users/**").permitAll()
+                                       auth.requestMatchers("/api/auth/**").permitAll()
                                            .anyRequest().authenticated()
                                   )
             .authenticationProvider(authenticationProvider())
@@ -76,7 +76,16 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://host.docker.internal:*",
+                "http://*.docker.internal:*",
+                "http://frontend:*",
+                "http://control2-frontend-1:*",
+                "http://172.*.*:*"
+        ));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(List.of("*"));

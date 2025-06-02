@@ -11,16 +11,9 @@ INSERT INTO users (username, email, password, first_name, last_name, rut, locati
 ('cliente9', 'cliente9@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Matías', 'Fernández', '19.876.543-4', NULL, NULL, NULL),
 ('cliente10', 'cliente10@example.com', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', 'Javiera', 'Muñoz', '10.543.876-6', ST_SetSRID(ST_MakePoint(-70.6555, -33.4555), 4326), 'tokenCliente10Refresh', EXTRACT(EPOCH FROM TIMESTAMP '2025-06-25 00:00:00') * 1000);
 
--- Existing Sector Data (ensure this is present before running new tarea inserts that might reference these)
-INSERT INTO sectores (nombre_sector, area) VALUES
-('Zona 1', ST_GeomFromText('SRID=4326;POLYGON((-70.65 -33.45, -70.66 -33.45, -70.66 -33.46, -70.65 -33.46, -70.65 -33.45))')),
-('Zona 2',  ST_GeomFromText('SRID=4326;POLYGON((-70.64 -33.44, -70.65 -33.44, -70.65 -33.45, -70.64 -33.45, -70.64 -33.44))')),
-('Zona 3',  ST_GeomFromText('SRID=4326;POLYGON((-70.66 -33.46, -70.67 -33.46, -70.67 -33.47, -70.66 -33.47, -70.66 -33.46))')),
-('Zona 4', ST_GeomFromText('SRID=4326;POLYGON((-70.62 -33.42, -70.63 -33.42, -70.63 -33.43, -70.62 -33.43, -70.62 -33.42))')),
-('Zona 5',  ST_GeomFromText('SRID=4326;POLYGON((-70.60 -33.40, -70.61 -33.40, -70.61 -33.41, -70.60 -33.41, -70.60 -33.40))'));
+-- Acá en teoría debe de ir zonas, pero se va a cargar aparte por temas de órden
 
--- Updated INSERT statement for tareas, now including id_sector
--- Assuming sector IDs 1-5 exist from the initial data.
+-- Tareas por zona, agregar más con las nuevas comunas
 INSERT INTO tareas (titulo, descripcion, fecha_vencimiento, id_usuario, id_sector, estado) VALUES
 ('Completar informe mensual', 'Elaborar el informe de ventas del mes de abril', '2025-05-25 12:00:00', 1, 1, 'PENDIENTE'),
 ('Reunión con cliente', 'Reunión con el cliente para discutir nuevos requerimientos', '2025-05-22 15:30:00', 2, 2, 'PENDIENTE'),

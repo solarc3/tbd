@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import com.example.tbd_lab1.entities.SectorEntity;
 
-import org.locationtech.jts.geom.Point;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -51,8 +49,8 @@ public class SectorRepository {
                 },
                 (rs, rowNum) -> {
                     SectorTareasResponse tareasResponse = new SectorTareasResponse();
-                    tareasResponse.setNombre_sector(rs.getString("nombre_sector"));
-                    tareasResponse.setCantidad_tareas(rs.getInt("tareas_completadas"));
+                    tareasResponse.setNombreSector(rs.getString("nombre_sector"));
+                    tareasResponse.setCantidadTareas(rs.getInt("tareas_completadas"));
                     return tareasResponse;
                 });
     }
@@ -64,11 +62,17 @@ public class SectorRepository {
 
     // 5.- Sectores con mayor cantidad de tareas pendientes
     public List<SectorTareasResponse> findTareasPendientesBySector(){
-        String sql = "select sectores.nombre_sector, count(tareas.id_sector) as cantidad_tareas from tareas left join sectores on sectores.id = tareas.id_sector where tareas.estado = 'PENDIENTE' group by sectores.nombre_sector order by cantidad_tareas desc";
+        String sql = """
+                SELECT sectores.nombre_sector, COUNT(tareas.id_sector) AS cantidad_tareas
+                FROM tareas LEFT JOIN sectores ON sectores.id = tareas.id_sector
+                WHERE tareas.estado = 'PENDIENTE'
+                GROUP BY sectores.nombre_sector
+                ORDER BY cantidad_tareas DESC
+                """;
         try {
             return jdbcTemplate.query(sql, (rs, rowNum) -> SectorTareasResponse.builder()
-                    .cantidad_tareas(rs.getInt("cantidad_tareas"))
-                    .nombre_sector(rs.getString("nombre_sector")).build());
+                    .cantidadTareas(rs.getInt("cantidad_tareas"))
+                    .nombreSector(rs.getString("nombre_sector")).build());
         }catch(EmptyResultDataAccessException e) {
             return new ArrayList<>();
         } catch (Exception e) {

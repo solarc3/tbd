@@ -1,262 +1,201 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import EmblaCarousel from "embla-carousel";
-import Autoplay from "embla-carousel-autoplay";
+import { ref, onMounted } from 'vue'
+import { navigateTo } from '#app'
+import CrearTarea from '@/components/CrearTarea.vue'
+import MapaTareas from '@/components/MapaTareas.vue'
+import TareaService from '@/api/services/tareaService'
+import SectorService, { type SectorEntity } from '@/api/services/sectorService'
 
-const emblaRef = ref<HTMLElement | null>(null);
-let _emblaInstance: ReturnType<typeof EmblaCarousel> | null = null;
-const activeSlide = ref(0);
+const isModalOpen = ref(false)
+const selectedTask = ref({
+  id: 0,
+  title: "",
+  description: "",
+  dueDate: "",
+  sector: "",
+  estado: "PENDIENTE"
+})
+const isEditMode = ref(false)
+const sectores = ref<SectorEntity[]>([])
+const isLoading = ref(false)
 
-const router = useRouter();
-
-// categorias nms
-const categories = [
-	{ name: "dermatologia", image: "/dermatologia.png" },
-	{ name: "higiene", image: "/higiene.png" },
-	{ name: "medicamentos", image: "/medicamentos.png" },
-	{ name: "suplementos", image: "/suplementos.png" },
-	{ name: "cosméticos", image: "/cosmeticos.png" },
-];
-
-type Category = {
-	name: string;
-	image: string;
-};
-
-// Slide data with titles
-const slides = [
-	{ image: "/slide4.jpeg", title: "Bienvenidos a Nuestra Farmacia" },
-	{ image: "/slide5.png", title: "Los Mejores Productos" },
-	{ image: "/slide3.jpg", title: "Calidad Garantizada" },
-];
-
-// Carousel navigation functions
-function prevSlide() {
-	_emblaInstance?.scrollPrev();
+function goToTaskManager() {
+  navigateTo('/gestor')
 }
 
-function nextSlide() {
-	_emblaInstance?.scrollNext();
+const goToStatisticsTasks = () => {
+  navigateTo('/estadisticas')
 }
 
-function goToSlide(index: number) {
-	_emblaInstance?.scrollTo(index);
+const openCreateModal = () => {
+  isEditMode.value = false
+  selectedTask.value = {
+    id: 0,
+    title: "",
+    description: "",
+    dueDate: "",
+    sector: "",
+    estado: "PENDIENTE"
+  }
+  isModalOpen.value = true
 }
 
-// netamente es para redirigir filtrado a productos por categoria seleccionada en elhome
-function goToCategory(category: Category) {
-	router.push({ path: "/productos", query: { category: category.name } });
+const closeModal = () => {
+  isModalOpen.value = false
 }
 
-onMounted(() => {
-	if (emblaRef.value) {
-		_emblaInstance = EmblaCarousel(emblaRef.value, { loop: true }, [
-			Autoplay({ delay: 3000 }),
-		]);
+interface TaskData {
+  title?: string;
+  description?: string;
+  dueDate?: string;
+  sector?: string;
+  estado?: string;
+  titulo?: string;
+  descripcion?: string;
+  fechaVencimiento?: string;
+  idSector?: number;
+  idUsuario?: number;
+}
 
-		// Track current slide for dots navigation
-		_emblaInstance.on("select", () => {
-			activeSlide.value = _emblaInstance?.selectedScrollSnap() || 0;
-		});
-	}
-});
+const saveTask = async (task: TaskData) => {
+  try {
+    console.log('Nueva tarea creada:', task)
+    if (task.title && task.description) {
+      const tareaToCreate = {
+        titulo: task.title,
+        descripcion: task.description,
+        fechaVencimiento: task.dueDate,
+        idSector: task.sector ? parseInt(task.sector as string) : 1,
+        estado: "PENDIENTE",
+        idUsuario: 1 // Assuming we have a default user ID, or get from auth store
+      }
+      await TareaService.createTarea(tareaToCreate)
+    } else {
+      // Task is already in the correct format
+      // Safe to use as Partial<Tarea> since the structure matches
+      await TareaService.createTarea({
+        titulo: task.titulo,
+        descripcion: task.descripcion,
+        fechaVencimiento: task.fechaVencimiento,
+        idSector: task.idSector,
+        estado: task.estado,
+        idUsuario: task.idUsuario
+      })
+    }
+    closeModal()
+  } catch (error) {
+    console.error('Error al guardar la tarea:', error)
+  }
+}
+
+const mapRef = ref(null)
+
+onMounted(async () => {
+  try {
+    isLoading.value = true
+    sectores.value = await SectorService.getAllSectores()
+    console.log('Sectores cargados:', sectores.value.length)
+    // The simplified MapaTareas component will automatically handle sectors through its reactive props
+    // No need for manual calls to addSectors or setTimeout anymore
+  } catch (error) {
+    console.error('Error al obtener los sectores:', error)
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
-	<div class="px-4 sm:px-6 lg:px-8">
-		<!-- carrusel mejorado -->
-		<div class="embla-wrapper">
-			<div
-				class="embla rounded-lg shadow-xl overflow-hidden"
-				ref="emblaRef"
-			>
-				<div class="embla__container">
-					<div
-						v-for="(slide, index) in slides"
-						:key="index"
-						class="embla__slide"
-					>
-						<img
-							:src="slide.image"
-							:alt="`Slide ${index + 1}`"
-							class="slide-image"
-						/>
-						<div class="slide-caption">
-							<h2>{{ slide.title }}</h2>
-						</div>
-					</div>
-				</div>
+  <div class="px-6 py-8">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-800">
+        ¡Bienvenido a tu Organizador de Tareas!
+      </h1>
+      <p class="text-lg text-gray-600 mt-4">
+        Gestiona tus tareas de manera eficiente y en un sólo lugar. Busca, crea y organiza tus actividades con facilidad.
+      </p>
+    </div>
 
-				<!-- Botones de navegación -->
-				<button
-					class="embla-button embla-button-prev"
-					@click="prevSlide"
-					aria-label="Anterior"
-				>
-					&#10094;
-				</button>
-				<button
-					class="embla-button embla-button-next"
-					@click="nextSlide"
-					aria-label="Siguiente"
-				>
-					&#10095;
-				</button>
-			</div>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-stretch">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="block cursor-pointer" @click="goToTaskManager">
+          <div class="bg-blue-100 p-6 rounded-lg shadow-md hover:shadow-lg transition h-32 flex flex-col justify-center">
+            <h2 class="text-2xl font-semibold text-blue-800">Tareas Pendientes</h2>
+            <p class="text-gray-600 mt-2">Revisa las tareas que tienes pendientes y prioriza tus actividades.</p>
+          </div>
+        </div>
 
-			<!-- Indicadores de posición -->
-			<div class="embla-dots">
-				<button
-					v-for="(_, index) in slides"
-					:key="index"
-					:class="['embla-dot', { active: activeSlide === index }]"
-					@click="goToSlide(index)"
-				></button>
-			</div>
-		</div>
+        <div class="bg-green-100 p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer h-32 flex flex-col justify-center" @click="openCreateModal">
+          <h2 class="text-2xl font-semibold text-green-800">Crear Nueva Tarea</h2>
+          <p class="text-gray-600 mt-2">Agrega nuevas tareas y organiza tu día de manera efectiva.</p>
+        </div>
 
-		<!-- blocks de las imagenes para redireccion a productos -->
-		<div
-			class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-8 mb-8"
-		>
-			<div
-				v-for="category in categories"
-				:key="category.name"
-				class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-			>
-				<img
-					:src="category.image"
-					:alt="category.name"
-					class="w-full h-48 object-cover cursor-pointer"
-					@click="goToCategory(category)"
-				/>
-				<div class="p-4 text-center">
-					<button
-						class="btn-custom w-full"
-						@click="goToCategory(category)"
-					>
-						{{
-							category.name.charAt(0).toUpperCase() +
-							category.name.slice(1)
-						}}
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="bg-yellow-100 p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer h-32 flex flex-col justify-center" @click="goToStatisticsTasks">
+          <h2 class="text-2xl font-semibold text-yellow-800">Estadísticas</h2>
+          <p class="text-gray-600 mt-2">Descubre las estadísticas y valoraciones en base a tus tareas completadas.</p>
+        </div>
+      </div>
+      <div class="lg:col-span-3 flex items-center">
+        <div class="w-full h-[60vh]" :class="{ 'map-dimmed': isModalOpen }">
+          <ClientOnly>
+            <MapaTareas
+                ref="mapRef"
+                :initial-lat="-33.444355"
+                :initial-lng="-70.653602"
+                :initial-zoom="9"
+                :sectores="sectores"
+            />
+          </ClientOnly>
+        </div>
+      </div>
+    </div>
+    <Teleport to="body">
+      <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
+        <div class="modal-content">
+          <CrearTarea
+              :task="selectedTask"
+              :is-edit="isEditMode"
+              @close="closeModal"
+              @save="saveTask"
+          />
+        </div>
+      </div>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>
-.embla-wrapper {
-	max-width: 1850px; /* Mantiene tu ajuste */
-	margin: 20px auto;
-	position: relative;
+h1 {
+  font-family: 'Poppins', sans-serif;
 }
-
-.embla {
-	overflow: hidden;
-	width: 100%;
-	position: relative;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
 }
-
-.embla__container {
-	display: flex;
+.modal-content {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 28rem;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  max-height: 90vh;
+  overflow-y: auto;
 }
-
-.embla__slide {
-	position: relative;
-	flex: 0 0 100%;
+.map-dimmed {
+  filter: brightness(0.7);
+  pointer-events: none;
+  transition: filter 0.3s ease;
 }
-
-.slide-image {
-	width: 100%;
-	height: 400px; /* Mantiene tu ajuste */
-	object-fit: cover;
-	transition: transform 0.3s ease;
-}
-
-.embla__slide:hover .slide-image {
-	transform: scale(1.02);
-}
-
-.slide-caption {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-	padding: 20px;
-	color: white;
-	text-align: center;
-}
-
-.slide-caption h2 {
-	font-size: 1.8rem;
-	font-weight: bold;
-	margin: 0;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Botones de navegación */
-.embla-button {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 40px;
-	height: 40px;
-	background: rgba(255, 255, 255, 0.7);
-	border-radius: 50%;
-	border: none;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	font-size: 18px;
-	z-index: 5;
-	transition: all 0.2s ease;
-}
-
-.embla-button:hover {
-	background: white;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.embla-button-prev {
-	left: 20px;
-}
-
-.embla-button-next {
-	right: 20px;
-}
-
-/* Puntos indicadores */
-.embla-dots {
-	display: flex;
-	justify-content: center;
-	margin-top: 10px;
-}
-
-.embla-dot {
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background-color: #ccc;
-	margin: 0 5px;
-	padding: 0;
-	border: none;
-	cursor: pointer;
-	transition: all 0.2s ease;
-}
-
-.embla-dot.active {
-	background-color: #555;
-	transform: scale(1.2);
-}
-
-img {
-	width: 100%;
-	height: 400px;
-	object-fit: cover;
+:deep(.leaflet-container),
+:deep(.leaflet-control-container) {
+  z-index: 1000 !important;
 }
 </style>

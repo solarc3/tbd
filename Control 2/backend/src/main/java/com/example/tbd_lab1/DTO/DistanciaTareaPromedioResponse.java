@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DistanciaTareaPromedioResponse {
-    private String nombre_usuario;
-    private double distancia_promedio;
+    private Long idUsuario;
+    private String nombreUsuario;
+    private Double distanciaPromedio;
 }

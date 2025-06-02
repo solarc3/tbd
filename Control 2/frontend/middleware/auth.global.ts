@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const auth = useAuthStore();
 	await auth.initAuth();
 
-	const publicPages = ["/login", "/register", "/clientes"];
+	const publicPages = ["/login", "/register"];
 	const isPublic = publicPages.includes(to.path);
 
 	if (!auth.isAuthenticated && !isPublic) {

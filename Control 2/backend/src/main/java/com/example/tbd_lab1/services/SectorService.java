@@ -51,7 +51,7 @@ public class SectorService {
                 radius.multiply(BigDecimal.valueOf(1000)));
     }
 
-    public List<SectorTareasResponse> TareasBySector() {
+    public List<SectorTareasResponse> tareasBySector() {
         return sectorRepository.findTareasPendientesBySector();
     }
 }

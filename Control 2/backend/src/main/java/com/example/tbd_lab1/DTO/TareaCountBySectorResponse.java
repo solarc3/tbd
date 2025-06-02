@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TareaCountBySectorDTO {
+public class TareaCountBySectorResponse {
+    private Long idUsuario;
     private Long idSector;
     private String nombreSector;
     private Long cantidadTareas;

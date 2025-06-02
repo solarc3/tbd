@@ -22,6 +22,7 @@ export interface User {
 	lastName: string;
 	rut: string;
 	email: string;
+	location: string;
 }
 
 export interface Product {
@@ -59,4 +60,20 @@ export interface RegistrarPedidoRequest {
 	esUrgente: boolean;
 	productos: Array<ProductRequest>;
 	monto: number;
+}
+
+export interface Tarea {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  fechaVencimiento: string;
+  idUsuario: number;
+  estado: string;
+  idSector: number;
+}
+
+export interface ClosestTask {
+	title: string;
+	description: string;
+	distance: number;
 }
