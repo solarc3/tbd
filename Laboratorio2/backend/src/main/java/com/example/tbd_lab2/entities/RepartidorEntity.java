@@ -20,7 +20,6 @@ public class RepartidorEntity {
     private Long idRepartidor;
     private String nombreRepartidor;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fechaContratacion;
 
     @JdbcTypeCode(SqlTypes.GEOMETRY)

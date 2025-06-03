@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.services;
 
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
+import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
 import com.example.tbd_lab2.DTO.cliente.TopClienteResponse;
 import com.example.tbd_lab2.repositories.UserRepository;
@@ -34,4 +35,10 @@ public class UserService {
 	// servicios lab 2
 	public ClienteZonaCoberturaDTO getZonaCoberturaByCliente(Long id_cliente) {
 		return userRepository.findByZonaCobertura(id_cliente);
-	}}
+	}
+
+	public List<ClienteLejanoDeFarmaciaResponse> getClientesLejanosDeFarmacia(Double radiusKm) {
+		return userRepository.findAllLejanoDeFarmacia(radiusKm * 1000.0);
+	}
+
+}

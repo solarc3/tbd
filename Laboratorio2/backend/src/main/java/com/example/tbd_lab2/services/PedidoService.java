@@ -1,13 +1,16 @@
 package com.example.tbd_lab2.services;
 
 import com.example.tbd_lab2.DTO.PagoMasUsadoUrgenteResponse;
+import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.DTO.producto.ProductoPedidoResponse;
 import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.entities.ProductoPedidoEntity;
+import com.example.tbd_lab2.entities.UserEntity;
 import com.example.tbd_lab2.repositories.PedidoRepository;
 import com.example.tbd_lab2.repositories.ProductoPedidoRepository;
 import com.example.tbd_lab2.repositories.ProductoRepository;
+import com.example.tbd_lab2.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +23,14 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProductoPedidoRepository productoPedidoRepository;
     private final ProductoRepository productoRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProductoPedidoRepository productoPedidoRepository, ProductoRepository productoRepository, ModelMapper modelMapper) {
+    public PedidoService(PedidoRepository pedidoRepository, ProductoPedidoRepository productoPedidoRepository, ProductoRepository productoRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.pedidoRepository = pedidoRepository;
         this.productoPedidoRepository = productoPedidoRepository;
         this.productoRepository = productoRepository;
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -78,5 +83,16 @@ public class PedidoService {
             request.setMonto(monto);
         }
         return pedidoRepository.registrarPedidoCompleto(request);
+    }
+
+    public List<PedidoCruzaZonasResponse> getBySectorIntersection(Integer sectorAmount) {
+        List<PedidoCruzaZonasResponse> pedidos = pedidoRepository.findBySectorIntersection(sectorAmount);
+        return pedidos.stream()
+                // generar nombre completo del cliente
+                .peek(p -> {
+                    UserEntity client = userRepository.findById(p.getIdCliente()).orElseThrow(IllegalArgumentException::new);
+                    String name = client.getFirstName() + " " + client.getLastName();
+                    p.setNombreCliente(name);
+                }).toList();
     }
 }

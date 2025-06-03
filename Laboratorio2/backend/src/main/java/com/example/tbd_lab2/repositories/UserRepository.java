@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.repositories;
 
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
+import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
 import com.example.tbd_lab2.DTO.cliente.TopClienteResponse;
 import com.example.tbd_lab2.entities.UserEntity;
@@ -304,6 +305,7 @@ public class UserRepository {
 	}
 
 	// Queries Laboratorio 2
+	// 2. Determinar si un cliente se encuentra dentro de una zona de cobertura.
 	public ClienteZonaCoberturaDTO findByZonaCobertura(Long id_cliente) {
 		try{
 			String sql =
@@ -330,5 +332,39 @@ public class UserRepository {
 			// Considerar lanzar una excepción personalizada aquí también
 			return null;
 		}
+	}
+
+	// 6. Determinar los clientes que están a más de ?km de cualquier empresa o farmacia
+	public List<ClienteLejanoDeFarmaciaResponse> findAllLejanoDeFarmacia(Double radiusMeters) {
+		String sql = """
+				WITH farmacia_mas_cercana AS (
+				    SELECT DISTINCT ON (users.id)
+				        users.id AS id_cliente,
+				        farmacia.nombre_farmacia,
+				        (ST_Distance(location::geography, farmacia.ubicacion::geography) / 1000) AS distancia_km
+				    FROM users
+				    CROSS JOIN farmacia
+				    ORDER BY id_cliente, distancia_km
+				)
+				SELECT id, first_name, last_name, nombre_farmacia, distancia_km
+				FROM users
+				INNER JOIN farmacia_mas_cercana ON id = id_cliente
+				WHERE NOT ST_Intersects(location, ST_Collect(
+				        ARRAY(SELECT ST_Buffer(ubicacion::geography, ?)::geometry
+				              FROM farmacia))
+				);
+				""";
+		return jdbcTemplate.query(sql,
+				(rs, rowNum) -> {
+					String nombreCliente = rs.getString("first_name") + ' ' + rs.getString("last_name");
+					return ClienteLejanoDeFarmaciaResponse.builder()
+							.idCliente(rs.getLong("id"))
+							.nombreCliente(nombreCliente)
+							.nombreFarmacia(rs.getString("nombre_farmacia"))
+							.distanciaKm(rs.getDouble("distancia_km"))
+							.build();
+				},
+				radiusMeters);
+
 	}
 }

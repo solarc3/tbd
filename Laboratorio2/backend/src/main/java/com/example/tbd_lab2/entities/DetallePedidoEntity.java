@@ -21,6 +21,5 @@ public class DetallePedidoEntity {
     private Long idRepartidor;
     private String metodoPago;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaEntrega;
 }

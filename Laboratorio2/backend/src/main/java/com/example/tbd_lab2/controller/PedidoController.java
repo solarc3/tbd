@@ -1,13 +1,21 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
+import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.pedido.DetallePedidoRequest;
 import com.example.tbd_lab2.DTO.pedido.EstadoPedidoRequest;
+import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.DetallePedidoEntity;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.services.DetallePedidoService;
 import com.example.tbd_lab2.services.PedidoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -136,5 +144,19 @@ public class PedidoController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error al registrar el pedido completo."));
+    }
+
+    @Operation(summary = "[LAB 2] Obtener los pedidos cuya ruta estimada cruce más de N sectores", description = "Implementación de query 5.- \"Listar todos los pedidos cuya ruta estimada cruce más de 2 zonas de reparto.\" En este caso sectorAmount = 3")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pedidos que abarquen el minimo de sectores, con info acotada- solo id, fecha, id y nombre del cliente; y un array con los nombres de los sectores por donde pasa su ruta estimada",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PedidoCruzaZonasResponse.class)))
+    })
+    @GetMapping("/cruza-zonas-reparto/{sectorAmount}")
+    public ResponseEntity<?> cruzaZonasReparto(@PathVariable("sectorAmount") @Parameter(
+            name = "sectorAmount",
+            description = "Cantidad mínima de sectores",
+            example = "3") Integer sectorAmount) {
+        List<PedidoCruzaZonasResponse> pedidos = pedidoService.getBySectorIntersection(sectorAmount);
+        return ResponseEntity.ok(pedidos);
     }
 }

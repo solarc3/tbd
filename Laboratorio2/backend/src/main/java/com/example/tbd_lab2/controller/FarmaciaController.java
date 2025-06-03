@@ -59,7 +59,7 @@ public class FarmaciaController {
 		return ResponseEntity.ok(ranking);
 	}
 	//Query 1 lab 2
-	@Operation(summary = "Obtener la distancia de la entrega mas cercana a la farmacia y el usuario de quien hizo el pedido", description = "Query donde se entrega el id de la farmacia donde se desea saber los 5 pedidos mas cercanos que han realizado ")
+	@Operation(summary = "[LAB 2] Obtener la distancia de la entrega mas cercana a la farmacia y el usuario de quien hizo el pedido", description = "Query donde se entrega el id de la farmacia donde se desea saber los 5 pedidos mas cercanos que han realizado ")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",description="Se devuelven la distancia y usuarios de los cuales estan las 5 (o menos) entregas mas cercanas",
 					content=@Content(mediaType = "application/json",schema = @Schema(implementation = FarmaciaClosestDeliveryResponse.class))),
@@ -76,7 +76,7 @@ public class FarmaciaController {
 	}
 
 	//Query 4 lab 2
-	@Operation(summary = "Obtener la entrega mas lejana a la farmacia y el respectivo nombre de a cual pertenece", description = "Query donde se entrega la distancia del punto mas lejano de entrega de la farmacia, y el nombre del cual esta asociada la distancia")
+	@Operation(summary = "[LAB 2] Obtener la entrega mas lejana a la farmacia y el respectivo nombre de a cual pertenece", description = "Query donde se entrega la distancia del punto mas lejano de entrega de la farmacia, y el nombre del cual esta asociada la distancia")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",description="Se devuelven la distancia y el nombre de la farmacia",
 					content=@Content(mediaType = "application/json",schema = @Schema(implementation = FarmaciaPuntoEntregaLejanaResponse.class))),

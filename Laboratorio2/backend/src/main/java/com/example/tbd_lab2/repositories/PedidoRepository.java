@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.repositories;
 
 import com.example.tbd_lab2.DTO.PagoMasUsadoUrgenteResponse;
+import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.DTO.producto.ProductoPedidoRequest;
 import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
 import com.example.tbd_lab2.entities.PedidoEntity;
@@ -16,6 +17,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Types;
 import java.util.*;
@@ -165,5 +167,30 @@ public class PedidoRepository {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Queries Laboratorio 2
+    // 5. Listar todos los pedidos cuya ruta estimada cruce más de ? zonas de reparto.
+    public List<PedidoCruzaZonasResponse> findBySectorIntersection(Integer sectorAmount) {
+        String sql = """
+                SELECT id_pedido, id_cliente, fecha_pedido,
+                    ARRAY_AGG(DISTINCT sectores.nombre_sector) AS nombres_zonas
+                FROM pedido
+                JOIN sectores ON ST_Intersects(pedido.ruta_estimada,
+                                               sectores.area)
+                GROUP BY id_pedido, id_cliente
+                HAVING COUNT(DISTINCT sectores.id) >= ?;
+                """;
+        return jdbcTemplate.query(sql,
+                (rs, rowNum) -> {
+                    Array nombresZonas = rs.getArray("nombres_zonas");
+                    return PedidoCruzaZonasResponse.builder()
+                            .idPedido(rs.getLong("id_pedido"))
+                            .idCliente(rs.getLong("id_cliente"))
+                            .fechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime())
+                            .nombresZonas((String[]) nombresZonas.getArray())
+                            .build();
+                },
+                sectorAmount);
     }
 }
