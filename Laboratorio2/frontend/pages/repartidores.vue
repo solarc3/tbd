@@ -41,20 +41,36 @@
               </div>
 
               <div>
+                <p class="text-sm font-medium text-gray-500">Distancia total</p>
+                <p class="text-lg font-semibold">{{ repartidor.distanciaTotal }} km</p>
+              </div>
+
+              <div>
                 <p class="text-sm font-medium text-gray-500">Tiempo promedio</p>
                 <p class="text-lg font-semibold">{{ formatPromedioHoras(repartidor.promedioHoras) }}</p>
               </div>
 
               <div>
-                <p class="text-sm font-medium text-gray-500">Eficiencia</p>
+                <p class="text-sm font-medium text-gray-500">Distancia recorrida</p>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                      class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
-                      :style="{ width: `${Math.min(repartidor.cantPaquetesEntregados * 25, 100)}%` }"
+                      class="bg-green-500 h-2.5 rounded-full transition-all duration-300"
+                      :style="{ width: `${Math.min((repartidor.distanciaTotal / maxDistancia) * 100, 100)}%` }"
                   ></div>
                 </div>
               </div>
             </div>
+
+            <div>
+              <p class="text-sm font-medium text-gray-500">Eficiencia</p>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                    class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+                    :style="{ width: `${Math.min(repartidor.cantPaquetesEntregados * 25, 100)}%` }"
+                ></div>
+              </div>
+            </div>
+
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -65,7 +81,6 @@
 import { ref, onMounted } from 'vue'
 import { repartidorService } from '@/api/services'
 
-// Import Accordion components
 import {
   Accordion,
   AccordionContent,
@@ -78,16 +93,17 @@ interface RepartidorInfo {
   nombre: string
   cantPaquetesEntregados: number
   promedioHoras: number
+  distanciaTotal: number
 }
 
 const repartidores = ref<RepartidorInfo[]>([])
 const loading = ref(true)
 const error = ref('')
+const maxDistancia = ref(0)
 
 const formatPromedioHoras = (horas: number): string => {
   if (horas === 0) return 'N/A';
-  
-  // Convert to hours and minutes
+
   const hours = Math.floor(horas);
   const minutes = Math.round((horas - hours) * 60);
   
@@ -100,35 +116,41 @@ const formatPromedioHoras = (horas: number): string => {
   }
 }
 
+// añadi la barra verde para la distancia y funciona igual q la de eficiencia en base al repartidor que tenga
+// la max distancia, van variando las barrasss !!
 onMounted(async () => {
   try {
-    loading.value = true
-    
-    // Get both data sets
-    const infoRepartidores = await repartidorService.getAllRepartidoresInfo()
-    const tiemposRepartidores = await repartidorService.getRepartidorTiempoPromedio()
-    
-    // Create a map of nombreRepartidor -> promedioHoras for easier merging
+    loading.value = true;
+
+    const infoRepartidores = await repartidorService.getAllRepartidoresInfo();
+    const tiemposRepartidores = await repartidorService.getRepartidorTiempoPromedio();
+    const distanciasRepartidores = await repartidorService.getRepartidorDistanciaTotal();
+
     const tiemposMap = new Map(
       tiemposRepartidores.map(item => [item.nombreRepartidor, item.promedioHoras])
-    )
-    
-    // Merge the data
-    repartidores.value = infoRepartidores.map(repartidor => ({
-      nombre: repartidor.nombre,
-      cantPaquetesEntregados: repartidor.cantPaquetesEntregados,
-      promedioHoras: tiemposMap.get(repartidor.nombre) || 0
-    }))
+    );
 
-    // Sort by number of packages delivered (descending)
-    repartidores.value.sort((a, b) => b.cantPaquetesEntregados - a.cantPaquetesEntregados)
+    const distanciasMap = new Map(
+      distanciasRepartidores.map(item => [item.nombreRepartidor, Math.round(item.distanciaTotalKm)])
+    );
+
+    repartidores.value = infoRepartidores
+      .filter(repartidor => distanciasMap.has(repartidor.nombre))
+      .map(repartidor => ({
+        nombre: repartidor.nombre,
+        cantPaquetesEntregados: repartidor.cantPaquetesEntregados,
+        promedioHoras: tiemposMap.get(repartidor.nombre) || 0,
+        distanciaTotal: distanciasMap.get(repartidor.nombre) || 0
+      }));
+
+    maxDistancia.value = Math.max(...repartidores.value.map(r => r.distanciaTotal));
+
+    repartidores.value.sort((a, b) => b.cantPaquetesEntregados - a.cantPaquetesEntregados);
   } catch (err) {
-    error.value = 'Error al cargar la lista de repartidores'
-    console.error(err)
+    error.value = 'Error al cargar la lista de repartidores';
+    console.error(err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-
-  
-})
+});
 </script>

@@ -12,7 +12,6 @@ export interface SignupRequest {
 	password: string;
 }
 
-// User data returned by el servidor
 export interface User {
 	id: number;
 	username: string;
@@ -57,4 +56,10 @@ export interface RegistrarPedidoRequest {
 	esUrgente: boolean;
 	productos: Array<ProductRequest>;
 	monto: number;
+}
+
+export interface RepartidorDistanciaTotal {
+  id: number
+  nombreRepartidor: string
+  distanciaTotalKm: number
 }

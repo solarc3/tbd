@@ -35,30 +35,30 @@ const rutError = ref("");
 const formatRut = (value: string): string => {
     // Remove all non-alphanumeric characters
     let cleaned = value.replace(/[^0-9kK]/g, "").toUpperCase();
-    
+
     if (cleaned.length === 0) return "";
-    
+
     // Format the RUT
     let result = "";
-    
+
     // Add the verification digit with a dash
     if (cleaned.length > 1) {
         const body = cleaned.slice(0, -1);
         const dv = cleaned.slice(-1);
         cleaned = body + "-" + dv;
     }
-    
+
     // Add dots for thousands
     const parts = cleaned.split("-");
     let num = parts[0];
-    
+
     // Add dots
     for (let i = num.length - 3; i > 0; i -= 3) {
         num = num.slice(0, i) + "." + num.slice(i);
     }
-    
+
     result = parts.length > 1 ? num + "-" + parts[1] : num;
-    
+
     return result;
 };
 
@@ -71,14 +71,14 @@ watch(() => form.value.rut, (newValue) => {
         const input = document.getElementById("rut") as HTMLInputElement;
         const cursorPos = input?.selectionStart || 0;
         const oldLength = newValue.length;
-        
+
         // Format RUT
         const formatted = formatRut(newValue);
-        
+
         // Only update if formatting actually changed something
         if (formatted !== newValue) {
             form.value.rut = formatted;
-            
+
             // Restore cursor position, accounting for added characters
             setTimeout(() => {
                 if (input) {
@@ -88,7 +88,7 @@ watch(() => form.value.rut, (newValue) => {
             }, 0);
         }
     }
-    
+
     // Validate in real-time
     if (newValue) {
         rutError.value = validateRut(newValue) ? "" : "RUT inválido";

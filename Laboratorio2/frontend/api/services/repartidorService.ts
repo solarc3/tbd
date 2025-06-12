@@ -1,4 +1,5 @@
 import apiClient from '@/api/axios'
+import type { RepartidorDistanciaTotal } from "@/api/models";
 
 interface RepartidorRendimiento {
   idRepartidor: number
@@ -44,6 +45,11 @@ class RepartidorService {
 
   async getRepartidorTiempoPromedio(): Promise<RepartidorTiempoPromedioResponse[]>{
     const { data } = await apiClient.get<RepartidorTiempoPromedioResponse[]>('/repartidor/tpromedio')
+    return data
+  }
+
+  async getRepartidorDistanciaTotal(): Promise<RepartidorDistanciaTotal[]> {
+    const { data } = await apiClient.get<RepartidorDistanciaTotal[]>('/repartidor/distancia-total')
     return data
   }
 }
