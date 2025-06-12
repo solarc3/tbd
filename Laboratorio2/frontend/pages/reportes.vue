@@ -4,34 +4,46 @@
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Reportes</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-      <!-- farmacias con mas entregas fallidas -->
+    <!-- Botones -->
+    <div class="flex justify-center space-x-4 mb-6">
+      <button
+          @click="activeTab = 'farmacias'"
+          :class="activeTab === 'farmacias' ? 'border-blue-500 text-blue-500' : 'border-gray-300 text-gray-700'"
+          class="w-full px-6 py-2 bg-white rounded-full border text-lg font-medium shadow-sm"
+      >
+        Farmacias
+      </button>
+      <button
+          @click="activeTab = 'pedidos'"
+          :class="activeTab === 'pedidos' ? 'border-blue-500 text-blue-500' : 'border-gray-300 text-gray-700'"
+          class="w-full px-6 py-2 bg-white rounded-full border text-lg font-medium shadow-sm"
+      >
+        Pedidos
+      </button>
+    </div>
+
+    <!-- Farmacias -->
+    <div v-if="activeTab === 'farmacias'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Farmacias con más entregas fallidas</h2>
-        <div v-if="loadingFarmacias" class="flex justify-center items-center h-[400px]">
-          <p>Cargando datos...</p>
-        </div>
-        <v-chart v-else :option="farmaciasFallidasOptions" style="height: 400px;" />
+        <v-chart :option="farmaciasFallidasOptions" style="height: 400px;" />
       </div>
-
-      <!-- top 3 repartidores con mejor rendimiento -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Top 3 repartidores con mejor rendimiento</h2>
-        <v-chart :option="topRepartidoresOptions" style="height: 400px;" />
-      </div>
-
-      <!-- medio de pago utilizado en pedidos urgentes -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Medio de pago utilizado en pedidos urgentes</h2>
-        <v-chart :option="mediosPagoUrgentesOptions" style="height: 400px;" />
-      </div>
-
-      <!-- farmacia con mayor producto de volumenes entregados -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Farmacia con mayor producto de volúmenes entregados</h2>
         <v-chart :option="farmaciaMayorVolumenOptions" style="height: 400px;" />
       </div>
-      <!-- Replace the existing Top products by category div with this: -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Medio de pago utilizado en pedidos urgentes</h2>
+        <v-chart :option="mediosPagoUrgentesOptions" style="height: 400px;" />
+      </div>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Top 3 repartidores con mejor rendimiento</h2>
+        <v-chart :option="topRepartidoresOptions" style="height: 400px;" />
+      </div>
+    </div>
+
+    <!-- Pedidos -->
+    <div v-if="activeTab === 'pedidos'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">Productos más pedidos por categoría</h2>
         <div v-if="loadingTopProducts" class="flex justify-center items-center h-[400px]">
@@ -45,13 +57,43 @@
             <div v-for="(category, index) in categorizedProducts" :key="index" class="mb-6">
               <h3 class="text-md font-medium text-blue-600 border-b pb-2 mb-3">{{ category.name }}</h3>
               <div class="space-y-2">
-                <div v-for="product in category.products" :key="product.nombreProducto" 
-                    class="flex justify-between items-center py-2 px-3 hover:bg-gray-50 rounded">
+                <div v-for="product in category.products" :key="product.nombreProducto"
+                     class="flex justify-between items-center py-2 px-3 hover:bg-gray-50 rounded">
                   <span class="text-gray-800">{{ product.nombreProducto }}</span>
                   <span class="bg-blue-100 text-blue-800 font-medium px-2.5 py-0.5 rounded-full">
                     {{ product.cantidadPedidos }} pedidos
                   </span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Pedidos que cruzan más de 2 zonas de reparto</h2>
+        <div v-if="loadingPedidosCruzaZonas" class="flex justify-center items-center h-[400px]">
+          <p>Cargando datos...</p>
+        </div>
+        <div v-else class="overflow-y-auto" style="max-height: 400px;">
+          <div v-if="pedidosCruzaZonas.length === 0" class="text-center text-gray-500 py-10">
+            No hay datos disponibles
+          </div>
+          <div v-else>
+            <div v-for="pedido in pedidosCruzaZonas" :key="pedido.idPedido" class="mb-4">
+              <button
+                @click="pedido.expanded = !pedido.expanded"
+                class="w-full text-left bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md font-medium text-gray-800"
+              >
+                Pedido #{{ pedido.idPedido }} - {{ pedido.nombreCliente }}
+              </button>
+              <div v-if="pedido.expanded" class="mt-2 bg-gray-50 border rounded-md p-4">
+                <p class="text-gray-800">Fecha: {{ pedido.fechaPedido }}</p>
+                <p class="text-gray-800">Zonas cruzadas:</p>
+                <ul class="list-disc pl-5">
+                  <li v-for="zona in pedido.nombresZonas" :key="zona" class="text-gray-600">
+                    {{ zona }}
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
@@ -71,14 +113,39 @@ import VChart from 'vue-echarts'
 
 // importar apis
 import { farmaciaService, repartidorService, pedidoService, productoService } from '@/api/services'
+import type { PedidoCruzaZonas } from '@/api/models';
 
-use([CanvasRenderer, BarChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
+// verificacion cliente nomas
+if (typeof window !== 'undefined') {
+  const { use } = await import('echarts/core')
+  const { CanvasRenderer } = await import('echarts/renderers')
+  const { BarChart, PieChart } = await import('echarts/charts')
+  const { LegendComponent, GridComponent, TooltipComponent, TitleComponent } = await import('echarts/components')
+  const VChart = (await import('vue-echarts')).default
+
+  use([CanvasRenderer, BarChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
+}
 
 // estados para aplicar "reactive"
 const loadingFarmacias = ref(true)
 const loadingRepartidores = ref(true)
 const loadingPedidos = ref(true)
+const activeTab = ref('farmacias')
 const topProductsData = ref<any[]>([])
+
+// Datos categorizados
+const categorizedProducts = computed(() => {
+  const groupedByCategory = topProductsData.value.reduce((acc, product) => {
+    const category = product.categoria
+    if (!acc[category]) acc[category] = []
+    acc[category].push(product)
+    return acc
+  }, {})
+  return Object.keys(groupedByCategory).map(category => ({
+    name: category,
+    products: groupedByCategory[category]
+  }))
+})
 
 // script updateado para "farmacias con mas entregas fallidas"
 const farmaciasFallidasOptions = reactive({
@@ -188,9 +255,6 @@ const topRepartidoresOptions = reactive({
   ],
 })
 
-// Replace the farmaciaMayorVolumenOptions declaration with this:
-
-// Make chart options reactive
 const loadingFarmaciaRanking = ref(true);
 const farmaciaMayorVolumenOptions = reactive({
   title: {
@@ -230,10 +294,8 @@ const farmaciaMayorVolumenOptions = reactive({
   ],
 });
 
-// Add loading state for top products
 const loadingTopProducts = ref(true)
 
-// Configuration for top products by category chart
 const topProductsByCategoryOptions = reactive({
   title: {
     text: 'Productos más pedidos por categoría',
@@ -280,93 +342,81 @@ const topProductsByCategoryOptions = reactive({
   ]
 })
 
-const categorizedProducts = computed(() => {
-    // Group by category
-    const groupedByCategory = topProductsData.value.reduce((acc, product) => {
-      const category = product.categoria
-      if (!acc[category]) {
-        acc[category] = []
-      }
-      acc[category].push(product)
-      return acc
-    }, {})
-    
-    // Convert to array format for v-for
-    return Object.keys(groupedByCategory).map(category => ({
-      name: category,
-      products: groupedByCategory[category]
-    }))
-  })
+const loadingPedidosCruzaZonas = ref(true);
+const pedidosCruzaZonas = ref<PedidoCruzaZonas[]>([]);
 
 onMounted(async () => {
+  try {
+    const pedidos = await pedidoService.getPedidosCruzaZonas(3)
+    pedidosCruzaZonas.value = pedidos
+    loadingPedidosCruzaZonas.value = false
+
+    const topProducts = await productoService.getTopProductsByCategory()
+    topProductsData.value = topProducts
+    loadingTopProducts.value = false
+  } catch (error) {
+    console.error(error)
+  }
+
   try {
     // consumir api de farmacias y obtener las farmacias con pedidos fallidos
     console.log('Fetching farmacias falladas from API...')
     const farmaciasFalladas = await farmaciaService.getFarmaciasFalladas()
     console.log('Farmacias falladas data:', farmaciasFalladas)
-    
+
     // DEBUGING ME VOY A VOLVER CHANGO
     // ahi si
     if (farmaciasFalladas && Array.isArray(farmaciasFalladas)) {
       // updatear grafico
       // se mapea el array para obtener los nombres y cantidades
-      // si no se encuentra el nombre, se pone "Sin nombre" 
+      // si no se encuentra el nombre, se pone "Sin nombre"
       farmaciasFallidasOptions.xAxis.data = farmaciasFalladas.map(f => f.nombreFarmacia || 'Sin nombre')
-      farmaciasFallidasOptions.series[0].data = farmaciasFalladas.map(f => 
-        typeof f.cantidad === 'number' ? f.cantidad : 0 
+      farmaciasFallidasOptions.series[0].data = farmaciasFalladas.map(f =>
+          typeof f.cantidad === 'number' ? f.cantidad : 0
       )
     }
 
-
-
     loadingFarmacias.value = false
   } catch (error) {
-      console.error('Error fetching farmacias falladas:', error)
-      // datos x defecto para no romper el grafico en caso de error
-      farmaciasFallidasOptions.xAxis.data = ['Error']
-      farmaciasFallidasOptions.series[0].data = [0]
-      loadingFarmacias.value = false
+    console.error('Error fetching farmacias falladas:', error)
+    // datos x defecto para no romper el grafico en caso de error
+    farmaciasFallidasOptions.xAxis.data = ['Error']
+    farmaciasFallidasOptions.series[0].data = [0]
+    loadingFarmacias.value = false
   }
 
-  //Farmacia Ranking
-  // Replace the Farmacia Ranking section in onMounted with this:
+  // Farmacia Ranking
+  try {
+    console.log('Fetching farmacia ranking data...')
+    loadingFarmaciaRanking.value = true
+    const farmaciaRanking = await farmaciaService.getFarmaciasRanking()
+    console.log('Farmacia ranking data:', farmaciaRanking)
 
-// Farmacia Ranking
-try {
-  console.log('Fetching farmacia ranking data...')
-  loadingFarmaciaRanking.value = true
-  const farmaciaRanking = await farmaciaService.getFarmaciasRanking()
-  console.log('Farmacia ranking data:', farmaciaRanking)
-  
-  if (farmaciaRanking && Array.isArray(farmaciaRanking) && farmaciaRanking.length > 0) {
-    // Make sure we're getting the data in the right format
-    console.log('First item sample:', farmaciaRanking[0])
-    
-    // Sort by cantPedidosEntregados descending for better visualization
-    const sortedData = [...farmaciaRanking].sort((a, b) => 
-      b.cantPedidosEntregados - a.cantPedidosEntregados
-    )
-    
-    // Update chart with the data from API
-    farmaciaMayorVolumenOptions.xAxis.data = sortedData.map(f => f.nombreFarmacia || 'Sin nombre')
-    farmaciaMayorVolumenOptions.series[0].data = sortedData.map(f => 
-      typeof f.cantPedidosEntregados === 'number' ? f.cantPedidosEntregados : 0
-    )
-  } else {
-    console.warn('No farmacia ranking data found or invalid format', farmaciaRanking)
-    farmaciaMayorVolumenOptions.xAxis.data = ['Sin datos disponibles']
+    if (farmaciaRanking && Array.isArray(farmaciaRanking) && farmaciaRanking.length > 0) {
+      console.log('First item sample:', farmaciaRanking[0])
+
+      const sortedData = [...farmaciaRanking].sort((a, b) =>
+          b.cantPedidosEntregados - a.cantPedidosEntregados
+      )
+
+      farmaciaMayorVolumenOptions.xAxis.data = sortedData.map(f => f.nombreFarmacia || 'Sin nombre')
+      farmaciaMayorVolumenOptions.series[0].data = sortedData.map(f =>
+          typeof f.cantPedidosEntregados === 'number' ? f.cantPedidosEntregados : 0
+      )
+    } else {
+      console.warn('No farmacia ranking data found or invalid format', farmaciaRanking)
+      farmaciaMayorVolumenOptions.xAxis.data = ['Sin datos disponibles']
+      farmaciaMayorVolumenOptions.series[0].data = [0]
+    }
+    loadingFarmaciaRanking.value = false
+  } catch (error) {
+    console.error('Error fetching farmacia ranking:', error)
+    // Default data to avoid breaking the chart
+    farmaciaMayorVolumenOptions.xAxis.data = ['Error al cargar datos']
     farmaciaMayorVolumenOptions.series[0].data = [0]
+    loadingFarmaciaRanking.value = false
   }
-  loadingFarmaciaRanking.value = false
-} catch (error) {
-  console.error('Error fetching farmacia ranking:', error)
-  // Default data to avoid breaking the chart
-  farmaciaMayorVolumenOptions.xAxis.data = ['Error al cargar datos']
-  farmaciaMayorVolumenOptions.series[0].data = [0]
-  loadingFarmaciaRanking.value = false
-}
-  
-  
+
   // para el grafico de "top 3 repartidores con mejor rendimiento"
   try {
     // sacar top 3 repartidores con mejor rendimiento
@@ -374,19 +424,19 @@ try {
     console.log('Fetching top repartidores...')
     const repartidores = await repartidorService.getTopRepartidores()
     console.log('Repartidores data:', repartidores)
-    
+
     // para arreglar skill issue de que no se haga top 3
     // sortear por indice de rendimiento y sacar los 3 primeros
     const top3Repartidores = [...repartidores]
-      .sort((a, b) => b.indiceRendimiento - a.indiceRendimiento)
-      .slice(0, 3)
-    
+        .sort((a, b) => b.indiceRendimiento - a.indiceRendimiento)
+        .slice(0, 3)
+
     // se tiene que dar vuelta el array para que se vea de arriba a abajo
     // pq echarts lo hace al revez plop
     const reversedRepartidores = [...top3Repartidores].reverse()
-    
+
     topRepartidoresOptions.yAxis.data = reversedRepartidores.map(r => r.nombreRepartidor)
-    
+
     // guardar datos en "tooltip" para que se vean al hacer hover
     topRepartidoresOptions.series[0].data = reversedRepartidores.map(r => ({
       value: r.indiceRendimiento,
@@ -408,20 +458,20 @@ try {
   try {
     // sacar los medios de pago utilizados en pedidos urgentes
     const mediosPago = await pedidoService.getMediosPagoUrgentes()
-    
+
     if (mediosPago && Array.isArray(mediosPago)) {
       // se actualiza el grafico con los datos obtenidos del api request
       mediosPagoUrgentesOptions.xAxis.data = mediosPago.map(m => m.metodoPago || 'No especificado')
       // se aplica un map para obtener la cantidad de cada metodo de pago
-      // si no se encuentra la cantidad, se pone 0 
-      mediosPagoUrgentesOptions.series[0].data = mediosPago.map(m => 
-        typeof m.cantidad === 'number' ? m.cantidad : 0
+      // si no se encuentra la cantidad, se pone 0
+      mediosPagoUrgentesOptions.series[0].data = mediosPago.map(m =>
+          typeof m.cantidad === 'number' ? m.cantidad : 0
       )
-    
+
     } else {
       console.error('Medios de pago: Data is not an array', mediosPago)
     }
-    
+
     loadingPedidos.value = false
   } catch (error) {
     // tira error y pone datos default para que no se vea feo
@@ -434,10 +484,10 @@ try {
   try {
     console.log('Fetching top products by category...')
     loadingTopProducts.value = true
-    
+
     const topProducts = await productoService.getTopProductsByCategory()
     console.log('Top products data:', topProducts)
-    
+
     if (topProducts && Array.isArray(topProducts) && topProducts.length > 0) {
       // Store the raw data instead of formatting for pie chart
       topProductsData.value = topProducts
@@ -445,12 +495,25 @@ try {
       console.warn('No top products data found or invalid format', topProducts)
       topProductsData.value = []
     }
-    
+
     loadingTopProducts.value = false
   } catch (error) {
     console.error('Error fetching top products by category:', error)
     topProductsData.value = []
     loadingTopProducts.value = false
+  }
+
+  // lab 2 - pedido + 2 zonas
+  try {
+    console.log('Fetching pedidos que cruzan más de 2 zonas...');
+    const pedidos = await pedidoService.getPedidosCruzaZonas(3);
+    pedidosCruzaZonas.value = pedidos.map(pedido => ({ ...pedido, expanded: false }));
+    console.log('Pedidos que cruzan más de 2 zonas:', pedidos);
+  } catch (error) {
+    console.error('Error fetching pedidos que cruzan más de 2 zonas:', error);
+    pedidosCruzaZonas.value = [];
+  } finally {
+    loadingPedidosCruzaZonas.value = false;
   }
 })
 

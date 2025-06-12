@@ -63,3 +63,11 @@ export interface RepartidorDistanciaTotal {
   nombreRepartidor: string
   distanciaTotalKm: number
 }
+
+export interface PedidoCruzaZonas {
+	idPedido: number
+	idCliente: number
+	nombreCliente: string
+	fechaPedido: string
+	nombresZonas: string[]
+}

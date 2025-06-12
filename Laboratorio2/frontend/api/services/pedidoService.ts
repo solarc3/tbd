@@ -1,5 +1,5 @@
 import apiClient from '@/api/axios'
-import type { RegistrarPedidoRequest } from '@/api/models'
+import type { RegistrarPedidoRequest, PedidoCruzaZonas } from '@/api/models'
 
 interface MedioPagoUrgente {
   metodoPago: string
@@ -74,6 +74,11 @@ class PedidoService {
       console.error('Error al entregar el pedido:', error)
       throw error
     }
+  }
+
+  async getPedidosCruzaZonas(sectorAmount: number): Promise<PedidoCruzaZonas[]> {
+    const { data } = await apiClient.get<PedidoCruzaZonas[]>(`/pedido/cruza-zonas-reparto/${sectorAmount}`)
+    return data
   }
 }
 
