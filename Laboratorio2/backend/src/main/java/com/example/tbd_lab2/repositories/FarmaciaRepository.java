@@ -76,15 +76,77 @@ public class FarmaciaRepository {
             }
     }
     public List<FarmaciaPuntoEntregaLejanaResponse> listbyFarmaciaFurthestPoint(){
+        WKTReader reader = new WKTReader(); // Initialize WKTReader
         try {
-            String sql = "select nombre_farmacia, max(distancia) as entrega_lejana from (SELECT farm.id_farmacia ,farm.nombre_farmacia, concat(usuarios.first_name,' ',usuarios.last_name) AS nombre_usuario ,st_distance(usuarios.location::geography,farm.ubicacion::geography) AS distancia FROM (SELECT pedido.id_farmacia, pedido.id_cliente FROM pedido) AS usuariofarmacia INNER JOIN users AS usuarios ON usuarios.id = usuariofarmacia.id_cliente INNER JOIN farmacia AS farm ON farm.id_farmacia = usuariofarmacia.id_farmacia group by farm.id_farmacia, farm.nombre_farmacia ,usuarios.location, farm.ubicacion,nombre_usuario ORDER BY id_farmacia, distancia DESC) as distacia_entregas group by nombre_farmacia";
-            return jdbcTemplate.query(sql,(rs,RowNum)-> FarmaciaPuntoEntregaLejanaResponse.builder()
-                    .distanciaEntrega(rs.getDouble("entrega_lejana"))
-                    .nombreFarmacia(rs.getString("nombre_farmacia"))
-                    .build());
+            String sql = "WITH FarmaciaDistancias AS (\n" +
+                    "    SELECT\n" +
+                    "        farm.nombre_farmacia,\n" +
+                    "        CONCAT(usuarios.first_name, ' ', usuarios.last_name) AS nombre_usuario,\n" +
+                    "        ST_Distance(usuarios.location::geography, farm.ubicacion::geography) AS distancia,\n" +
+                    // Request geometry as WKT
+                    "        ST_AsText(farm.ubicacion) AS ubicacion_farmacia_wkt,\n" +
+                    "        ST_AsText(usuarios.location) AS ubicacion_usuario_wkt,\n" +
+                    "        ROW_NUMBER() OVER (PARTITION BY farm.id_farmacia ORDER BY ST_Distance(usuarios.location::geography, farm.ubicacion::geography) DESC) as rn\n" +
+                    "    FROM\n" +
+                    "        pedido\n" +
+                    "            INNER JOIN\n" +
+                    "        users AS usuarios ON usuarios.id = pedido.id_cliente\n" +
+                    "            INNER JOIN\n" +
+                    "        farmacia AS farm ON farm.id_farmacia = pedido.id_farmacia\n" +
+                    ")\n" +
+                    "SELECT\n" +
+                    "    nombre_farmacia,\n" +
+                    "    nombre_usuario,\n" +
+                    "    distancia AS entrega_lejana,\n" +
+                    // Select the WKT strings
+                    "    ubicacion_farmacia_wkt,\n" +
+                    "    ubicacion_usuario_wkt\n" +
+                    "FROM\n" +
+                    "    FarmaciaDistancias\n" +
+                    "WHERE\n" +
+                    "    rn = 1\n" +
+                    "ORDER BY\n" +
+                    "    entrega_lejana DESC;";
+            return jdbcTemplate.query(sql,(rs,RowNum)-> {
+                Point ubicacionFarmaciaPoint = null;
+                String farmaciaWkt = rs.getString("ubicacion_farmacia_wkt");
+                if (farmaciaWkt != null && !farmaciaWkt.isEmpty()) {
+                    try {
+                        Geometry farmaciaGeom = reader.read(farmaciaWkt);
+                        if (farmaciaGeom instanceof Point) {
+                            ubicacionFarmaciaPoint = (Point) farmaciaGeom;
+                        }
+                    } catch (ParseException e) {
+                        // Log or handle parsing error, e.g., throw a runtime exception or return null
+                        System.err.println("Error parsing ubicacion_farmacia_wkt: " + farmaciaWkt + " - " + e.getMessage());
+                    }
+                }
+
+                Point ubicacionUsuarioPoint = null;
+                String usuarioWkt = rs.getString("ubicacion_usuario_wkt");
+                if (usuarioWkt != null && !usuarioWkt.isEmpty()) {
+                    try {
+                        Geometry usuarioGeom = reader.read(usuarioWkt);
+                        if (usuarioGeom instanceof Point) {
+                            ubicacionUsuarioPoint = (Point) usuarioGeom;
+                        }
+                    } catch (ParseException e) {
+                        // Log or handle parsing error
+                        System.err.println("Error parsing ubicacion_usuario_wkt: " + usuarioWkt + " - " + e.getMessage());
+                    }
+                }
+
+                return FarmaciaPuntoEntregaLejanaResponse.builder()
+                        .distanciaEntrega(rs.getDouble("entrega_lejana"))
+                        .nombreFarmacia(rs.getString("nombre_farmacia"))
+                        .ubicacionEntrega(ubicacionUsuarioPoint)
+                        .ubicacionFarmacia(ubicacionFarmaciaPoint)
+                        .nombreUsuario(rs.getString("nombre_usuario")).build();
+            });
         } catch(EmptyResultDataAccessException e){
             return new ArrayList<>();
-        }catch (Exception e) {
+        }catch (Exception e) { // Catching general Exception can hide specific issues.
+            // Consider more specific catches if possible.
             e.printStackTrace();
             return new ArrayList<>();
         }
