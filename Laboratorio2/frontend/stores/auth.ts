@@ -51,27 +51,31 @@ export const useAuthStore = defineStore("auth", {
 		},
 
 		async register(
-			username: string,
-			firstName: string,
-			lastName: string,
-			rut: string,
-			email: string,
-			password: string,
-		) {
-			this.loading = true;
-			try {
-				return await authService.register({
-					username,
-					firstName,
-					lastName,
-					rut,
-					email,
-					password,
-				});
-			} finally {
-				this.loading = false;
-			}
-		},
+            username: string,
+            firstName: string,
+            lastName: string,
+            rut: string,
+            email: string,
+            password: string,
+            latitude: number | null, // Add latitude
+            longitude: number | null // Add longitude
+        ) {
+            this.loading = true;
+            try {
+                return await authService.register({
+                    username,
+                    firstName,
+                    lastName,
+                    rut,
+                    email,
+                    password,
+                    latitude, // Pass latitude
+                    longitude, // Pass longitude
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
 
 		async initAuth() {
 			if (initPromise) {

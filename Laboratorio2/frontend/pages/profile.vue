@@ -5,14 +5,13 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/auth'
 // importar componente
 import type PedidosCliente from '@/components/PedidosCliente.vue'
-
+import { userService } from '@/api/services/userService'; // Import the user service
+import type { ClienteZonaCobertura } from '@/api/models'; // Import the interface
 
 const shouldRender = ref(false)
 const pedidosRef = ref<InstanceType<typeof PedidosCliente> | null>(null)
-
-onMounted(() => {
-  shouldRender.value = true
-})
+const zonaCobertura = ref<ClienteZonaCobertura | null>(null)
+const errorZonaCobertura = ref<string | null>(null)
 
 const authStore = useAuthStore()
 //const router = useRouter()
@@ -21,6 +20,37 @@ const userInitials = computed(() => {
   const username = authStore.currentUser?.username || ''
   return username.slice(0, 2).toUpperCase()
 })
+
+onMounted(() => {
+  shouldRender.value = true
+  if (authStore.currentUser?.id) {
+    fetchZonaCobertura(authStore.currentUser.id);
+  }
+})
+
+watch(() => authStore.currentUser, (newUser) => {
+  if (newUser?.id && !zonaCobertura.value) {
+    fetchZonaCobertura(newUser.id);
+  }
+}, { immediate: true });
+
+async function fetchZonaCobertura(userId: number) {
+  try {
+    const data = await userService.getZonaCoberturaByClienteId(userId);
+    zonaCobertura.value = data;
+    errorZonaCobertura.value = null;
+  } catch (error) {
+    console.error("Failed to fetch zona de cobertura:", error);
+    // Check if the error response has a specific message
+    if (error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data) {
+      errorZonaCobertura.value = (error.response.data as { message: string }).message;
+    } else {
+      errorZonaCobertura.value = "No se pudo cargar la zona de cobertura.";
+    }
+    zonaCobertura.value = null; // Clear previous data on error
+  }
+}
+
 
 /*
 async function logoutUser() {
@@ -60,6 +90,10 @@ function mostrarPedidos() {
               <div>{{ authStore.currentUser?.email }}</div>
               <div class="text-gray-500">ID de usuario:</div>
               <div>{{ authStore.currentUser?.id }}</div>
+              <div class="text-gray-500">Sector de Cobertura:</div>
+              <div v-if="zonaCobertura">{{ zonaCobertura.nombreSector }}</div>
+              <div v-else-if="errorZonaCobertura" class="text-red-500">{{ errorZonaCobertura }}</div>
+              <div v-else class="text-gray-400">Cargando...</div>
             </div>
           </div>
         </div>

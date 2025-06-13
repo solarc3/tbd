@@ -4,12 +4,14 @@ export interface LoginRequest {
 }
 
 export interface SignupRequest {
-	username: string;
-	firstName: string;
-	lastName: string;
-	rut: string;
-	email: string;
-	password: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    rut: string;
+    email: string;
+    password: string;
+    latitude?: number | null; // Add latitude
+    longitude?: number | null; // Add longitude
 }
 
 export interface User {
@@ -70,4 +72,12 @@ export interface PedidoCruzaZonas {
 	nombreCliente: string
 	fechaPedido: string
 	nombresZonas: string[]
+}
+
+// lab 2
+export interface ClienteZonaCobertura {
+    id: number;
+    nombre: string;
+    apellido: string;
+    nombreSector: string;
 }

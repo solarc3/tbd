@@ -1,5 +1,5 @@
 import axiosInstance from "../axios";
-import type { ClienteGasto } from "@/api/models";
+import type { ClienteGasto, ClienteZonaCobertura } from "@/api/models";
 
 export const userService = {
 	getAllClientsWithSpending: async (): Promise<ClienteGasto[]> => {
@@ -11,4 +11,13 @@ export const userService = {
 			throw error;
 		}
 	},
+	getZonaCoberturaByClienteId: async (id: number): Promise<ClienteZonaCobertura> => {
+        try {
+            const response = await axiosInstance.get(`/users/zona-cobertura/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching zona de cobertura for client ID ${id}:`, error);
+            throw error;
+        }
+    }
 };
