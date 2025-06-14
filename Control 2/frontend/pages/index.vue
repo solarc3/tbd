@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { navigateTo } from '#app'
 import CrearTarea from '@/components/CrearTarea.vue'
 import MapaTareas from '@/components/MapaTareas.vue'
 import TareaService from '@/api/services/tareaService'
-import SectorService, { type SectorEntity } from '@/api/services/sectorService'
 
 const isModalOpen = ref(false)
 const selectedTask = ref({
@@ -16,8 +15,7 @@ const selectedTask = ref({
   estado: "PENDIENTE"
 })
 const isEditMode = ref(false)
-const sectores = ref<SectorEntity[]>([])
-const isLoading = ref(false)
+
 
 function goToTaskManager() {
   navigateTo('/gestor')
@@ -88,21 +86,7 @@ const saveTask = async (task: TaskData) => {
   }
 }
 
-const mapRef = ref(null)
 
-onMounted(async () => {
-  try {
-    isLoading.value = true
-    sectores.value = await SectorService.getAllSectores()
-    console.log('Sectores cargados:', sectores.value.length)
-    // The simplified MapaTareas component will automatically handle sectors through its reactive props
-    // No need for manual calls to addSectors or setTimeout anymore
-  } catch (error) {
-    console.error('Error al obtener los sectores:', error)
-  } finally {
-    isLoading.value = false
-  }
-})
 </script>
 
 <template>
@@ -139,11 +123,9 @@ onMounted(async () => {
         <div class="w-full h-[60vh]" :class="{ 'map-dimmed': isModalOpen }">
           <ClientOnly>
             <MapaTareas
-                ref="mapRef"
                 :initial-lat="-33.444355"
                 :initial-lng="-70.653602"
                 :initial-zoom="9"
-                :sectores="sectores"
             />
           </ClientOnly>
         </div>
