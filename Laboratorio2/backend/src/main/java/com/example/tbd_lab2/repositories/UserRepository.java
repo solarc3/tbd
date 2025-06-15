@@ -344,11 +344,11 @@ public class UserRepository {
 				WITH farmacia_mas_cercana AS (
 				    SELECT DISTINCT ON (users.id)
 				        users.id AS id_cliente,
-				        users.location as ubicacion_cliente,
+				        ST_AsText(users.location) as ubicacion_cliente,
 				        farmacia.nombre_farmacia,
 				        farmacia.id_farmacia,
 				        farmacia.direccion,
-				        farmacia.ubicacion as ubicacion_farmacia,
+				        ST_AsText(farmacia.ubicacion) as ubicacion_farmacia,
 				        (ST_Distance(location::geography, farmacia.ubicacion::geography) / 1000) AS distancia_km
 				    FROM users
 				    CROSS JOIN farmacia
@@ -390,7 +390,7 @@ public class UserRepository {
 					String wkt2 = rs.getString("ubicacion_farmacia");
 					if (wkt2 != null) {
 						try {
-							Geometry geom = reader.read(wkt);
+							Geometry geom = reader.read(wkt2);
 							farmacia.setUbicacion((Point) geom);
 						} catch (ParseException e) {
 							throw new RuntimeException(e);

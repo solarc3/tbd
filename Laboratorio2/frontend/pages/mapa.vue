@@ -11,14 +11,14 @@ import { userService } from '@/api/services/userService'
 import 'leaflet/dist/leaflet.css'
 import type {
   FarmaciaEntity,
-  FarmaciaClosestDelivery,
+  FarmaciaClosestDeliveryResponse,
   ClienteZonaCobertura,
   ClienteLejanoDeFarmacia,
 } from '@/api/models'
 
 const farmacias = ref<FarmaciaEntity[]>([])
 const selectedFarmaciaId = ref<number | null>(null)
-const entregasCercanas = ref<FarmaciaClosestDelivery[]>([])
+const entregasCercanas = ref<FarmaciaClosestDeliveryResponse[]>([])
 
 const clienteId = ref<number | null>(null)
 const zonaCobertura = ref<ClienteZonaCobertura | null>(null)
@@ -45,13 +45,20 @@ async function initializeMap1() {
 
   const leaflet = await import('leaflet')
   L = leaflet.default
+
+  // Fix for default marker icons in Vue/Vite
+  delete (L.Icon.Default.prototype as any)._getIconUrl
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  })
+
   map1 = L.map(map1Container.value).setView([-33.45, -70.65], 13)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
   }).addTo(map1)
-
-  map1.invalidateSize()
 }
 
 async function initializeMap2() {
@@ -92,14 +99,25 @@ function clearMapLayers(map: any, markers: any[]) {
 }
 
 onMounted(async () => {
+  console.log('Component mounted')
+
   try {
+    console.log('Fetching farmacias...')
     farmacias.value = await farmaciaService.getAllFarmacias()
+    console.log('Farmacias loaded:', farmacias.value.length)
   } catch (error) {
     console.error('Error fetching farmacias:', error)
   }
 
   await nextTick()
-  initializeMap1()
+
+  // Add a small delay to ensure DOM is ready
+  setTimeout(() => {
+    if (import.meta.client) {
+      console.log('Attempting to initialize map after mount')
+      initializeMap1()
+    }
+  }, 100)
 })
 
 watch(activeTab, async (newTab) => {
@@ -124,19 +142,55 @@ watch(selectedFarmaciaId, async (id) => {
 
   try {
     entregasCercanas.value = await farmaciaService.getEntregasCercanas(id)
-    const farmacia = farmacias.value.find((f) => f.idFarmacia === id)
 
-    if (farmacia?.ubicacion) {
+    // Find the selected farmacia
+    const farmacia = farmacias.value.find(f => f.idFarmacia === id)
+
+    if (farmacia) {
       clearMapLayers(map1, markers1)
-      const marker = L.marker([farmacia.ubicacion.y, farmacia.ubicacion.x])
+
+      // Determine farmacia coordinates - check if we have them from the response or need to use the farmacia entity
+      let farmaciaLat, farmaciaLng;
+
+      if (entregasCercanas.value.length > 0 && entregasCercanas.value[0].ubicacionFarmacia) {
+        // Use coordinates from the response
+        farmaciaLat = entregasCercanas.value[0].ubicacionFarmacia.latitude;
+        farmaciaLng = entregasCercanas.value[0].ubicacionFarmacia.longitude;
+      } else if (farmacia.ubicacion) {
+        // Use coordinates from farmacia entity (x, y format)
+        farmaciaLat = farmacia.ubicacion.y;
+        farmaciaLng = farmacia.ubicacion.x;
+      } else {
+        console.error('No coordinates found for farmacia');
+        return;
+      }
+
+      // Add farmacia marker
+      const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng])
           .addTo(map1)
           .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
           .openPopup()
 
-      markers1.push(marker)
+      markers1.push(farmaciaMarker)
+
+      // Add delivery markers from entregasCercanas
+      entregasCercanas.value.forEach((entrega) => {
+        if (entrega.ubicacionUsuario) {
+          const deliveryMarker = L.marker([
+            entrega.ubicacionUsuario.latitude,
+            entrega.ubicacionUsuario.longitude
+          ])
+              .addTo(map1)
+              .bindPopup(`<b>${entrega.nombreUsuario}</b><br>Distancia: ${entrega.distanciaEntrega.toFixed(2)} metros`)
+
+          markers1.push(deliveryMarker)
+        }
+      })
+
+      // Add circle for max distance
       if (entregasCercanas.value.length > 0) {
         const maxDistance = Math.max(...entregasCercanas.value.map(e => e.distanciaEntrega))
-        const circle = L.circle([farmacia.ubicacion.y, farmacia.ubicacion.x], {
+        const circle = L.circle([farmaciaLat, farmaciaLng], {
           radius: maxDistance,
           color: 'blue',
           fillColor: '#30f',
@@ -145,7 +199,8 @@ watch(selectedFarmaciaId, async (id) => {
         markers1.push(circle)
       }
 
-      map1.setView([farmacia.ubicacion.y, farmacia.ubicacion.x], 15)
+      // Center map on farmacia
+      map1.setView([farmaciaLat, farmaciaLng], 14)
     }
   } catch (e) {
     console.error('Error fetching entregas cercanas:', e)
@@ -191,23 +246,141 @@ async function checkZonaCobertura() {
 async function fetchClientesLejanos() {
   try {
     clientesLejanos.value = await userService.getClientesLejanosDeFarmacia(radiusKm.value)
+    console.log('Clientes lejanos:', clientesLejanos.value)
 
-    if (map3) {
+    if (map3 && clientesLejanos.value.length > 0) {
       clearMapLayers(map3, markers3)
+      const farmaciaMap = new Map()
+      clientesLejanos.value.forEach(cliente => {
+        if (cliente.farmacia) {
+          const farmaciaId = cliente.farmacia.idFarmacia
+          if (!farmaciaMap.has(farmaciaId)) {
+            farmaciaMap.set(farmaciaId, {
+              farmacia: cliente.farmacia,
+              clientes: []
+            })
+          }
+          farmaciaMap.get(farmaciaId).clientes.push(cliente)
+        }
+      })
 
-      if (clientesLejanos.value.length > 0) {
-        // Add a circle to represent the search radius
-        const circle = L.circle([-33.45, -70.65], {
-          radius: radiusKm.value * 1000,
-          color: 'red',
-          fillColor: '#f03',
-          fillOpacity: 0.1,
-          weight: 2
-        }).addTo(map3).bindPopup(`Radio de búsqueda: ${radiusKm.value} km`)
+      // First, draw all circles (so they appear behind markers)
+      farmaciaMap.forEach(({ farmacia, clientes }) => {
+        if (farmacia.ubicacion) {
+          // Check if coordinates are in the correct format
+          const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y
+          const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x
 
-        markers3.push(circle)
-        map3.setView([-33.45, -70.65], 11)
+          console.log('Drawing circle for farmacia:', farmacia.nombreFarmacia, 'at', farmaciaLat, farmaciaLng)
+
+          // Add green circle for farmacia coverage area
+          const circle = L.circle([farmaciaLat, farmaciaLng], {
+            radius: radiusKm.value * 1000,
+            color: 'green',
+            fillColor: '#0f0',
+            fillOpacity: 0.1,
+            weight: 2
+          }).addTo(map3)
+
+          markers3.push(circle)
+        }
+      })
+
+      // Then draw lines (so they appear above circles but below markers)
+      clientesLejanos.value.forEach((cliente, index) => {
+        if (cliente.ubicacionCliente && cliente.farmacia?.ubicacion) {
+          // Handle both coordinate formats
+          const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
+          const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
+          const farmaciaLat = cliente.farmacia.ubicacion.latitude || cliente.farmacia.ubicacion.y
+          const farmaciaLng = cliente.farmacia.ubicacion.longitude || cliente.farmacia.ubicacion.x
+
+          console.log(`Drawing line ${index}:`,
+              'Cliente:', clienteLat, clienteLng,
+              'Farmacia:', farmaciaLat, farmaciaLng)
+
+          // Draw thick orange line
+          const line = L.polyline([
+            [clienteLat, clienteLng],
+            [farmaciaLat, farmaciaLng]
+          ], {
+            color: '#ff6600',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '10, 5'
+          }).addTo(map3)
+
+          markers3.push(line)
+        } else {
+          console.log(`No line for cliente ${index}:`,
+              'Cliente location:', cliente.ubicacionCliente,
+              'Farmacia location:', cliente.farmacia?.ubicacion)
+        }
+      })
+
+      // Draw farmacia markers
+      farmaciaMap.forEach(({ farmacia, clientes }) => {
+        if (farmacia.ubicacion) {
+          const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y
+          const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x
+
+          // Add farmacia marker with white background and red cross
+          const farmaciaIcon = L.divIcon({
+            html: '<div style="background: white; border: 3px solid red; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: red; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">+</div>',
+            iconSize: [30, 30],
+            className: 'farmacia-icon'
+          })
+
+          const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng], { icon: farmaciaIcon })
+              .addTo(map3)
+              .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
+
+          markers3.push(farmaciaMarker)
+        }
+      })
+
+      // Finally, draw client markers (so they appear on top)
+      clientesLejanos.value.forEach(cliente => {
+        if (cliente.ubicacionCliente) {
+          const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
+          const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
+
+          // Orange marker for clients outside radius
+          const clienteIcon = L.divIcon({
+            html: '<div style="background: #ff8800; border: 2px solid #cc6600; border-radius: 50%; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+            iconSize: [24, 24],
+            className: 'cliente-lejano-icon'
+          })
+
+          const clienteMarker = L.marker([clienteLat, clienteLng], { icon: clienteIcon })
+              .addTo(map3)
+              .bindPopup(`<b>${cliente.nombreCliente}</b><br>A ${cliente.distanciaKm.toFixed(2)} km de ${cliente.farmacia?.nombreFarmacia || 'farmacia'}`)
+
+          markers3.push(clienteMarker)
+        }
+      })
+
+      // Adjust map view to show all markers
+      const allLatLngs = []
+      clientesLejanos.value.forEach(cliente => {
+        if (cliente.ubicacionCliente) {
+          const lat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
+          const lng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
+          allLatLngs.push([lat, lng])
+        }
+        if (cliente.farmacia?.ubicacion) {
+          const lat = cliente.farmacia.ubicacion.latitude || cliente.farmacia.ubicacion.y
+          const lng = cliente.farmacia.ubicacion.longitude || cliente.farmacia.ubicacion.x
+          allLatLngs.push([lat, lng])
+        }
+      })
+
+      if (allLatLngs.length > 0) {
+        const bounds = L.latLngBounds(allLatLngs)
+        map3.fitBounds(bounds, { padding: [50, 50] })
       }
+    } else if (map3) {
+      clearMapLayers(map3, markers3)
     }
   } catch (e) {
     console.error('Error fetching clientes lejanos:', e)
@@ -240,10 +413,10 @@ async function fetchClientesLejanos() {
             </select>
           </div>
 
-                    <div
-                        ref="map1Container"
-                        class="leaflet-container h-96 w-full rounded-lg overflow-hidden border"
-                      />
+          <div
+              ref="map1Container"
+              class="leaflet-container h-96 w-full rounded-lg overflow-hidden border"
+          />
 
           <div v-if="entregasCercanas.length" class="mt-4">
             <h3 class="font-semibold mb-2">Entregas Cercanas ({{ entregasCercanas.length }}):</h3>
@@ -328,7 +501,7 @@ async function fetchClientesLejanos() {
                 <li v-for="c in clientesLejanos" :key="c.idCliente" class="text-sm">
                   <span class="font-medium">{{ c.nombreCliente }}</span> -
                   <span class="text-muted-foreground">
-                    {{ c.distanciaKm.toFixed(2) }} km desde {{ c.nombreFarmacia }}
+                    {{ c.distanciaKm.toFixed(2) }} km desde {{ c.farmacia.nombreFarmacia }}
                   </span>
                 </li>
               </ul>
@@ -354,6 +527,11 @@ async function fetchClientesLejanos() {
   background: #f3f4f6;
 }
 
+/* Ensure the map container has explicit height */
+.leaflet-container {
+  min-height: 384px; /* h-96 = 24rem = 384px */
+}
+
 :deep(.leaflet-control-container) {
   position: absolute;
   pointer-events: none;
@@ -367,5 +545,34 @@ async function fetchClientesLejanos() {
   color: #333;
   font-size: 20px;
   font-weight: bold;
+}
+
+/* Fix potential z-index issues */
+:deep(.leaflet-pane) {
+  z-index: 400;
+}
+
+:deep(.leaflet-tile-pane) {
+  z-index: 200;
+}
+
+:deep(.leaflet-overlay-pane) {
+  z-index: 400;
+}
+
+:deep(.leaflet-shadow-pane) {
+  z-index: 500;
+}
+
+:deep(.leaflet-marker-pane) {
+  z-index: 600;
+}
+
+:deep(.leaflet-tooltip-pane) {
+  z-index: 650;
+}
+
+:deep(.leaflet-popup-pane) {
+  z-index: 700;
 }
 </style>
