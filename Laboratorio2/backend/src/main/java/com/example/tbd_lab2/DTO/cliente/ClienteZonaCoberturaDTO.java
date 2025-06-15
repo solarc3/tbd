@@ -14,4 +14,6 @@ public class ClienteZonaCoberturaDTO {
     private String nombre;
     private String apellido;
     private String nombreSector;
+    private Double latitud;
+    private Double longitud;
 }

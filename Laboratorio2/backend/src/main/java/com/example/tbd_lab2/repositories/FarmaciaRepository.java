@@ -63,17 +63,55 @@ public class FarmaciaRepository {
     }
     public List<FarmaciaClosestDeliveryResponse> listUsersFarmaciaClosestDelivery(Long id){
         try {
-            String sql = "SELECT concat(usuarios.first_name,' ',usuarios.last_name) AS nombre_usuario ,st_distance(usuarios.location::geography,farm.ubicacion::geography) AS distancia FROM (SELECT pedido.id_farmacia, pedido.id_cliente FROM pedido WHERE pedido.id_farmacia = ?) AS usuariofarmacia INNER JOIN users AS usuarios ON usuarios.id = usuariofarmacia.id_cliente INNER JOIN farmacia AS farm ON farm.id_farmacia = usuariofarmacia.id_farmacia group by usuarios.location, farm.ubicacion,nombre_usuario ORDER BY distancia ASC";
-                    return jdbcTemplate.query(sql,(rs,rowNum )-> FarmaciaClosestDeliveryResponse.builder()
-                            .distanciaEntrega(rs.getDouble("distancia"))
-                            .nombreUsuario(rs.getString("nombre_usuario"))
-                            .build(),id);
-            }catch(EmptyResultDataAccessException e){
-                return new ArrayList<>();
-            }catch (Exception e) {
-                e.printStackTrace();
-                return new ArrayList<>();
-            }
+            String sql = "SELECT concat(usuarios.first_name,' ',usuarios.last_name) AS nombre_usuario ,\n" +
+                         "st_distance(usuarios.location::geography,farm.ubicacion::geography) AS distancia,\n" +
+                         "ST_AsText(farm.ubicacion) as punto_farmacia, \n" +
+                         "farm.nombre_farmacia, \n" +
+                         "ST_AsText(usuarios.location) as ubicacion_usuario\n" +
+                         "FROM (SELECT pedido.id_farmacia, pedido.id_cliente FROM pedido\n" +
+                         "WHERE pedido.id_farmacia = ?) AS usuariofarmacia\n" +
+                         "INNER JOIN users AS usuarios ON usuarios.id = usuariofarmacia.id_cliente\n" +
+                         "INNER JOIN farmacia AS farm ON farm.id_farmacia = usuariofarmacia.id_farmacia\n" +
+                         "group by usuarios.location, farm.ubicacion, nombre_usuario, farm.nombre_farmacia ORDER BY distancia ASC LIMIT 5";
+            return jdbcTemplate.query(sql,(rs,rowNum )-> {
+                Point ubicacionFarmaciaPoint = null;
+                String farmaciaWkt = rs.getString("punto_farmacia");
+                if (farmaciaWkt != null && !farmaciaWkt.isEmpty()) {
+                    try {
+                        Geometry farmaciaGeom = this.reader.read(farmaciaWkt);
+                        if (farmaciaGeom instanceof Point) {
+                            ubicacionFarmaciaPoint = (Point) farmaciaGeom;
+                        }
+                    } catch (ParseException e) {
+
+                        System.err.println("Error parsing punto_farmacia (WKT): " + farmaciaWkt + " - " + e.getMessage());
+                    }
+                }
+
+                Point ubicacionUsuarioPoint = null;
+                String usuarioWkt = rs.getString("ubicacion_usuario");
+                if (usuarioWkt != null && !usuarioWkt.isEmpty()) {
+                    try {
+                        Geometry usuarioGeom = this.reader.read(usuarioWkt);
+                        if (usuarioGeom instanceof Point) {
+                            ubicacionUsuarioPoint = (Point) usuarioGeom;
+                        }
+                    } catch (ParseException e) {
+
+                        System.err.println("Error parsing ubicacion_usuario (WKT): " + usuarioWkt + " - " + e.getMessage());
+                    }
+                }
+                return FarmaciaClosestDeliveryResponse.builder()
+                    .distanciaEntrega(rs.getDouble("distancia"))
+                    .nombreFarmacia(rs.getString("nombre_farmacia"))
+                    .ubicacionFarmacia(ubicacionFarmaciaPoint)
+                    .ubicacionUsuario(ubicacionUsuarioPoint)
+                    .nombreUsuario(rs.getString("nombre_usuario"))
+                    .build();
+            },id);
+        }catch(EmptyResultDataAccessException e) {
+            return new ArrayList<>();
+        }
     }
     public List<FarmaciaPuntoEntregaLejanaResponse> listbyFarmaciaFurthestPoint(){
         WKTReader reader = new WKTReader(); // Initialize WKTReader

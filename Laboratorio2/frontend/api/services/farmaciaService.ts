@@ -1,4 +1,5 @@
 import apiClient from "@/api/axios";
+import type {FarmaciaClosestDeliveryResponse} from "~/api/models";
 
 export interface FarmaciaFallada {
 	nombreFarmacia: string;
@@ -9,7 +10,6 @@ export interface FarmaciaRanking {
 	nombreFarmacia: string;
 	cantPedidosEntregados: number;
 }
-
 class FarmaciaService {
 	async getAllFarmacias(): Promise<FarmaciaEntity[]> {
 		try {
@@ -61,9 +61,9 @@ class FarmaciaService {
                 }
         }
 
-        async getEntregasCercanas(idFarmacia: number): Promise<FarmaciaClosestDelivery[]> {
+        async getEntregasCercanas(idFarmacia: number): Promise<FarmaciaClosestDeliveryResponse[]> {
                 try {
-                        const { data } = await apiClient.get<FarmaciaClosestDelivery[]>(
+                        const { data } = await apiClient.get<FarmaciaClosestDeliveryResponse[]>(
                                 `/farmacia/entregas-cercanas/${idFarmacia}`,
                         );
                         return data;

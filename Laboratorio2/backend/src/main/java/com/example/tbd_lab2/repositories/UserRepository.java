@@ -4,6 +4,7 @@ import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
 import com.example.tbd_lab2.DTO.cliente.TopClienteResponse;
+import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.entities.UserEntity;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
@@ -309,15 +310,18 @@ public class UserRepository {
 	public ClienteZonaCoberturaDTO findByZonaCobertura(Long id_cliente) {
 		try{
 			String sql =
-					"SELECT u.id, u.first_name, u.last_name, s.nombre_sector\n" +
-							"FROM users as u, sectores as s\n" +
-							"WHERE u.id = ? AND st_within(u.location, s.area)";
+				"SELECT u.id, u.first_name, u.last_name, s.nombre_sector, " +
+				"ST_Y(ST_Centroid(s.area)) as latitud, ST_X(ST_Centroid(s.area)) as longitud\n" +
+				"FROM users as u, sectores as s\n" +
+				"WHERE u.id = ? AND st_within(u.location, s.area)";
 			return jdbcTemplate.queryForObject(sql, new Object[]{id_cliente}, (rs, rowNum) ->
 					new ClienteZonaCoberturaDTO(
 							rs.getLong("id"),
 							rs.getString("first_name"),
 							rs.getString("last_name"),
-							rs.getString("nombre_sector")
+							rs.getString("nombre_sector"),
+							rs.getDouble("latitud"),
+							rs.getDouble("longitud")
 					)
 			);
 		} catch (EmptyResultDataAccessException e) {
@@ -340,29 +344,60 @@ public class UserRepository {
 				WITH farmacia_mas_cercana AS (
 				    SELECT DISTINCT ON (users.id)
 				        users.id AS id_cliente,
+				        users.location as ubicacion_cliente,
 				        farmacia.nombre_farmacia,
+				        farmacia.id_farmacia,
+				        farmacia.direccion,
+				        farmacia.ubicacion as ubicacion_farmacia,
 				        (ST_Distance(location::geography, farmacia.ubicacion::geography) / 1000) AS distancia_km
 				    FROM users
 				    CROSS JOIN farmacia
 				    ORDER BY id_cliente, distancia_km
 				)
-				SELECT id, first_name, last_name, nombre_farmacia, distancia_km
+				SELECT id, first_name, last_name, ubicacion_cliente, nombre_farmacia,
+				       id_farmacia, direccion, ubicacion_farmacia, distancia_km
 				FROM users
 				INNER JOIN farmacia_mas_cercana ON id = id_cliente
 				WHERE NOT ST_Intersects(location, ST_Collect(
-				        ARRAY(SELECT ST_Buffer(ubicacion::geography, ?)::geometry
-				              FROM farmacia))
+				        ARRAY(SELECT ST_Buffer(ubicacion::geography, ?)::geometry FROM farmacia))
 				);
 				""";
 		return jdbcTemplate.query(sql,
 				(rs, rowNum) -> {
 					String nombreCliente = rs.getString("first_name") + ' ' + rs.getString("last_name");
-					return ClienteLejanoDeFarmaciaResponse.builder()
+					ClienteLejanoDeFarmaciaResponse response = ClienteLejanoDeFarmaciaResponse.builder()
 							.idCliente(rs.getLong("id"))
 							.nombreCliente(nombreCliente)
-							.nombreFarmacia(rs.getString("nombre_farmacia"))
 							.distanciaKm(rs.getDouble("distancia_km"))
 							.build();
+
+					String wkt = rs.getString("ubicacion_cliente");
+					if (wkt != null) {
+						try {
+							Geometry geom = reader.read(wkt);
+							response.setUbicacionCliente((Point) geom);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					}
+
+					FarmaciaEntity farmacia = FarmaciaEntity.builder()
+						.idFarmacia(rs.getLong("id_farmacia"))
+						.nombreFarmacia(rs.getString("nombre_farmacia"))
+						.direccion(rs.getString("direccion"))
+						.build();
+
+					String wkt2 = rs.getString("ubicacion_farmacia");
+					if (wkt2 != null) {
+						try {
+							Geometry geom = reader.read(wkt);
+							farmacia.setUbicacion((Point) geom);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					}
+					response.setFarmacia(farmacia);
+					return response;
 				},
 				radiusMeters);
 

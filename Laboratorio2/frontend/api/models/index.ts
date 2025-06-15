@@ -84,6 +84,8 @@ export interface ClienteZonaCobertura {
     nombre: string;
     apellido: string;
     nombreSector: string;
+	latitud: string;
+	longitud: string;
 }
 
 export interface FarmaciaClosestDelivery {
@@ -96,4 +98,17 @@ export interface ClienteLejanoDeFarmacia {
     nombreCliente: string;
     nombreFarmacia: string;
     distanciaKm: number;
+}
+
+export interface Ubicacion {
+	longitude: number;
+	latitude: number;
+}
+
+export interface FarmaciaClosestDeliveryResponse {
+	nombreUsuario: string;
+	nombreFarmacia: string;
+	distanciaEntrega: number;
+	ubicacionFarmacia: Ubicacion;
+	ubicacionUsuario: Ubicacion;
 }

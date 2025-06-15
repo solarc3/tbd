@@ -36,122 +36,155 @@ let L: any
 let map1: any
 let map2: any
 let map3: any
+let markers1: any[] = []
+let markers2: any[] = []
+let markers3: any[] = []
 
-async function initLeaflet() {
-  if (!L) {
-    const leaflet = await import('leaflet')
-    L = leaflet.default
+async function initializeMap1() {
+  if (!import.meta.client || !map1Container.value || map1) return
 
-    // Fix for default markers in Leaflet
-    const iconRetinaUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png'
-    const iconUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png'
-    const shadowUrl = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png'
-
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl,
-      iconUrl,
-      shadowUrl,
-    })
-  }
-}
-
-function createMap(container: HTMLElement, lat: number, lng: number, zoom = 13) {
-  const map = L.map(container).setView([lat, lng], zoom)
+  const leaflet = await import('leaflet')
+  L = leaflet.default
+  map1 = L.map(map1Container.value).setView([-33.45, -70.65], 13)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
-    maxZoom: 19,
-  }).addTo(map)
-  return map
+    maxZoom: 19
+  }).addTo(map1)
+
+  map1.invalidateSize()
 }
 
-async function initializeMaps() {
-  await nextTick()
+async function initializeMap2() {
+  if (!import.meta.client || !map2Container.value || map2) return
 
-  // Initialize map 1 if container exists and map doesn't exist
-  if (map1Container.value && !map1) {
-    map1 = createMap(map1Container.value, -33.45, -70.65)
-  }
+  const leaflet = await import('leaflet')
+  if (!L) L = leaflet.default
 
-  // Initialize map 2 if container exists and map doesn't exist
-  if (map2Container.value && !map2) {
-    map2 = createMap(map2Container.value, -33.45, -70.65)
-  }
+  map2 = L.map(map2Container.value).setView([-33.45, -70.65], 13)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(map2)
 
-  // Initialize map 3 if container exists and map doesn't exist
-  if (map3Container.value && !map3) {
-    map3 = createMap(map3Container.value, -33.45, -70.65)
-  }
+  map2.invalidateSize()
+}
+
+async function initializeMap3() {
+  if (!import.meta.client || !map3Container.value || map3) return
+
+  const leaflet = await import('leaflet')
+  if (!L) L = leaflet.default
+
+  map3 = L.map(map3Container.value).setView([-33.45, -70.65], 11)
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(map3)
+
+  map3.invalidateSize()
+}
+
+function clearMapLayers(map: any, markers: any[]) {
+  if (!map) return
+  markers.forEach(marker => map.removeLayer(marker))
+  markers.length = 0
 }
 
 onMounted(async () => {
-  await initLeaflet()
-  farmacias.value = await farmaciaService.getAllFarmacias()
-  await initializeMaps()
+  try {
+    farmacias.value = await farmaciaService.getAllFarmacias()
+  } catch (error) {
+    console.error('Error fetching farmacias:', error)
+  }
+
+  await nextTick()
+  initializeMap1()
 })
 
-// Watch for tab changes to initialize maps when containers become visible
-watch(activeTab, async () => {
+watch(activeTab, async (newTab) => {
   await nextTick()
-  await initializeMaps()
 
-  // Invalidate map sizes to ensure proper rendering
-  setTimeout(() => {
-    if (activeTab.value === 'primero' && map1) {
-      map1.invalidateSize()
-    } else if (activeTab.value === 'segundo' && map2) {
-      map2.invalidateSize()
-    } else if (activeTab.value === 'tercero' && map3) {
-      map3.invalidateSize()
+  setTimeout(async () => {
+    if (newTab === 'primero') {
+      if (!map1) await initializeMap1()
+      else map1.invalidateSize()
+    } else if (newTab === 'segundo') {
+      if (!map2) await initializeMap2()
+      else map2.invalidateSize()
+    } else if (newTab === 'tercero') {
+      if (!map3) await initializeMap3()
+      else map3.invalidateSize()
     }
   }, 100)
 })
 
 watch(selectedFarmaciaId, async (id) => {
-  if (id != null) {
-    try {
-      entregasCercanas.value = await farmaciaService.getEntregasCercanas(id)
-      const farmacia = farmacias.value.find((f) => f.idFarmacia === id)
+  if (id == null || !map1) return
 
-      if (farmacia?.ubicacion) {
-        if (!map1 && map1Container.value) {
-          map1 = createMap(map1Container.value, farmacia.ubicacion.y, farmacia.ubicacion.x)
-        }
+  try {
+    entregasCercanas.value = await farmaciaService.getEntregasCercanas(id)
+    const farmacia = farmacias.value.find((f) => f.idFarmacia === id)
 
-        if (map1) {
-          map1.eachLayer((layer: any) => {
-            if (layer instanceof L.Marker) {
-              map1.removeLayer(layer)
-            }
-          })
+    if (farmacia?.ubicacion) {
+      clearMapLayers(map1, markers1)
+      const marker = L.marker([farmacia.ubicacion.y, farmacia.ubicacion.x])
+          .addTo(map1)
+          .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
+          .openPopup()
 
-          L.marker([farmacia.ubicacion.y, farmacia.ubicacion.x])
-              .addTo(map1)
-              .bindPopup(farmacia.nombreFarmacia)
-              .openPopup()
-
-          map1.setView([farmacia.ubicacion.y, farmacia.ubicacion.x], 15)
-        }
+      markers1.push(marker)
+      if (entregasCercanas.value.length > 0) {
+        const maxDistance = Math.max(...entregasCercanas.value.map(e => e.distanciaEntrega))
+        const circle = L.circle([farmacia.ubicacion.y, farmacia.ubicacion.x], {
+          radius: maxDistance,
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.1
+        }).addTo(map1)
+        markers1.push(circle)
       }
-    } catch (e) {
-      console.error('Error fetching entregas cercanas:', e)
-      entregasCercanas.value = []
+
+      map1.setView([farmacia.ubicacion.y, farmacia.ubicacion.x], 15)
     }
+  } catch (e) {
+    console.error('Error fetching entregas cercanas:', e)
+    entregasCercanas.value = []
   }
 })
 
 async function checkZonaCobertura() {
-  if (!clienteId.value) return
+  if (!clienteId.value) {
+    coberturaError.value = 'Por favor ingrese un ID de cliente'
+    return
+  }
+
   try {
     zonaCobertura.value = await userService.getZonaCoberturaByClienteId(clienteId.value)
     coberturaError.value = null
 
     if (map2 && zonaCobertura.value) {
-      // Example: Center map on the zone
-      // map2.setView([lat, lng], 13)
+      clearMapLayers(map2, markers2)
+
+      // Convert string coordinates to numbers
+      const lat = parseFloat(zonaCobertura.value.latitud)
+      const lng = parseFloat(zonaCobertura.value.longitud)
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const marker = L.marker([lat, lng])
+            .addTo(map2)
+            .bindPopup(`<b>${zonaCobertura.value.nombre} ${zonaCobertura.value.apellido}</b><br>Sector: ${zonaCobertura.value.nombreSector}`)
+            .openPopup()
+
+        markers2.push(marker)
+        map2.setView([lat, lng], 15)
+      } else {
+        coberturaError.value = 'Coordenadas inválidas para el cliente'
+      }
     }
   } catch (e: any) {
     zonaCobertura.value = null
-    coberturaError.value = 'No encontrado'
+    coberturaError.value = e.response?.data?.message || 'Cliente no encontrado'
   }
 }
 
@@ -159,22 +192,22 @@ async function fetchClientesLejanos() {
   try {
     clientesLejanos.value = await userService.getClientesLejanosDeFarmacia(radiusKm.value)
 
-    // Clear existing markers on map3
     if (map3) {
-      map3.eachLayer((layer: any) => {
-        if (layer instanceof L.Marker || layer instanceof L.Circle) {
-          map3.removeLayer(layer)
-        }
-      })
+      clearMapLayers(map3, markers3)
 
-      // Add markers for distant clients (you'd need actual coordinates)
-      // This is just an example, you'll need the actual coordinates from your API
-      clientesLejanos.value.forEach((cliente) => {
-        // Example: Add markers if you have coordinates
-        // L.marker([cliente.lat, cliente.lng])
-        //   .addTo(map3)
-        //   .bindPopup(`${cliente.nombreCliente} - ${cliente.distanciaKm.toFixed(2)} km`)
-      })
+      if (clientesLejanos.value.length > 0) {
+        // Add a circle to represent the search radius
+        const circle = L.circle([-33.45, -70.65], {
+          radius: radiusKm.value * 1000,
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: 0.1,
+          weight: 2
+        }).addTo(map3).bindPopup(`Radio de búsqueda: ${radiusKm.value} km`)
+
+        markers3.push(circle)
+        map3.setView([-33.45, -70.65], 11)
+      }
     }
   } catch (e) {
     console.error('Error fetching clientes lejanos:', e)
@@ -188,85 +221,125 @@ async function fetchClientesLejanos() {
     <Tabs v-model="activeTab" default-value="primero" class="w-full">
       <TabsList class="grid w-full grid-cols-3 h-10 bg-muted p-1 rounded-md">
         <TabsTrigger value="primero" class="rounded-sm">Farmacias</TabsTrigger>
-        <TabsTrigger value="segundo" class="rounded-sm">Zona</TabsTrigger>
-        <TabsTrigger value="tercero" class="rounded-sm">Lejanos</TabsTrigger>
+        <TabsTrigger value="segundo" class="rounded-sm">Zona Cobertura</TabsTrigger>
+        <TabsTrigger value="tercero" class="rounded-sm">Clientes Lejanos</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="primero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm space-y-4">
-        <div>
-          <label class="mr-2 font-medium">Seleccione Farmacia:</label>
-          <select v-model.number="selectedFarmaciaId" class="border rounded px-3 py-1.5 bg-white">
-            <option :value="null" disabled>Seleccione una farmacia</option>
-            <option v-for="f in farmacias" :key="f.idFarmacia" :value="f.idFarmacia">
-              {{ f.nombreFarmacia }}
-            </option>
-          </select>
-        </div>
-        <div ref="map1Container" class="h-96 w-full rounded border" />
-        <div v-if="entregasCercanas.length" class="mt-4">
-          <h3 class="font-medium mb-2">Entregas Cercanas:</h3>
-          <ul class="list-disc ml-5 space-y-1">
-            <li v-for="(e, idx) in entregasCercanas" :key="idx" class="text-sm">
-              <span class="font-medium">{{ e.nombreUsuario }}</span> - {{ e.distanciaEntrega.toFixed(2) }} m
-            </li>
-          </ul>
+      <TabsContent value="primero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Seleccione Farmacia:</label>
+            <select
+                v-model.number="selectedFarmaciaId"
+                class="w-full md:w-auto border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option :value="null" disabled>Seleccione una farmacia</option>
+              <option v-for="f in farmacias" :key="f.idFarmacia" :value="f.idFarmacia">
+                {{ f.nombreFarmacia }}
+              </option>
+            </select>
+          </div>
+
+                    <div
+                        ref="map1Container"
+                        class="leaflet-container h-96 w-full rounded-lg overflow-hidden border"
+                      />
+
+          <div v-if="entregasCercanas.length" class="mt-4">
+            <h3 class="font-semibold mb-2">Entregas Cercanas ({{ entregasCercanas.length }}):</h3>
+            <div class="max-h-40 overflow-y-auto">
+              <ul class="list-disc ml-5 space-y-1">
+                <li v-for="(e, idx) in entregasCercanas" :key="idx" class="text-sm">
+                  <span class="font-medium">{{ e.nombreUsuario }}</span> -
+                  <span class="text-muted-foreground">{{ e.distanciaEntrega.toFixed(2) }} metros</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </TabsContent>
 
-      <TabsContent value="segundo" class="mt-6 p-6 bg-background rounded-lg border shadow-sm space-y-4">
-        <div class="flex items-center space-x-3">
-          <input
-              type="number"
-              v-model.number="clienteId"
-              placeholder="ID Cliente"
-              class="border rounded px-3 py-1.5 w-32"
-              @keyup.enter="checkZonaCobertura"
-          />
-          <button
-              class="bg-primary text-primary-foreground px-4 py-1.5 rounded hover:bg-primary/90 transition-colors"
-              @click="checkZonaCobertura"
-          >
-            Buscar
-          </button>
-        </div>
-        <div ref="map2Container" class="h-96 w-full rounded border" />
-        <div v-if="zonaCobertura" class="p-3 bg-green-50 border border-green-200 rounded">
-          <p class="text-sm font-medium text-green-800">
-            Cliente: {{ zonaCobertura.nombre }} {{ zonaCobertura.apellido }}
-          </p>
-          <p class="text-sm text-green-700">Zona: {{ zonaCobertura.nombreSector }}</p>
-        </div>
-        <div v-else-if="coberturaError" class="p-3 bg-red-50 border border-red-200 rounded">
-          <p class="text-sm text-red-600">{{ coberturaError }}</p>
+      <TabsContent value="segundo" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <input
+                type="number"
+                v-model.number="clienteId"
+                placeholder="ID Cliente"
+                class="border rounded px-3 py-1.5 w-32 focus:outline-none focus:ring-2 focus:ring-primary"
+                @keyup.enter="checkZonaCobertura"
+            />
+            <button
+                class="bg-primary text-primary-foreground px-4 py-1.5 rounded hover:bg-primary/90 transition-colors"
+                @click="checkZonaCobertura"
+            >
+              Buscar Cliente
+            </button>
+          </div>
+
+          <div ref="map2Container" class="h-96 w-full rounded-lg overflow-hidden border" />
+
+          <div v-if="zonaCobertura" class="p-4 bg-green-50 border border-green-200 rounded-md">
+            <h4 class="font-semibold text-green-800 mb-1">Cliente Encontrado</h4>
+            <p class="text-sm text-green-700">
+              <span class="font-medium">Nombre:</span> {{ zonaCobertura.nombre }} {{ zonaCobertura.apellido }}
+            </p>
+            <p class="text-sm text-green-700">
+              <span class="font-medium">Sector:</span> {{ zonaCobertura.nombreSector }}
+            </p>
+            <p class="text-sm text-green-700">
+              <span class="font-medium">Coordenadas:</span> {{ zonaCobertura.latitud }}, {{ zonaCobertura.longitud }}
+            </p>
+          </div>
+
+          <div v-else-if="coberturaError" class="p-4 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-sm text-red-600">{{ coberturaError }}</p>
+          </div>
         </div>
       </TabsContent>
 
-      <TabsContent value="tercero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm space-y-4">
-        <div class="flex items-center space-x-3">
-          <label class="text-sm font-medium">Radio (km):</label>
-          <input
-              type="number"
-              v-model.number="radiusKm"
-              class="border rounded px-3 py-1.5 w-20"
-              min="1"
-              max="50"
-          />
-          <button
-              class="bg-primary text-primary-foreground px-4 py-1.5 rounded hover:bg-primary/90 transition-colors"
-              @click="fetchClientesLejanos"
-          >
-            Buscar Clientes
-          </button>
-        </div>
-        <div ref="map3Container" class="h-96 w-full rounded border" />
-        <div v-if="clientesLejanos.length" class="mt-4">
-          <h3 class="font-medium mb-2">Clientes más lejanos ({{ clientesLejanos.length }} encontrados):</h3>
-          <ul class="list-disc ml-5 space-y-1">
-            <li v-for="c in clientesLejanos" :key="c.idCliente" class="text-sm">
-              <span class="font-medium">{{ c.nombreCliente }}</span> -
-              {{ c.distanciaKm.toFixed(2) }} km desde {{ c.nombreFarmacia }}
-            </li>
-          </ul>
+      <TabsContent value="tercero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <label class="text-sm font-medium">Radio (km):</label>
+            <input
+                type="number"
+                v-model.number="radiusKm"
+                class="border rounded px-3 py-1.5 w-20 focus:outline-none focus:ring-2 focus:ring-primary"
+                min="1"
+                max="50"
+            />
+            <button
+                class="bg-primary text-primary-foreground px-4 py-1.5 rounded hover:bg-primary/90 transition-colors"
+                @click="fetchClientesLejanos"
+            >
+              Buscar Clientes Lejanos
+            </button>
+          </div>
+
+          <div ref="map3Container" class="h-96 w-full rounded-lg overflow-hidden border" />
+
+          <div v-if="clientesLejanos.length" class="mt-4">
+            <h3 class="font-semibold mb-2">
+              Clientes fuera del radio ({{ clientesLejanos.length }} encontrados):
+            </h3>
+            <div class="max-h-60 overflow-y-auto">
+              <ul class="list-disc ml-5 space-y-1">
+                <li v-for="c in clientesLejanos" :key="c.idCliente" class="text-sm">
+                  <span class="font-medium">{{ c.nombreCliente }}</span> -
+                  <span class="text-muted-foreground">
+                    {{ c.distanciaKm.toFixed(2) }} km desde {{ c.nombreFarmacia }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div v-else-if="clientesLejanos.length === 0 && radiusKm" class="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <p class="text-sm text-blue-600">
+              No se encontraron clientes fuera del radio de {{ radiusKm }} km
+            </p>
+          </div>
         </div>
       </TabsContent>
     </Tabs>
@@ -278,9 +351,9 @@ async function fetchClientesLejanos() {
   height: 100%;
   width: 100%;
   z-index: 1;
+  background: #f3f4f6;
 }
 
-/* Ensure proper rendering of Leaflet controls */
 :deep(.leaflet-control-container) {
   position: absolute;
   pointer-events: none;
@@ -288,5 +361,11 @@ async function fetchClientesLejanos() {
 
 :deep(.leaflet-control) {
   pointer-events: auto;
+}
+
+:deep(.leaflet-popup-close-button) {
+  color: #333;
+  font-size: 20px;
+  font-weight: bold;
 }
 </style>
