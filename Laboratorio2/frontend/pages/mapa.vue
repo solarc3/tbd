@@ -32,359 +32,425 @@ const map2Container = ref<HTMLElement | null>(null)
 const map3Container = ref<HTMLElement | null>(null)
 const activeTab = ref('primero')
 
-let L: any
-let map1: any
-let map2: any
-let map3: any
+let L: any;
+let leafletPromise: Promise<any> | null = null;
+let map1: any = null
+let map2: any = null
+let map3: any = null
 let markers1: any[] = []
 let markers2: any[] = []
 let markers3: any[] = []
 
-async function initializeMap1() {
-  if (!import.meta.client || !map1Container.value || map1) return
+function loadLeaflet() {
+  if (typeof window === 'undefined') {
+    return Promise.reject("Not in a client environment");
+  }
+  if (!leafletPromise) {
+    leafletPromise = import('leaflet').then(leafletModule => {
+      L = leafletModule.default;
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+      });
+      return L;
+    });
+  }
+  return leafletPromise;
+}
 
-  const leaflet = await import('leaflet')
-  L = leaflet.default
 
-  // Fix for default marker icons in Vue/Vite
-  delete (L.Icon.Default.prototype as any)._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+// --- Funciones para crear íconos consistentes ---
+function createFarmaciaIcon() {
+  return L.divIcon({
+    html: `<div style="
+      background: white;
+      border: 2px solid #dc2626;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #dc2626;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      position: relative;
+      z-index: 1000;
+    ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hospital-icon lucide-hospital"><path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/></svg>
+    </div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18],
+    className: 'farmacia-custom-icon'
   })
+}
 
-  map1 = L.map(map1Container.value).setView([-33.45, -70.65], 13)
+function createUserIcon() {
+  return L.divIcon({
+    html: `<div style="
+      background: #3b82f6;
+      border: 2px solid #1d4ed8;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      position: relative;
+      z-index: 1000;
+    ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+    className: 'user-custom-icon'
+  })
+}
+
+async function initializeMap(container: HTMLElement, view: [number, number], zoom: number): Promise<any> {
+  try {
+    await loadLeaflet();
+  } catch (error) {
+    console.error("Failed to load Leaflet:", error);
+    return null;
+  }
+
+  const map = L.map(container, {
+    zoomControl: true,
+    attributionControl: true
+  }).setView(view, zoom)
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
-  }).addTo(map1)
+  }).addTo(map)
+
+  return map
 }
 
-async function initializeMap2() {
-  if (!import.meta.client || !map2Container.value || map2) return
-
-  const leaflet = await import('leaflet')
-  if (!L) L = leaflet.default
-
-  map2 = L.map(map2Container.value).setView([-33.45, -70.65], 13)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
-  }).addTo(map2)
-
-  map2.invalidateSize()
-}
-
-async function initializeMap3() {
-  if (!import.meta.client || !map3Container.value || map3) return
-
-  const leaflet = await import('leaflet')
-  if (!L) L = leaflet.default
-
-  map3 = L.map(map3Container.value).setView([-33.45, -70.65], 11)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
-  }).addTo(map3)
-
-  map3.invalidateSize()
-}
 
 function clearMapLayers(map: any, markers: any[]) {
   if (!map) return
-  markers.forEach(marker => map.removeLayer(marker))
+  markers.forEach(layer => {
+    if (map.hasLayer(layer)) {
+      map.removeLayer(layer)
+    }
+  })
   markers.length = 0
 }
 
 onMounted(async () => {
-  console.log('Component mounted')
-
   try {
-    console.log('Fetching farmacias...')
     farmacias.value = await farmaciaService.getAllFarmacias()
-    console.log('Farmacias loaded:', farmacias.value.length)
   } catch (error) {
     console.error('Error fetching farmacias:', error)
   }
 
   await nextTick()
-
-  // Add a small delay to ensure DOM is ready
-  setTimeout(() => {
-    if (import.meta.client) {
-      console.log('Attempting to initialize map after mount')
-      initializeMap1()
-    }
-  }, 100)
+  if (activeTab.value === 'primero' && map1Container.value) {
+    map1 = await initializeMap(map1Container.value, [-33.45, -70.65], 13)
+  }
 })
 
-watch(activeTab, async (newTab) => {
+watch(activeTab, async (newTab, oldTab) => {
+  if (oldTab) {
+    switch (oldTab) {
+      case 'primero':
+        if (map1) {
+          clearMapLayers(map1, markers1)
+          map1.remove();
+          map1 = null;
+        }
+        break
+      case 'segundo':
+        if (map2) {
+          clearMapLayers(map2, markers2)
+          map2.remove();
+          map2 = null;
+        }
+        break
+      case 'tercero':
+        if (map3) {
+          clearMapLayers(map3, markers3)
+          map3.remove();
+          map3 = null;
+        }
+        break
+    }
+  }
+
   await nextTick()
 
   setTimeout(async () => {
-    if (newTab === 'primero') {
-      if (!map1) await initializeMap1()
-      else map1.invalidateSize()
-    } else if (newTab === 'segundo') {
-      if (!map2) await initializeMap2()
-      else map2.invalidateSize()
-    } else if (newTab === 'tercero') {
-      if (!map3) await initializeMap3()
-      else map3.invalidateSize()
+    if (newTab === 'primero' && !map1 && map1Container.value) {
+      map1 = await initializeMap(map1Container.value, [-33.45, -70.65], 13)
+      if(selectedFarmaciaId.value) renderEntregasCercanas();
+    } else if (newTab === 'segundo' && !map2 && map2Container.value) {
+      map2 = await initializeMap(map2Container.value, [-33.45, -70.65], 13)
+      if(clienteId.value) checkZonaCobertura();
+    } else if (newTab === 'tercero' && !map3 && map3Container.value) {
+      map3 = await initializeMap(map3Container.value, [-33.45, -70.65], 11)
+      if(clientesLejanos.value.length > 0) fetchClientesLejanos();
     }
   }, 100)
 })
 
 watch(selectedFarmaciaId, async (id) => {
-  if (id == null || !map1) return
-
+  if (id == null) return;
   try {
-    entregasCercanas.value = await farmaciaService.getEntregasCercanas(id)
-
-    // Find the selected farmacia
-    const farmacia = farmacias.value.find(f => f.idFarmacia === id)
-
-    if (farmacia) {
-      clearMapLayers(map1, markers1)
-
-      // Determine farmacia coordinates - check if we have them from the response or need to use the farmacia entity
-      let farmaciaLat, farmaciaLng;
-
-      if (entregasCercanas.value.length > 0 && entregasCercanas.value[0].ubicacionFarmacia) {
-        // Use coordinates from the response
-        farmaciaLat = entregasCercanas.value[0].ubicacionFarmacia.latitude;
-        farmaciaLng = entregasCercanas.value[0].ubicacionFarmacia.longitude;
-      } else if (farmacia.ubicacion) {
-        // Use coordinates from farmacia entity (x, y format)
-        farmaciaLat = farmacia.ubicacion.y;
-        farmaciaLng = farmacia.ubicacion.x;
-      } else {
-        console.error('No coordinates found for farmacia');
-        return;
-      }
-
-      // Add farmacia marker
-      const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng])
-          .addTo(map1)
-          .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
-          .openPopup()
-
-      markers1.push(farmaciaMarker)
-
-      // Add delivery markers from entregasCercanas
-      entregasCercanas.value.forEach((entrega) => {
-        if (entrega.ubicacionUsuario) {
-          const deliveryMarker = L.marker([
-            entrega.ubicacionUsuario.latitude,
-            entrega.ubicacionUsuario.longitude
-          ])
-              .addTo(map1)
-              .bindPopup(`<b>${entrega.nombreUsuario}</b><br>Distancia: ${entrega.distanciaEntrega.toFixed(2)} metros`)
-
-          markers1.push(deliveryMarker)
-        }
-      })
-
-      // Add circle for max distance
-      if (entregasCercanas.value.length > 0) {
-        const maxDistance = Math.max(...entregasCercanas.value.map(e => e.distanciaEntrega))
-        const circle = L.circle([farmaciaLat, farmaciaLng], {
-          radius: maxDistance,
-          color: 'blue',
-          fillColor: '#30f',
-          fillOpacity: 0.1
-        }).addTo(map1)
-        markers1.push(circle)
-      }
-
-      // Center map on farmacia
-      map1.setView([farmaciaLat, farmaciaLng], 14)
-    }
+    entregasCercanas.value = await farmaciaService.getEntregasCercanas(id);
+    renderEntregasCercanas();
   } catch (e) {
     console.error('Error fetching entregas cercanas:', e)
     entregasCercanas.value = []
   }
 })
 
+
+async function renderEntregasCercanas() {
+  if (!map1 || selectedFarmaciaId.value == null) return;
+
+  const farmacia = farmacias.value.find(f => f.idFarmacia === selectedFarmaciaId.value);
+  if (!farmacia) return;
+
+  clearMapLayers(map1, markers1);
+
+  let farmaciaLat, farmaciaLng;
+  if (entregasCercanas.value.length > 0 && entregasCercanas.value[0].ubicacionFarmacia) {
+    farmaciaLat = entregasCercanas.value[0].ubicacionFarmacia.latitude;
+    farmaciaLng = entregasCercanas.value[0].ubicacionFarmacia.longitude;
+  } else if (farmacia.ubicacion) {
+    farmaciaLat = farmacia.ubicacion.y;
+    farmaciaLng = farmacia.ubicacion.x;
+  } else {
+    console.error('No se encontraron coordenadas para la farmacia');
+    return;
+  }
+
+  if (entregasCercanas.value.length > 0) {
+    const maxDistance = Math.max(...entregasCercanas.value.map(e => e.distanciaEntrega));
+    const circle = L.circle([farmaciaLat, farmaciaLng], {
+      radius: maxDistance,
+      color: 'green',
+      fillColor: '#0f0',
+      fillOpacity: 0.1,
+      weight: 2
+    }).addTo(map1);
+    markers1.push(circle);
+
+    const entregaMasLejana = entregasCercanas.value.reduce((max, entrega) =>
+        entrega.distanciaEntrega > max.distanciaEntrega ? entrega : max
+    );
+
+    if (entregaMasLejana.ubicacionUsuario) {
+      const line = L.polyline([
+        [farmaciaLat, farmaciaLng],
+        [entregaMasLejana.ubicacionUsuario.latitude, entregaMasLejana.ubicacionUsuario.longitude]
+      ], {
+        color: '#ff6600',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '10, 5'
+      }).addTo(map1);
+      markers1.push(line);
+    }
+  }
+
+  const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng], {
+    icon: createFarmaciaIcon(),
+    zIndexOffset: 1000
+  })
+      .addTo(map1)
+      .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
+      .openPopup();
+  markers1.push(farmaciaMarker);
+
+  const distanciaMaxima = entregasCercanas.value.length > 0
+      ? Math.max(...entregasCercanas.value.map(e => e.distanciaEntrega))
+      : 0;
+
+  entregasCercanas.value.forEach((entrega) => {
+    if (entrega.ubicacionUsuario) {
+      const esElMasLejano = entrega.distanciaEntrega === distanciaMaxima;
+      const deliveryMarker = L.marker([
+        entrega.ubicacionUsuario.latitude,
+        entrega.ubicacionUsuario.longitude
+      ], {
+        icon: createUserIcon(),
+        zIndexOffset: esElMasLejano ? 600 : 500
+      })
+          .addTo(map1)
+          .bindPopup(`<b>${entrega.nombreUsuario}</b><br>Distancia: ${entrega.distanciaEntrega.toFixed(2)} metros${esElMasLejano ? '<br><span style="color: #ff6600; font-weight: bold;">⚠️ Más lejano</span>' : ''}`);
+      markers1.push(deliveryMarker);
+    }
+  });
+
+  map1.setView([farmaciaLat, farmaciaLng], 14);
+}
+
 async function checkZonaCobertura() {
   if (!clienteId.value) {
-    coberturaError.value = 'Por favor ingrese un ID de cliente'
-    return
+    coberturaError.value = 'Por favor ingrese un ID de cliente';
+    return;
+  }
+  if (!map2) {
+    coberturaError.value = 'El mapa no está inicializado. Intente de nuevo.';
+    return;
   }
 
   try {
-    zonaCobertura.value = await userService.getZonaCoberturaByClienteId(clienteId.value)
-    coberturaError.value = null
+    zonaCobertura.value = await userService.getZonaCoberturaByClienteId(clienteId.value);
+    coberturaError.value = null;
 
-    if (map2 && zonaCobertura.value) {
-      clearMapLayers(map2, markers2)
+    clearMapLayers(map2, markers2);
 
-      // Convert string coordinates to numbers
-      const lat = parseFloat(zonaCobertura.value.latitud)
-      const lng = parseFloat(zonaCobertura.value.longitud)
+    const lat = parseFloat(zonaCobertura.value.latitud);
+    const lng = parseFloat(zonaCobertura.value.longitud);
 
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const marker = L.marker([lat, lng])
-            .addTo(map2)
-            .bindPopup(`<b>${zonaCobertura.value.nombre} ${zonaCobertura.value.apellido}</b><br>Sector: ${zonaCobertura.value.nombreSector}`)
-            .openPopup()
+    if (!isNaN(lat) && !isNaN(lng)) {
+      const circle = L.circle([lat, lng], {
+        radius: 1000,
+        color: 'blue',
+        fillColor: '#30f',
+        fillOpacity: 0.1,
+        weight: 2
+      }).addTo(map2);
+      markers2.push(circle);
 
-        markers2.push(marker)
-        map2.setView([lat, lng], 15)
-      } else {
-        coberturaError.value = 'Coordenadas inválidas para el cliente'
-      }
+      const marker = L.marker([lat, lng], {
+        icon: createUserIcon(),
+        zIndexOffset: 1000
+      })
+          .addTo(map2)
+          .bindPopup(`<b>${zonaCobertura.value.nombre} ${zonaCobertura.value.apellido}</b><br>Sector: ${zonaCobertura.value.nombreSector}`)
+          .openPopup();
+      markers2.push(marker);
+
+      map2.setView([lat, lng], 15);
+
+    } else {
+      coberturaError.value = 'Coordenadas inválidas para el cliente';
     }
+
   } catch (e: any) {
-    zonaCobertura.value = null
-    coberturaError.value = e.response?.data?.message || 'Cliente no encontrado'
+    zonaCobertura.value = null;
+    clearMapLayers(map2, markers2);
+    coberturaError.value = e.response?.data?.message || 'Cliente no encontrado';
   }
 }
 
 async function fetchClientesLejanos() {
+  if (!map3) return;
+
   try {
-    clientesLejanos.value = await userService.getClientesLejanosDeFarmacia(radiusKm.value)
-    console.log('Clientes lejanos:', clientesLejanos.value)
+    clientesLejanos.value = await userService.getClientesLejanosDeFarmacia(radiusKm.value);
+    clearMapLayers(map3, markers3);
 
-    if (map3 && clientesLejanos.value.length > 0) {
-      clearMapLayers(map3, markers3)
-      const farmaciaMap = new Map()
-      clientesLejanos.value.forEach(cliente => {
-        if (cliente.farmacia) {
-          const farmaciaId = cliente.farmacia.idFarmacia
-          if (!farmaciaMap.has(farmaciaId)) {
-            farmaciaMap.set(farmaciaId, {
-              farmacia: cliente.farmacia,
-              clientes: []
-            })
-          }
-          farmaciaMap.get(farmaciaId).clientes.push(cliente)
-        }
-      })
-
-      // First, draw all circles (so they appear behind markers)
-      farmaciaMap.forEach(({ farmacia, clientes }) => {
-        if (farmacia.ubicacion) {
-          // Check if coordinates are in the correct format
-          const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y
-          const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x
-
-          console.log('Drawing circle for farmacia:', farmacia.nombreFarmacia, 'at', farmaciaLat, farmaciaLng)
-
-          // Add green circle for farmacia coverage area
-          const circle = L.circle([farmaciaLat, farmaciaLng], {
-            radius: radiusKm.value * 1000,
-            color: 'green',
-            fillColor: '#0f0',
-            fillOpacity: 0.1,
-            weight: 2
-          }).addTo(map3)
-
-          markers3.push(circle)
-        }
-      })
-
-      // Then draw lines (so they appear above circles but below markers)
-      clientesLejanos.value.forEach((cliente, index) => {
-        if (cliente.ubicacionCliente && cliente.farmacia?.ubicacion) {
-          // Handle both coordinate formats
-          const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
-          const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
-          const farmaciaLat = cliente.farmacia.ubicacion.latitude || cliente.farmacia.ubicacion.y
-          const farmaciaLng = cliente.farmacia.ubicacion.longitude || cliente.farmacia.ubicacion.x
-
-          console.log(`Drawing line ${index}:`,
-              'Cliente:', clienteLat, clienteLng,
-              'Farmacia:', farmaciaLat, farmaciaLng)
-
-          // Draw thick orange line
-          const line = L.polyline([
-            [clienteLat, clienteLng],
-            [farmaciaLat, farmaciaLng]
-          ], {
-            color: '#ff6600',
-            weight: 3,
-            opacity: 0.7,
-            dashArray: '10, 5'
-          }).addTo(map3)
-
-          markers3.push(line)
-        } else {
-          console.log(`No line for cliente ${index}:`,
-              'Cliente location:', cliente.ubicacionCliente,
-              'Farmacia location:', cliente.farmacia?.ubicacion)
-        }
-      })
-
-      // Draw farmacia markers
-      farmaciaMap.forEach(({ farmacia, clientes }) => {
-        if (farmacia.ubicacion) {
-          const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y
-          const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x
-
-          // Add farmacia marker with white background and red cross
-          const farmaciaIcon = L.divIcon({
-            html: '<div style="background: white; border: 3px solid red; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: red; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">+</div>',
-            iconSize: [30, 30],
-            className: 'farmacia-icon'
-          })
-
-          const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng], { icon: farmaciaIcon })
-              .addTo(map3)
-              .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`)
-
-          markers3.push(farmaciaMarker)
-        }
-      })
-
-      // Finally, draw client markers (so they appear on top)
-      clientesLejanos.value.forEach(cliente => {
-        if (cliente.ubicacionCliente) {
-          const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
-          const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
-
-          // Orange marker for clients outside radius
-          const clienteIcon = L.divIcon({
-            html: '<div style="background: #ff8800; border: 2px solid #cc6600; border-radius: 50%; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-            iconSize: [24, 24],
-            className: 'cliente-lejano-icon'
-          })
-
-          const clienteMarker = L.marker([clienteLat, clienteLng], { icon: clienteIcon })
-              .addTo(map3)
-              .bindPopup(`<b>${cliente.nombreCliente}</b><br>A ${cliente.distanciaKm.toFixed(2)} km de ${cliente.farmacia?.nombreFarmacia || 'farmacia'}`)
-
-          markers3.push(clienteMarker)
-        }
-      })
-
-      // Adjust map view to show all markers
-      const allLatLngs = []
-      clientesLejanos.value.forEach(cliente => {
-        if (cliente.ubicacionCliente) {
-          const lat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y
-          const lng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x
-          allLatLngs.push([lat, lng])
-        }
-        if (cliente.farmacia?.ubicacion) {
-          const lat = cliente.farmacia.ubicacion.latitude || cliente.farmacia.ubicacion.y
-          const lng = cliente.farmacia.ubicacion.longitude || cliente.farmacia.ubicacion.x
-          allLatLngs.push([lat, lng])
-        }
-      })
-
-      if (allLatLngs.length > 0) {
-        const bounds = L.latLngBounds(allLatLngs)
-        map3.fitBounds(bounds, { padding: [50, 50] })
-      }
-    } else if (map3) {
-      clearMapLayers(map3, markers3)
+    if (clientesLejanos.value.length === 0) {
+      return;
     }
+
+    const farmaciaMap = new Map();
+    clientesLejanos.value.forEach(cliente => {
+      if (cliente.farmacia) {
+        const farmaciaId = cliente.farmacia.idFarmacia;
+        if (!farmaciaMap.has(farmaciaId)) {
+          farmaciaMap.set(farmaciaId, {
+            farmacia: cliente.farmacia,
+            clientes: []
+          });
+        }
+        farmaciaMap.get(farmaciaId).clientes.push(cliente);
+      }
+    });
+
+    farmaciaMap.forEach(({ farmacia }) => {
+      if (farmacia.ubicacion) {
+        const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y;
+        const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x;
+        const circle = L.circle([farmaciaLat, farmaciaLng], {
+          radius: radiusKm.value * 1000,
+          color: 'green',
+          fillColor: '#0f0',
+          fillOpacity: 0.1,
+          weight: 2
+        }).addTo(map3);
+        markers3.push(circle);
+      }
+    });
+
+    clientesLejanos.value.forEach(cliente => {
+      if (cliente.ubicacionCliente && cliente.farmacia?.ubicacion) {
+        const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y;
+        const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x;
+        const farmaciaLat = cliente.farmacia.ubicacion.latitude || cliente.farmacia.ubicacion.y;
+        const farmaciaLng = cliente.farmacia.ubicacion.longitude || cliente.farmacia.ubicacion.x;
+
+        const line = L.polyline([[clienteLat, clienteLng], [farmaciaLat, farmaciaLng]], {
+          color: '#ff6600',
+          weight: 3,
+          opacity: 0.7,
+          dashArray: '10, 5'
+        }).addTo(map3);
+        markers3.push(line);
+      }
+    });
+
+    clientesLejanos.value.forEach(cliente => {
+      if (cliente.ubicacionCliente) {
+        const clienteLat = cliente.ubicacionCliente.latitude || cliente.ubicacionCliente.y;
+        const clienteLng = cliente.ubicacionCliente.longitude || cliente.ubicacionCliente.x;
+
+        const clienteMarker = L.marker([clienteLat, clienteLng], {
+          icon: createUserIcon(),
+          zIndexOffset: 500
+        })
+            .addTo(map3)
+            .bindPopup(`<b>${cliente.nombreCliente}</b><br>A ${cliente.distanciaKm.toFixed(2)} km`);
+        markers3.push(clienteMarker);
+      }
+    });
+
+    farmaciaMap.forEach(({ farmacia }) => {
+      if (farmacia.ubicacion) {
+        const farmaciaLat = farmacia.ubicacion.latitude || farmacia.ubicacion.y;
+        const farmaciaLng = farmacia.ubicacion.longitude || farmacia.ubicacion.x;
+
+        const farmaciaMarker = L.marker([farmaciaLat, farmaciaLng], {
+          icon: createFarmaciaIcon(),
+          zIndexOffset: 1000
+        })
+            .addTo(map3)
+            .bindPopup(`<b>${farmacia.nombreFarmacia}</b><br>${farmacia.direccion}`);
+        markers3.push(farmaciaMarker);
+      }
+    });
+
+    const allLatLngs = clientesLejanos.value.flatMap(c => {
+      const points = [];
+      if(c.ubicacionCliente) points.push([c.ubicacionCliente.latitude || c.ubicacionCliente.y, c.ubicacionCliente.longitude || c.ubicacionCliente.x]);
+      if(c.farmacia?.ubicacion) points.push([c.farmacia.ubicacion.latitude || c.farmacia.ubicacion.y, c.farmacia.ubicacion.longitude || c.farmacia.ubicacion.x]);
+      return points;
+    });
+
+    if (allLatLngs.length > 0) {
+      const bounds = L.latLngBounds(allLatLngs);
+      map3.fitBounds(bounds, { padding: [50, 50] });
+    }
+
   } catch (e) {
-    console.error('Error fetching clientes lejanos:', e)
-    clientesLejanos.value = []
+    console.error('Error fetching clientes lejanos:', e);
+    clientesLejanos.value = [];
   }
 }
 </script>
@@ -400,11 +466,11 @@ async function fetchClientesLejanos() {
 
       <TabsContent value="primero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
         <div class="space-y-4">
-          <div>
+          <div class="p-4 bg-muted/30 border rounded-lg">
             <label class="block text-sm font-medium mb-2">Seleccione Farmacia:</label>
             <select
                 v-model.number="selectedFarmaciaId"
-                class="w-full md:w-auto border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+                class="w-full border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option :value="null" disabled>Seleccione una farmacia</option>
               <option v-for="f in farmacias" :key="f.idFarmacia" :value="f.idFarmacia">
@@ -413,20 +479,40 @@ async function fetchClientesLejanos() {
             </select>
           </div>
 
-          <div
-              ref="map1Container"
-              class="leaflet-container h-96 w-full rounded-lg overflow-hidden border"
-          />
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-1">
+              <div v-if="entregasCercanas.length" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Entregas Cercanas</h3>
+                <div class="bg-muted/30 rounded-lg p-3 mb-3">
+                  <p class="text-sm font-medium text-muted-foreground">Total entregas</p>
+                  <p class="text-2xl font-bold">{{ entregasCercanas.length }}</p>
+                </div>
+                <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                  <div
+                      v-for="(e, idx) in entregasCercanas"
+                      :key="idx"
+                      class="p-3 bg-background border rounded-lg hover:bg-muted/20 transition-colors"
+                      :class="{ 'border-orange-500 bg-orange-50': e.distanciaEntrega === Math.max(...entregasCercanas.map(ent => ent.distanciaEntrega)) }"
+                  >
+                    <p class="font-medium text-sm">{{ e.nombreUsuario }}</p>
+                    <p class="text-sm text-muted-foreground">{{ e.distanciaEntrega.toFixed(0) }} m</p>
+                    <div v-if="e.distanciaEntrega === Math.max(...entregasCercanas.map(ent => ent.distanciaEntrega))"
+                         class="mt-1">
+                      <span class="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">Más lejano</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else-if="selectedFarmaciaId" class="text-center py-8">
+                <p class="text-muted-foreground">No hay entregas cercanas</p>
+              </div>
+            </div>
 
-          <div v-if="entregasCercanas.length" class="mt-4">
-            <h3 class="font-semibold mb-2">Entregas Cercanas ({{ entregasCercanas.length }}):</h3>
-            <div class="max-h-40 overflow-y-auto">
-              <ul class="list-disc ml-5 space-y-1">
-                <li v-for="(e, idx) in entregasCercanas" :key="idx" class="text-sm">
-                  <span class="font-medium">{{ e.nombreUsuario }}</span> -
-                  <span class="text-muted-foreground">{{ e.distanciaEntrega.toFixed(2) }} metros</span>
-                </li>
-              </ul>
+            <div class="lg:col-span-3">
+              <div
+                  ref="map1Container"
+                  class="leaflet-container h-[400px] w-full rounded-lg overflow-hidden border"
+              />
             </div>
           </div>
         </div>
@@ -434,7 +520,7 @@ async function fetchClientesLejanos() {
 
       <TabsContent value="segundo" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
         <div class="space-y-4">
-          <div class="flex items-center space-x-3">
+          <div class="p-4 bg-muted/30 border rounded-lg flex flex-wrap items-center gap-4">
             <input
                 type="number"
                 v-model.number="clienteId"
@@ -450,30 +536,57 @@ async function fetchClientesLejanos() {
             </button>
           </div>
 
-          <div ref="map2Container" class="h-96 w-full rounded-lg overflow-hidden border" />
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-1">
+              <div v-if="zonaCobertura" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Información del Cliente</h3>
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg space-y-3">
+                  <div>
+                    <p class="text-xs font-medium text-green-600 uppercase tracking-wider">Nombre</p>
+                    <p class="text-sm font-semibold text-green-800">{{ zonaCobertura.nombre }} {{ zonaCobertura.apellido }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-green-600 uppercase tracking-wider">Sector</p>
+                    <p class="text-sm font-semibold text-green-800">{{ zonaCobertura.nombreSector }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-green-600 uppercase tracking-wider">Coordenadas</p>
+                    <p class="text-sm font-semibold text-green-800">{{ parseFloat(zonaCobertura.latitud).toFixed(4) }}, {{ parseFloat(zonaCobertura.longitud).toFixed(4) }}</p>
+                  </div>
+                  <div class="pt-2 border-t border-green-200">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <p class="text-xs text-green-600">Dentro de cobertura</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div v-if="zonaCobertura" class="p-4 bg-green-50 border border-green-200 rounded-md">
-            <h4 class="font-semibold text-green-800 mb-1">Cliente Encontrado</h4>
-            <p class="text-sm text-green-700">
-              <span class="font-medium">Nombre:</span> {{ zonaCobertura.nombre }} {{ zonaCobertura.apellido }}
-            </p>
-            <p class="text-sm text-green-700">
-              <span class="font-medium">Sector:</span> {{ zonaCobertura.nombreSector }}
-            </p>
-            <p class="text-sm text-green-700">
-              <span class="font-medium">Coordenadas:</span> {{ zonaCobertura.latitud }}, {{ zonaCobertura.longitud }}
-            </p>
-          </div>
+              <div v-else-if="coberturaError" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Estado de Búsqueda</h3>
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p class="text-sm text-red-600">{{ coberturaError }}</p>
+                </div>
+              </div>
 
-          <div v-else-if="coberturaError" class="p-4 bg-red-50 border border-red-200 rounded-md">
-            <p class="text-sm text-red-600">{{ coberturaError }}</p>
+              <div v-else class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Búsqueda de Cliente</h3>
+                <div class="p-4 bg-muted/30 rounded-lg">
+                  <p class="text-sm text-muted-foreground">Ingrese un ID de cliente para buscar su ubicación y zona de cobertura</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-3">
+              <div ref="map2Container" class="h-[400px] w-full rounded-lg overflow-hidden border" />
+            </div>
           </div>
         </div>
       </TabsContent>
 
       <TabsContent value="tercero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
         <div class="space-y-4">
-          <div class="flex items-center space-x-3">
+          <div class="p-4 bg-muted/30 border rounded-lg flex flex-wrap items-center gap-4">
             <label class="text-sm font-medium">Radio (km):</label>
             <input
                 type="number"
@@ -490,28 +603,49 @@ async function fetchClientesLejanos() {
             </button>
           </div>
 
-          <div ref="map3Container" class="h-96 w-full rounded-lg overflow-hidden border" />
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-1">
+              <div v-if="clientesLejanos.length" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Clientes Fuera del Radio</h3>
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                  <p class="text-sm font-medium text-orange-600">Total encontrados</p>
+                  <p class="text-2xl font-bold text-orange-700">{{ clientesLejanos.length }}</p>
+                  <p class="text-xs text-orange-600 mt-1">Radio: {{ radiusKm }} km</p>
+                </div>
+                <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                  <div
+                      v-for="c in clientesLejanos"
+                      :key="c.idCliente"
+                      class="p-3 bg-background border rounded-lg hover:bg-muted/20 transition-colors"
+                  >
+                    <p class="font-medium text-sm">{{ c.nombreCliente }}</p>
+                    <p class="text-xs text-muted-foreground">{{ c.farmacia.nombreFarmacia }}</p>
+                    <div class="flex items-center justify-between mt-2">
+                      <span class="text-sm font-semibold text-orange-600">{{ c.distanciaKm.toFixed(1) }} km</span>
+                      <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                        +{{ (c.distanciaKm - radiusKm).toFixed(1) }} km
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div v-if="clientesLejanos.length" class="mt-4">
-            <h3 class="font-semibold mb-2">
-              Clientes fuera del radio ({{ clientesLejanos.length }} encontrados):
-            </h3>
-            <div class="max-h-60 overflow-y-auto">
-              <ul class="list-disc ml-5 space-y-1">
-                <li v-for="c in clientesLejanos" :key="c.idCliente" class="text-sm">
-                  <span class="font-medium">{{ c.nombreCliente }}</span> -
-                  <span class="text-muted-foreground">
-                    {{ c.distanciaKm.toFixed(2) }} km desde {{ c.farmacia.nombreFarmacia }}
-                  </span>
-                </li>
-              </ul>
+              <div v-else class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Análisis de Cobertura</h3>
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p class="text-sm text-blue-600">
+                    No se encontraron clientes fuera del radio de {{ radiusKm }} km o aún no se ha realizado una búsqueda.
+                  </p>
+                  <p class="text-xs text-blue-500 mt-2">
+                    Ajuste el radio y presione "Buscar" para analizar la cobertura.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div v-else-if="clientesLejanos.length === 0 && radiusKm" class="p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p class="text-sm text-blue-600">
-              No se encontraron clientes fuera del radio de {{ radiusKm }} km
-            </p>
+            <div class="lg:col-span-3">
+              <div ref="map3Container" class="h-[400px] w-full rounded-lg overflow-hidden border" />
+            </div>
           </div>
         </div>
       </TabsContent>
@@ -527,27 +661,30 @@ async function fetchClientesLejanos() {
   background: #f3f4f6;
 }
 
-/* Ensure the map container has explicit height */
 .leaflet-container {
-  min-height: 384px; /* h-96 = 24rem = 384px */
+  min-height: 400px;
 }
 
 :deep(.leaflet-control-container) {
   position: absolute;
   pointer-events: none;
+  z-index: 1000;
 }
 
 :deep(.leaflet-control) {
   pointer-events: auto;
 }
 
-:deep(.leaflet-popup-close-button) {
-  color: #333;
-  font-size: 20px;
-  font-weight: bold;
+:deep(.farmacia-custom-icon),
+:deep(.user-custom-icon) {
+  cursor: pointer !important;
+  pointer-events: auto !important;
 }
 
-/* Fix potential z-index issues */
+:deep(.leaflet-marker-icon) {
+  cursor: pointer !important;
+}
+
 :deep(.leaflet-pane) {
   z-index: 400;
 }
@@ -574,5 +711,9 @@ async function fetchClientesLejanos() {
 
 :deep(.leaflet-popup-pane) {
   z-index: 700;
+}
+
+:deep(.leaflet-popup) {
+  z-index: 1000;
 }
 </style>
