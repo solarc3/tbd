@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.MessageResponse;
+import com.example.tbd_lab2.DTO.auth.UserInfoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
@@ -28,6 +29,16 @@ public class UserController {
 	@Autowired
 	public UserController(UserService userService) {
 		this.userService = userService;
+	}
+
+	@GetMapping("/")
+	public ResponseEntity<?> getAll() {
+		List<UserInfoResponse> users = userService.getAllUsers();
+		if (users.isEmpty()) {
+			return ResponseEntity.ok().body(new MessageResponse("No hay clientes registrados."));
+		}
+
+		return ResponseEntity.ok(users);
 	}
 
 	@GetMapping("/topuser")

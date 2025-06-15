@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.repositories;
 
+import com.example.tbd_lab2.DTO.auth.UserInfoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
@@ -248,6 +249,38 @@ public class UserRepository {
 
 	// Inicio querys
 	// Buscar cliente que haya gastado mas
+
+	public List<UserInfoResponse> getAll() {
+		try {
+			String sql =
+				"SELECT id, username, first_name, last_name, rut, email, ST_AsText(location) AS location FROM users";
+
+			return jdbcTemplate.query(sql, (rs, rowNum) -> {
+				UserInfoResponse userInfoResponse = new UserInfoResponse();
+				userInfoResponse.setId(rs.getLong("id"));
+				userInfoResponse.setUsername(rs.getString("username"));
+				userInfoResponse.setFirstName(rs.getString("first_name"));
+				userInfoResponse.setLastName(rs.getString("last_name"));
+				userInfoResponse.setRut(rs.getString("rut"));
+				userInfoResponse.setEmail(rs.getString("email"));
+				String wkt = rs.getString("location");
+				if (wkt != null) {
+					try {
+						Geometry geom = reader.read(wkt);
+						userInfoResponse.setLocation((Point) geom);
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+
+				return userInfoResponse;
+			});
+		}
+		catch (EmptyResultDataAccessException e) {
+			System.out.println("No se pudieron recuperar los usuarios");
+			return null;
+		}
+	}
 	public TopClienteResponse findClienteWithMostSpending() {
 		try {
 			String sql =

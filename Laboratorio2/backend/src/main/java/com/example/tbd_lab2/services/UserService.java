@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.services;
 
+import com.example.tbd_lab2.DTO.auth.UserInfoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteGastoResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
 import com.example.tbd_lab2.DTO.cliente.ClienteZonaCoberturaDTO;
@@ -27,6 +28,8 @@ public class UserService {
 	public boolean eliminarCliente(Long id) {
 		return userRepository.deleteCliente(id);
 	}
+
+	public List<UserInfoResponse> getAllUsers() {return userRepository.getAll(); }
 
 	public List<ClienteGastoResponse> getAllClientsWithSpending() {
 		return userRepository.findAllClientsWithSpending();

@@ -14,12 +14,16 @@ import type {
   FarmaciaClosestDeliveryResponse,
   ClienteZonaCobertura,
   ClienteLejanoDeFarmacia,
+  UserInfoResponse,
 } from '@/api/models'
 
 const farmacias = ref<FarmaciaEntity[]>([])
 const selectedFarmaciaId = ref<number | null>(null)
 const entregasCercanas = ref<FarmaciaClosestDeliveryResponse[]>([])
 
+// Variables para usuarios y zona de cobertura
+const allUsers = ref<UserInfoResponse[]>([])
+const selectedUserId = ref<number | null>(null)
 const clienteId = ref<number | null>(null)
 const zonaCobertura = ref<ClienteZonaCobertura | null>(null)
 const coberturaError = ref<string | null>(null)
@@ -60,8 +64,6 @@ function loadLeaflet() {
   return leafletPromise;
 }
 
-
-// --- Funciones para crear íconos consistentes ---
 function createFarmaciaIcon() {
   return L.divIcon({
     html: `<div style="
@@ -138,7 +140,6 @@ async function initializeMap(container: HTMLElement, view: [number, number], zoo
   return map
 }
 
-
 function clearMapLayers(map: any, markers: any[]) {
   if (!map) return
   markers.forEach(layer => {
@@ -152,8 +153,10 @@ function clearMapLayers(map: any, markers: any[]) {
 onMounted(async () => {
   try {
     farmacias.value = await farmaciaService.getAllFarmacias()
+
+    allUsers.value = await userService.getAllUsers()
   } catch (error) {
-    console.error('Error fetching farmacias:', error)
+    console.error('Error fetching data:', error)
   }
 
   await nextTick()
@@ -197,7 +200,7 @@ watch(activeTab, async (newTab, oldTab) => {
       if(selectedFarmaciaId.value) renderEntregasCercanas();
     } else if (newTab === 'segundo' && !map2 && map2Container.value) {
       map2 = await initializeMap(map2Container.value, [-33.45, -70.65], 13)
-      if(clienteId.value) checkZonaCobertura();
+      if(selectedUserId.value) checkZonaCobertura();
     } else if (newTab === 'tercero' && !map3 && map3Container.value) {
       map3 = await initializeMap(map3Container.value, [-33.45, -70.65], 11)
       if(clientesLejanos.value.length > 0) fetchClientesLejanos();
@@ -216,6 +219,16 @@ watch(selectedFarmaciaId, async (id) => {
   }
 })
 
+watch(selectedUserId, async (userId) => {
+  if (userId == null) {
+    zonaCobertura.value = null;
+    coberturaError.value = null;
+    clearMapLayers(map2, markers2);
+    return;
+  }
+  clienteId.value = userId;
+  await checkZonaCobertura();
+})
 
 async function renderEntregasCercanas() {
   if (!map1 || selectedFarmaciaId.value == null) return;
@@ -300,7 +313,7 @@ async function renderEntregasCercanas() {
 
 async function checkZonaCobertura() {
   if (!clienteId.value) {
-    coberturaError.value = 'Por favor ingrese un ID de cliente';
+    coberturaError.value = 'Por favor seleccione un cliente';
     return;
   }
   if (!map2) {
@@ -520,20 +533,17 @@ async function fetchClientesLejanos() {
 
       <TabsContent value="segundo" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
         <div class="space-y-4">
-          <div class="p-4 bg-muted/30 border rounded-lg flex flex-wrap items-center gap-4">
-            <input
-                type="number"
-                v-model.number="clienteId"
-                placeholder="ID Cliente"
-                class="border rounded px-3 py-1.5 w-32 focus:outline-none focus:ring-2 focus:ring-primary"
-                @keyup.enter="checkZonaCobertura"
-            />
-            <button
-                class="bg-primary text-primary-foreground px-4 py-1.5 rounded hover:bg-primary/90 transition-colors"
-                @click="checkZonaCobertura"
+          <div class="p-4 bg-muted/30 border rounded-lg">
+            <label class="block text-sm font-medium mb-2">Seleccione Cliente:</label>
+            <select
+                v-model.number="selectedUserId"
+                class="w-full border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              Buscar Cliente
-            </button>
+              <option :value="null" disabled>Seleccione un cliente</option>
+              <option v-for="user in allUsers" :key="user.id" :value="user.id">
+                {{ user.firstName }} {{ user.lastName }} ({{ user.username }})
+              </option>
+            </select>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -572,7 +582,7 @@ async function fetchClientesLejanos() {
               <div v-else class="sticky top-0">
                 <h3 class="font-semibold mb-3 text-lg">Búsqueda de Cliente</h3>
                 <div class="p-4 bg-muted/30 rounded-lg">
-                  <p class="text-sm text-muted-foreground">Ingrese un ID de cliente para buscar su ubicación y zona de cobertura</p>
+                  <p class="text-sm text-muted-foreground">Seleccione un cliente para buscar su ubicación y zona de cobertura</p>
                 </div>
               </div>
             </div>

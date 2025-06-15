@@ -28,5 +28,14 @@ export const userService = {
             console.error(`Error fetching clientes lejanos for radius ${radiusKm}:`, error);
             throw error;
         }
+    },
+    getAllUsers: async (): Promise<UserInfoResponse[]> => {
+        try {
+            const response = await axiosInstance.get("/users/");
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching all users:", error);
+            throw error;
+        }
     }
 };
