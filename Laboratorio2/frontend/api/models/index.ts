@@ -40,10 +40,14 @@ export interface ClienteGasto {
 }
 
 export interface FarmaciaEntity {
-	idFarmacia: number;
-	nombreFarmacia: string;
-	direccion: string;
-	telefono?: string;
+        idFarmacia: number;
+        nombreFarmacia: string;
+        direccion: string;
+        telefono?: string;
+        ubicacion?: {
+                x: number;
+                y: number;
+        };
 }
 
 export interface ProductRequest {
@@ -80,4 +84,16 @@ export interface ClienteZonaCobertura {
     nombre: string;
     apellido: string;
     nombreSector: string;
+}
+
+export interface FarmaciaClosestDelivery {
+    nombreUsuario: string;
+    distanciaEntrega: number;
+}
+
+export interface ClienteLejanoDeFarmacia {
+    idCliente: number;
+    nombreCliente: string;
+    nombreFarmacia: string;
+    distanciaKm: number;
 }

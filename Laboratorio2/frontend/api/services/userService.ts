@@ -1,5 +1,5 @@
 import axiosInstance from "../axios";
-import type { ClienteGasto, ClienteZonaCobertura } from "@/api/models";
+import type { ClienteGasto, ClienteZonaCobertura, ClienteLejanoDeFarmacia } from "@/api/models";
 
 export const userService = {
 	getAllClientsWithSpending: async (): Promise<ClienteGasto[]> => {
@@ -17,6 +17,15 @@ export const userService = {
             return response.data;
         } catch (error) {
             console.error(`Error fetching zona de cobertura for client ID ${id}:`, error);
+            throw error;
+        }
+    },
+    getClientesLejanosDeFarmacia: async (radiusKm: number): Promise<ClienteLejanoDeFarmacia[]> => {
+        try {
+            const response = await axiosInstance.get(`/users/mas-lejanos-farmacia/${radiusKm}`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching clientes lejanos for radius ${radiusKm}:`, error);
             throw error;
         }
     }

@@ -49,17 +49,29 @@ class FarmaciaService {
 		}
 	}
 
-	async getFarmaciasRanking(): Promise<FarmaciaRanking[]> {
-		try {
-			const { data } =
-				await apiClient.get<FarmaciaRanking[]>("/farmacia/ranking");
-			console.log("Farmacia ranking data received:", data);
-			return data;
-		} catch (error) {
-			console.error("Error fetching farmacias ranking:", error);
-			throw error;
-		}
-	}
+        async getFarmaciasRanking(): Promise<FarmaciaRanking[]> {
+                try {
+                        const { data } =
+                                await apiClient.get<FarmaciaRanking[]>("/farmacia/ranking");
+                        console.log("Farmacia ranking data received:", data);
+                        return data;
+                } catch (error) {
+                        console.error("Error fetching farmacias ranking:", error);
+                        throw error;
+                }
+        }
+
+        async getEntregasCercanas(idFarmacia: number): Promise<FarmaciaClosestDelivery[]> {
+                try {
+                        const { data } = await apiClient.get<FarmaciaClosestDelivery[]>(
+                                `/farmacia/entregas-cercanas/${idFarmacia}`,
+                        );
+                        return data;
+                } catch (error) {
+                        console.error(`Error fetching entregas cercanas for farmacia ${idFarmacia}:`, error);
+                        throw error;
+                }
+        }
 }
 
 export default new FarmaciaService();
