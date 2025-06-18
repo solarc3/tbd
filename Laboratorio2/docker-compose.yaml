@@ -1,0 +1,55 @@
+services:
+  postgis:
+    image: postgis/postgis:15-3.3
+    container_name: postgis-container
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+      - backend_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - web_server
+      - backend_network
+    depends_on:
+      postgis:
+        condition: service_healthy
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - web_server
+    depends_on:
+      - postgis
+
+
+volumes:
+  postgis_data:
+
+networks:
+  postgres_network:
+    driver: bridge
+  backend_network:
+    driver: bridge
+  web_server:
+    driver: bridge
