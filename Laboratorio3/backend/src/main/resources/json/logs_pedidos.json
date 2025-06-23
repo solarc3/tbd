@@ -1,11 +1,10 @@
-// filepath: logs_pedidos.json
 [
   {
     "idPedido": 1,
     "eventos": [
       { "estado": "PENDIENTE", "timestamp": { "$date": "2025-06-20T14:00:00Z" } },
       { "estado": "CONFIRMADO", "timestamp": { "$date": "2025-06-20T14:05:00Z" } },
-      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-20T14:20:00Z" } },
+      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-20T14:20:00Z" } }
     ]
   },
   {
@@ -13,7 +12,7 @@
     "eventos": [
       { "estado": "PENDIENTE", "timestamp": { "$date": "2025-06-21T17:30:00Z" } },
       { "estado": "CONFIRMADO", "timestamp": { "$date": "2025-06-21T17:35:00Z" } },
-      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-21T17:50:00Z" } },
+      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-21T17:50:00Z" } }
     ]
   },
   {
@@ -21,7 +20,7 @@
     "eventos": [
       { "estado": "PENDIENTE", "timestamp": { "$date": "2025-06-22T11:00:00Z" } },
       { "estado": "CONFIRMADO", "timestamp": { "$date": "2025-06-22T11:10:00Z" } },
-      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-22T11:30:00Z" } },
+      { "estado": "ENTREGADO", "timestamp": { "$date": "2025-06-22T11:30:00Z" } }
     ]
   }
 ]
