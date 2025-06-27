@@ -3,8 +3,14 @@ package com.example.tbd_lab2.controller;
 import com.example.tbd_lab2.DTO.MessageResponse;
 import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
 import com.example.tbd_lab2.DTO.opinion.AgruparHoraResponse;
+import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.services.OpinionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +54,11 @@ public class OpinionesController {
 
     }
 
+    @Operation(summary = "[LAB 3] Obtener el promedio de puntuación por empresa o farmacia.", description = "Implementación de consulta 1: Tomar del log el id de los pedidos y hacer un 'JOIN' con la tabla de farmcia, luego de manera funcional se va mapeando y con la función average() se computa el promedio x log.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Para cada farmacia, se le asocia un promedio, notar que solo se entrega el nombre de la farmacia; si es necesario se puede modificar para obtener el objeto farmacia.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = FarmaciaPromedioDTO.class)))
+    })
     @GetMapping("/farmacia/promedio")
     public ResponseEntity<?> getPromedioPuntuacionPorFarmacia() {
         List<FarmaciaPromedioDTO> promedios = opinionService.getPromedioPuntuacionPorFarmacia();

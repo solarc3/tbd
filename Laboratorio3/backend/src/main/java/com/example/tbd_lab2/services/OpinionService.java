@@ -96,7 +96,7 @@ public class OpinionService {
     public AgruparHoraResponse getOpinionesByHoras(){
         List<OpinionesClientesCollection> opiniones = opinionesClientesRepository.findAll();
 
-        Map<Integer, OpinionesClientesCollection> opinionesPorHora = new HashMap<>(Map.of());
+        LinkedHashMap<Integer, OpinionesClientesCollection> opinionesPorHora = new LinkedHashMap<>();
 
         LocalDateTime fecha = LocalDateTime.now();
         for(OpinionesClientesCollection opinion : opiniones){

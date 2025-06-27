@@ -1,5 +1,6 @@
 package com.example.tbd_lab2.controller;
 
+import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.DTO.repartidor.*;
 import com.example.tbd_lab2.entities.RepartidorEntity;
 import com.example.tbd_lab2.services.RepartidorService;
@@ -64,6 +65,11 @@ public class RepartidorController {
         return ResponseEntity.ok(distanciasTotalDTOS);
     }
 
+    @Operation(summary = "[LAB 3] Analizar las rutas más frecuentes de repartidores en los últimos 7 días.", description = "Implementación de consulta 4: Agrupa por repartidor y por medio de agregate va entregando la frecuencia por punto, solo toma en cuenta la parte entera de la coordenada.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Para cada repartidor que esté siendo logueado, se entrega la ruta cómo un cjto de puntos con su timestamp (sampleo) y la frecuencia de la dicha ruta.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RepartidorRutasFrecuentesDTO.class)))
+    })
     @GetMapping("/rutas-frecuentes")
     public ResponseEntity<List<RepartidorRutasFrecuentesDTO>> getRutasFrecuentes() {
         List<RepartidorRutasFrecuentesDTO> rutas = repartidorService.getRutasFrecuentesUltimos7Dias();
