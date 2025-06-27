@@ -16,9 +16,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class AgruparHoraResponse {
 
-    private LinkedHashMap<Integer, OpinionesClientesCollection> opiniones;
-
-    public void putOpinion(int opinionId, OpinionesClientesCollection opinion) {
-        opiniones.put(opinionId, opinion);
-    }
+    private LinkedHashMap<Integer, List<OpinionesClientesCollection>> opiniones;
 }

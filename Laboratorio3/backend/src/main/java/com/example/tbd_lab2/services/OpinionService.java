@@ -93,19 +93,17 @@ public class OpinionService {
                 .collect(Collectors.toList());
     }
 
-    public AgruparHoraResponse getOpinionesByHoras(){
-        List<OpinionesClientesCollection> opiniones = opinionesClientesRepository.findAll();
+    public AgruparHoraResponse getOpinionesByHoras() {
+    List<OpinionesClientesCollection> opiniones = opinionesClientesRepository.findAll();
 
-        LinkedHashMap<Integer, OpinionesClientesCollection> opinionesPorHora = new LinkedHashMap<>();
-
-        LocalDateTime fecha = LocalDateTime.now();
-        for(OpinionesClientesCollection opinion : opiniones){
-            fecha = opinion.getFecha();
-            int comparacion = fecha.getHour();
-            opinionesPorHora.put(comparacion, opinion);
-        }
-        AgruparHoraResponse response = new AgruparHoraResponse();
-        response.setOpiniones(opinionesPorHora);
-        return response;
-    }
+    LinkedHashMap<Integer, List<OpinionesClientesCollection>> opinionesPorHora = opiniones.stream()
+        .collect(Collectors.groupingBy(
+            opinion -> opinion.getFecha().getHour(),
+            LinkedHashMap::new,
+            Collectors.toList()
+        ));
+    AgruparHoraResponse response = new AgruparHoraResponse();
+    response.setOpiniones(opinionesPorHora);
+    return response;
+}
 }
