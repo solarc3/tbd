@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class AgruparHoraResponse {
 
-    private Map<Integer, OpinionesClientesCollection> opiniones;
-
-    public void putOpinion(int opinionId, OpinionesClientesCollection opinion) {
-        opiniones.put(opinionId, opinion);
-    }
+    private LinkedHashMap<Integer, List<OpinionesClientesCollection>> opiniones;
 }
