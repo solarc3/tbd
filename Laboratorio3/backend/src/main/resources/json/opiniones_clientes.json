@@ -33,5 +33,12 @@
     "fecha": "2025-06-23T09:05:00Z",
     "idCliente": 4,
     "idPedido": 5
+  },
+  {
+    "comentarios": "Mala experiencia en general. El seguimiento del pedido fue muy útil.",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 4,
+    "idPedido": 5
   }
 ]

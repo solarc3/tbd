@@ -94,25 +94,18 @@ public class OpinionService {
     }
 
     public AgruparHoraResponse getOpinionesByHoras(){
-        //Map<Integer,List<OpinionesClientesCollection>> opinionesPorHora;
         List<OpinionesClientesCollection> opiniones = opinionesClientesRepository.findAll();
 
-        AgruparHoraResponse opinionesPorHora = new AgruparHoraResponse();
-        ArrayList<String> horas = new ArrayList<>();
+        Map<Integer, OpinionesClientesCollection> opinionesPorHora = new HashMap<>(Map.of());
 
         LocalDateTime fecha = LocalDateTime.now();
-        for(int i = 0; i < 24 ; i++) {
-            for(OpinionesClientesCollection opinion : opiniones){
-                fecha = opinion.getFecha();
-                int comparacion = fecha.getHour();
-                if(comparacion > i){
-                    if (comparacion < i+1){
-                        opinionesPorHora.getOpiniones().put(i,opinion);
-                        opiniones.remove(opinion);
-                    }
-                }
-            }
+        for(OpinionesClientesCollection opinion : opiniones){
+            fecha = opinion.getFecha();
+            int comparacion = fecha.getHour();
+            opinionesPorHora.put(comparacion, opinion);
         }
-        return opinionesPorHora;
+        AgruparHoraResponse response = new AgruparHoraResponse();
+        response.setOpiniones(opinionesPorHora);
+        return response;
     }
 }

@@ -2,6 +2,7 @@ package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.MessageResponse;
 import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
+import com.example.tbd_lab2.DTO.opinion.AgruparHoraResponse;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.services.OpinionService;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/opiniones")
@@ -39,7 +41,12 @@ public class OpinionesController {
         return ResponseEntity.ok().body(opiniones);
     }
 
-    // @GetMapping("/Opi")
+    @GetMapping("/opiniones-por-hora")
+    public ResponseEntity<?> getOpinionesPorHora() {
+        AgruparHoraResponse opiniones = opinionService.getOpinionesByHoras();
+        return ResponseEntity.ok().body(Objects.requireNonNullElseGet(opiniones, () -> new MessageResponse("No existen opiniones...")));
+
+    }
 
     @GetMapping("/farmacia/promedio")
     public ResponseEntity<?> getPromedioPuntuacionPorFarmacia() {
@@ -49,5 +56,6 @@ public class OpinionesController {
         }
         return ResponseEntity.ok().body(promedios);
     }
+
 
 }
