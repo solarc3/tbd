@@ -1,6 +1,7 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.MessageResponse;
+import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.services.OpinionService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,17 @@ public class OpinionesController {
             return ResponseEntity.ok().body(new MessageResponse("No existen opiniones para este usuario"));
         }
         return ResponseEntity.ok().body(opiniones);
+    }
+
+    // @GetMapping("/Opi")
+
+    @GetMapping("/farmacia/promedio")
+    public ResponseEntity<?> getPromedioPuntuacionPorFarmacia() {
+        List<FarmaciaPromedioDTO> promedios = opinionService.getPromedioPuntuacionPorFarmacia();
+        if (promedios.isEmpty()) {
+            return ResponseEntity.ok().body(new MessageResponse("No hay suficientes datos para calcular promedios por farmacia."));
+        }
+        return ResponseEntity.ok().body(promedios);
     }
 
 }

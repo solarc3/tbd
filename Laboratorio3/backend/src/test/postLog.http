@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/log/
+Content-Type: application/json
+
+{
+  "idCliente": 1,
+  "tipo": "compra",
+  "valor": "aaaaa",
+  "timestamp": "2025-06-20T14:02:00Z"
+}

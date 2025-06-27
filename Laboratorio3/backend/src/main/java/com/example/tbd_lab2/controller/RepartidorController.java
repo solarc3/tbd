@@ -1,9 +1,6 @@
 package com.example.tbd_lab2.controller;
 
-import com.example.tbd_lab2.DTO.repartidor.RepartidorDistanciaTotalDTO;
-import com.example.tbd_lab2.DTO.repartidor.RepartidorInfoResponse;
-import com.example.tbd_lab2.DTO.repartidor.RepartidorMejorRendimientoResponse;
-import com.example.tbd_lab2.DTO.repartidor.RepartidorTiempoPromedioResponse;
+import com.example.tbd_lab2.DTO.repartidor.*;
 import com.example.tbd_lab2.entities.RepartidorEntity;
 import com.example.tbd_lab2.services.RepartidorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,5 +62,11 @@ public class RepartidorController {
             return ResponseEntity.ok().body("No hay datos de distancia total para los repartidores.");
         }
         return ResponseEntity.ok(distanciasTotalDTOS);
+    }
+
+    @GetMapping("/rutas-frecuentes")
+    public ResponseEntity<List<RepartidorRutasFrecuentesDTO>> getRutasFrecuentes() {
+        List<RepartidorRutasFrecuentesDTO> rutas = repartidorService.getRutasFrecuentesUltimos7Dias();
+        return ResponseEntity.ok(rutas);
     }
 }

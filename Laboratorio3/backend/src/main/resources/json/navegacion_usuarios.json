@@ -2,16 +2,18 @@
   {
     "idCliente": 1,
     "eventos": [
-      { "tipo": "busqueda", "valor": "aspirina", "timestamp": { "$date": "2025-06-20T13:55:00Z" } },
-      { "tipo": "filtro", "valor": "marca:bayer", "timestamp": { "$date": "2025-06-20T13:56:00Z" } },
-      { "tipo": "click", "valor": "producto_45", "timestamp": { "$date": "2025-06-20T13:57:00Z" } }
+      { "tipo": "busqueda", "valor": "aspirina", "timestamp": "2025-06-20T13:55:00Z" },
+      { "tipo": "filtro", "valor": "marca:bayer", "timestamp": "2025-06-20T13:56:00Z" },
+      { "tipo": "click", "valor": "producto_45", "timestamp": "2025-06-20T13:57:00Z" },
+      { "tipo": "compra", "valor": "producto_45", "timestamp": "2025-06-20T14:02:00Z" },
+      { "tipo": "compra", "valor": "producto_48", "timestamp": "2025-06-20T14:02:00Z" }
     ]
   },
   {
     "idCliente": 2,
     "eventos": [
-      { "tipo": "busqueda", "valor": "paracetamol", "timestamp": { "$date": "2025-06-21T17:25:00Z" } },
-      { "tipo": "click", "valor": "producto_82", "timestamp": { "$date": "2025-06-21T17:26:00Z" } }
+      { "tipo": "busqueda", "valor": "paracetamol", "timestamp": "2025-06-21T17:25:00Z" },
+      { "tipo": "click", "valor": "producto_82", "timestamp": "2025-06-21T17:26:00Z" }
     ]
   }
 ]

@@ -1,10 +1,7 @@
 package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
-import com.example.tbd_lab2.DTO.farmacia.FarmaciaClosestDeliveryResponse;
-import com.example.tbd_lab2.DTO.farmacia.FarmaciaPedidoFallidoResponse;
-import com.example.tbd_lab2.DTO.farmacia.FarmaciaPuntoEntregaLejanaResponse;
-import com.example.tbd_lab2.DTO.farmacia.RankingFarmaciaPedidoResponse;
+import com.example.tbd_lab2.DTO.farmacia.*;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.services.FarmaciaService;
 import java.util.List;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class FarmaciaController {
 
 	private final FarmaciaService farmaciaService;
-
 	@Autowired
 	public FarmaciaController(FarmaciaService farmaciaService) {
 		this.farmaciaService = farmaciaService;
@@ -103,4 +99,6 @@ public class FarmaciaController {
 
 		return ResponseEntity.ok(farmacias);
 	}
+
+
 }
