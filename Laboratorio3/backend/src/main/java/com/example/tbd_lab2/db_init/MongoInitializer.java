@@ -2,11 +2,11 @@ package com.example.tbd_lab2.db_init;
 
 import com.example.tbd_lab2.collections.HistorialRepartidoresCollection;
 import com.example.tbd_lab2.collections.LogsPedidosCollection;
-import com.example.tbd_lab2.collections.NavegacionUsuariosCollection;
+import com.example.tbd_lab2.collections.NavegacionLog;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.repositories.HistorialRepartidoresRepository;
 import com.example.tbd_lab2.repositories.LogsPedidosRepository;
-import com.example.tbd_lab2.repositories.NavegacionUsuariosRepository;
+import com.example.tbd_lab2.repositories.NavegacionLogRepository;
 import com.example.tbd_lab2.repositories.OpinionesClientesRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,20 +27,20 @@ public class MongoInitializer implements CommandLineRunner {
 
     private final HistorialRepartidoresRepository historialRepartidoresRepository;
     private final LogsPedidosRepository logsPedidosRepository;
-    private final NavegacionUsuariosRepository navegacionUsuariosRepository;
+    private final NavegacionLogRepository navegacionLogRepository;
     private final OpinionesClientesRepository opinionesClientesRepository;
 
     public MongoInitializer(@Qualifier("webApplicationContext") ResourceLoader resourceLoader,
                             ObjectMapper objectMapper,
                             HistorialRepartidoresRepository historialRepartidoresRepository,
                             LogsPedidosRepository logsPedidosRepository,
-                            NavegacionUsuariosRepository navegacionUsuariosRepository,
+                            NavegacionLogRepository navegacionLogRepository,
                             OpinionesClientesRepository opinionesClientesRepository) {
         this.resourceLoader = resourceLoader;
         this.objectMapper = objectMapper;
         this.historialRepartidoresRepository = historialRepartidoresRepository;
         this.logsPedidosRepository = logsPedidosRepository;
-        this.navegacionUsuariosRepository = navegacionUsuariosRepository;
+        this.navegacionLogRepository = navegacionLogRepository; // <-- CAMBIO
         this.opinionesClientesRepository = opinionesClientesRepository;
     }
 
@@ -69,10 +69,11 @@ public class MongoInitializer implements CommandLineRunner {
         // Navegacion Usuarios
         Resource navegacionResource = resourceLoader.getResource("classpath:json/navegacion_usuarios.json");
         try (InputStream inputStream = navegacionResource.getInputStream()) {
-            navegacionUsuariosRepository.deleteAll();
-            NavegacionUsuariosCollection[] navegaciones = objectMapper.readValue(inputStream, NavegacionUsuariosCollection[].class);
-            navegacionUsuariosRepository.saveAll(Arrays.asList(navegaciones));
+            navegacionLogRepository.deleteAll();
+            NavegacionLog[] navegaciones = objectMapper.readValue(inputStream, NavegacionLog[].class);
+            navegacionLogRepository.saveAll(Arrays.asList(navegaciones));
         }
+
 
         // Opiniones Clientes
         Resource opinionesResource = resourceLoader.getResource("classpath:json/opiniones_clientes.json");

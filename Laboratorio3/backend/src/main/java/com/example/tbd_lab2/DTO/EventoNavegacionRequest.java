@@ -10,8 +10,12 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventoNavegacionRequest {
-    private Long idCliente;
+    private Long id;
+    private Long clientId;
     private String tipo; // "busqueda", "click", "filtro", "compra"
     private String valor;
+    private String direccion;
+    private String from;
+    private String to;
     private Date timestamp;
 }
