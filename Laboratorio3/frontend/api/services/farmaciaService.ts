@@ -36,6 +36,7 @@ class FarmaciaService {
 			throw error;
 		}
 	}
+
 	async getFarmaciasFalladas(): Promise<FarmaciaFallada[]> {
 		try {
 			const { data } = await apiClient.get<FarmaciaFallada[]>(
@@ -49,29 +50,41 @@ class FarmaciaService {
 		}
 	}
 
-        async getFarmaciasRanking(): Promise<FarmaciaRanking[]> {
-                try {
-                        const { data } =
-                                await apiClient.get<FarmaciaRanking[]>("/farmacia/ranking");
-                        console.log("Farmacia ranking data received:", data);
-                        return data;
-                } catch (error) {
-                        console.error("Error fetching farmacias ranking:", error);
-                        throw error;
-                }
-        }
+	async getFarmaciasRanking(): Promise<FarmaciaRanking[]> {
+			try {
+					const { data } =
+							await apiClient.get<FarmaciaRanking[]>("/farmacia/ranking");
+					console.log("Farmacia ranking data received:", data);
+					return data;
+			} catch (error) {
+					console.error("Error fetching farmacias ranking:", error);
+					throw error;
+			}
+	}
 
-        async getEntregasCercanas(idFarmacia: number): Promise<FarmaciaClosestDeliveryResponse[]> {
-                try {
-                        const { data } = await apiClient.get<FarmaciaClosestDeliveryResponse[]>(
-                                `/farmacia/entregas-cercanas/${idFarmacia}`,
-                        );
-                        return data;
-                } catch (error) {
-                        console.error(`Error fetching entregas cercanas for farmacia ${idFarmacia}:`, error);
-                        throw error;
-                }
-        }
+	async getEntregasCercanas(idFarmacia: number): Promise<FarmaciaClosestDeliveryResponse[]> {
+			try {
+					const { data } = await apiClient.get<FarmaciaClosestDeliveryResponse[]>(
+							`/farmacia/entregas-cercanas/${idFarmacia}`,
+					);
+					return data;
+			} catch (error) {
+					console.error(`Error fetching entregas cercanas for farmacia ${idFarmacia}:`, error);
+					throw error;
+			}
+	}
+
+	async getPromedioPuntuacionPorFarmacia(): Promise<{ nombreFarmacia: string; promedio: number }[]> {
+		try {
+			const { data } = await apiClient.get<{ nombreFarmacia: string; promedio: number }[]>(
+				"/opiniones/farmacia/promedio"
+			);
+			return data;
+		} catch (error) {
+			console.error("Error fetching promedio puntuación por farmacia:", error);
+			throw error;
+		}
+	}
 }
 
 export default new FarmaciaService();

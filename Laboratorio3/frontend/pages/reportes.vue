@@ -42,6 +42,64 @@
       </div>
     </div>
 
+    <!-- query 1 - lab 3 -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">Promedio de puntuación por farmacia</h2>
+      <div v-if="loadingPromedioFarmacias" class="flex justify-center items-center h-[200px]">
+        <p>Cargando datos...</p>
+      </div>
+      <div v-else>
+        <div v-if="promedioFarmacias.length === 0" class="text-center text-gray-500 py-10">
+          No hay datos disponibles
+        </div>
+        <ul v-else class="divide-y divide-gray-200">
+          <li v-for="farmacia in promedioFarmacias" :key="farmacia.nombreFarmacia" class="py-3 flex items-center justify-between">
+            <span class="font-medium text-gray-800">{{ farmacia.nombreFarmacia }}</span>
+            <span class="flex items-center gap-1">
+              <span class="text-yellow-500 font-bold">{{ (farmacia.promedio ?? 0).toFixed(1) }}</span>
+              <span class="flex">
+                <template v-for="i in 5" :key="i">
+                  <!-- para que la estrella este llena (valores cerrados como 5.0 o 2.0 por ejemplop !) -->
+                  <svg
+                    v-if="i <= Math.floor(farmacia.promedio)"
+                    class="w-4 h-4"
+                    viewBox="0 0 20 20"
+                  >
+                    <path fill="#facc15" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
+                  </svg>
+                  <!-- estrella a la mitad para valores como 2.5 !! -->
+                  <svg
+                    v-else-if="i === Math.floor(farmacia.promedio) + 1 && farmacia.promedio % 1 >= 0.5"
+                    class="w-4 h-4"
+                    viewBox="0 0 20 20"
+                  >
+                    <defs>
+                      <linearGradient :id="`half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i}`" x1="0%" x2="100%" y1="0%" y2="0%">
+                        <stop offset="50%" stop-color="#facc15"/>
+                        <stop offset="50%" stop-color="#d1d5db"/>
+                      </linearGradient>
+                    </defs>
+                    <path
+                      :fill="`url(#half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i})`"
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"
+                    />
+                  </svg>
+                  <!-- estrella vacia para literal las que no tienen nada lol -->
+                  <svg
+                    v-else
+                    class="w-4 h-4"
+                    viewBox="0 0 20 20"
+                  >
+                    <path fill="#d1d5db" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
+                  </svg>
+                </template>
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <!-- Pedidos -->
     <div v-if="activeTab === 'pedidos'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow-md p-6">
@@ -100,6 +158,7 @@
         </div>
       </div>
 
+      <!-- query 3 - lab 3 -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">
           Pedidos con más de 3 cambios de estado en menos de 3 minutos
@@ -132,7 +191,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -380,6 +438,10 @@ const topProductsByCategoryOptions = reactive({
 const loadingPedidosCruzaZonas = ref(true);
 const pedidosCruzaZonas = ref<PedidoCruzaZonas[]>([]);
 
+// query 1 - lab 3 !!
+const loadingPromedioFarmacias = ref(true);
+const promedioFarmacias = ref<{ nombreFarmacia: string; promedio: number }[]>([]);
+
 // query 3 - lab 3 !!
 const loadingPedidosCambiosRapidos = ref(true);
 const pedidosCambiosRapidos = ref<any[]>([]);
@@ -580,6 +642,20 @@ onMounted(async () => {
     pedidosCambiosRapidos.value = [];
   } finally {
     loadingPedidosCambiosRapidos.value = false;
+  }
+
+  // query 1 - promedio de puntuacion por farmacia
+  try {
+    loadingPromedioFarmacias.value = true
+    const data = await farmaciaService.getPromedioPuntuacionPorFarmacia()
+    promedioFarmacias.value = data.map(f => ({
+      nombreFarmacia: f.nombreFarmacia,
+      promedio: f.promedioPuntuacion ?? 0
+    }))
+  } catch (error) {
+    promedioFarmacias.value = []
+  } finally {
+    loadingPromedioFarmacias.value = false
   }
 })
 
