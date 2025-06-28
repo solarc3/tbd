@@ -7,19 +7,18 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          'border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
-        secondary:
-          'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
-        destructive:
-         'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-        outline:
-          'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+        default: 'bg-gray-100 text-gray-800 border-transparent',
+        secondary: 'bg-gray-200 text-gray-800 border-transparent',
+        destructive: 'bg-red-100 text-red-800 border-red-200',
+        outline: 'border border-gray-300 text-gray-800 bg-transparent',
+        success: 'bg-green-100 text-green-800 border-green-200',
+        info: 'bg-blue-100 text-blue-800 border-blue-200',
+        warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       },
     },
     defaultVariants: {
       variant: 'default',
     },
-  },
+  }
 )
 export type BadgeVariants = VariantProps<typeof badgeVariants>

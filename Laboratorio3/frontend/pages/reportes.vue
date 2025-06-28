@@ -99,6 +99,40 @@
           </div>
         </div>
       </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">
+          Pedidos con más de 3 cambios de estado en menos de 3 minutos
+        </h2>
+        <div v-if="loadingPedidosCambiosRapidos" class="flex justify-center items-center h-[200px]">
+          <p>Cargando datos...</p>
+        </div>
+        <div v-else>
+          <div v-if="pedidosCambiosRapidos.length === 0" class="text-center text-gray-500 py-10">
+            No hay pedidos que cumplan este criterio.
+          </div>
+          <div v-else>
+            <ul class="divide-y divide-gray-200">
+              <li v-for="pedido in pedidosCambiosRapidos" :key="pedido.idPedido" class="py-3">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <span class="font-medium text-black-700">Pedido #{{ pedido.idPedido }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <Badge :variant="getEstadoVariant(pedido.estadoPedido)">
+                      {{ pedido.estadoPedido }}
+                    </Badge>
+                  </div>
+                  <div class="text-gray-500 text-sm mt-1 md:mt-0">
+                    Fecha: {{ pedido.fechaPedido.replace('T', ' ').slice(0, 16) }}
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -110,6 +144,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, PieChart } from 'echarts/charts'
 import { LegendComponent, GridComponent, TooltipComponent, TitleComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
+import { Badge } from "~/components/ui/badge";
 
 // importar apis
 import { farmaciaService, repartidorService, pedidoService, productoService } from '@/api/services'
@@ -275,7 +310,7 @@ const farmaciaMayorVolumenOptions = reactive({
     data: [] as string[],
     axisLabel: {
       interval: 0,
-      rotate: 30  // Rotate labels for better visibility
+      rotate: 30
     }
   },
   yAxis: {
@@ -344,6 +379,25 @@ const topProductsByCategoryOptions = reactive({
 
 const loadingPedidosCruzaZonas = ref(true);
 const pedidosCruzaZonas = ref<PedidoCruzaZonas[]>([]);
+
+// query 3 - lab 3 !!
+const loadingPedidosCambiosRapidos = ref(true);
+const pedidosCambiosRapidos = ref<any[]>([]);
+
+const getEstadoVariant = (estado: string) => {
+  switch (estado) {
+    case "ENTREGADO":
+      return "success";
+    case "CONFIRMADO":
+      return "info";
+    case "POR_CONFIRMAR":
+      return "warning";
+    case "CANCELADO":
+      return "destructive";
+    default:
+      return "default";
+  }
+};
 
 onMounted(async () => {
   try {
@@ -514,6 +568,18 @@ onMounted(async () => {
     pedidosCruzaZonas.value = [];
   } finally {
     loadingPedidosCruzaZonas.value = false;
+  }
+
+  // query 3 - pedidos con mas de 3 cambios de estado en menos de 3 minutos
+  try {
+    loadingPedidosCambiosRapidos.value = true;
+    const data = await pedidoService.getPedidosCambiosRapidos();
+    pedidosCambiosRapidos.value = data && data.pedidos ? data.pedidos : [];
+  } catch (error) {
+    console.error('Error fetching pedidos cambios rápidos:', error);
+    pedidosCambiosRapidos.value = [];
+  } finally {
+    loadingPedidosCambiosRapidos.value = false;
   }
 })
 

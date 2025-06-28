@@ -80,6 +80,11 @@ class PedidoService {
     const { data } = await apiClient.get<PedidoCruzaZonas[]>(`/pedido/cruza-zonas-reparto/${sectorAmount}`)
     return data
   }
+
+  async getPedidosCambiosRapidos(): Promise<any> {
+    const { data } = await apiClient.get('/pedido/logs/cambios-rapidos');
+    return data;
+  }
 }
 
 export default new PedidoService()
