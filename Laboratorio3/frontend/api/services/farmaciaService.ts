@@ -74,6 +74,7 @@ class FarmaciaService {
 			}
 	}
 
+	// querys lab 3
 	async getPromedioPuntuacionPorFarmacia(): Promise<{ nombreFarmacia: string; promedio: number }[]> {
 		try {
 			const { data } = await apiClient.get<{ nombreFarmacia: string; promedio: number }[]>(
@@ -84,6 +85,16 @@ class FarmaciaService {
 			console.error("Error fetching promedio puntuación por farmacia:", error);
 			throw error;
 		}
+	}
+
+	async getOpinionesPorHora(): Promise<{ [hora: string]: any[] }> {
+	  try {
+	    const { data } = await apiClient.get<{ opiniones: { [hora: string]: any[] } }>("/opiniones/opiniones-por-hora");
+	    return data.opiniones;
+	  } catch (error) {
+	    console.error("Error fetching opiniones por hora:", error);
+	    throw error;
+	  }
 	}
 }
 

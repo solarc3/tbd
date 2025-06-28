@@ -20,6 +20,14 @@
       >
         Pedidos
       </button>
+
+      <button
+          @click="activeTab = 'valoraciones'"
+          :class="activeTab === 'valoraciones' ? 'border-blue-500 text-blue-500' : 'border-gray-300 text-gray-700'"
+          class="w-full px-6 py-2 bg-white rounded-full border text-lg font-medium shadow-sm"
+      >
+        Valoraciones
+      </button>
     </div>
 
     <!-- Farmacias -->
@@ -43,60 +51,62 @@
     </div>
 
     <!-- query 1 - lab 3 -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">Promedio de puntuación por farmacia</h2>
-      <div v-if="loadingPromedioFarmacias" class="flex justify-center items-center h-[200px]">
-        <p>Cargando datos...</p>
-      </div>
-      <div v-else>
-        <div v-if="promedioFarmacias.length === 0" class="text-center text-gray-500 py-10">
-          No hay datos disponibles
+    <div v-if="activeTab === 'farmacias' || activeTab === 'valoraciones'" class="bg-white rounded-lg shadow-md p-6">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Promedio de puntuación por farmacia</h2>
+        <div v-if="loadingPromedioFarmacias" class="flex justify-center items-center h-[200px]">
+          <p>Cargando datos...</p>
         </div>
-        <ul v-else class="divide-y divide-gray-200">
-          <li v-for="farmacia in promedioFarmacias" :key="farmacia.nombreFarmacia" class="py-3 flex items-center justify-between">
-            <span class="font-medium text-gray-800">{{ farmacia.nombreFarmacia }}</span>
-            <span class="flex items-center gap-1">
-              <span class="text-yellow-500 font-bold">{{ (farmacia.promedio ?? 0).toFixed(1) }}</span>
-              <span class="flex">
-                <template v-for="i in 5" :key="i">
-                  <!-- para que la estrella este llena (valores cerrados como 5.0 o 2.0 por ejemplop !) -->
-                  <svg
-                    v-if="i <= Math.floor(farmacia.promedio)"
-                    class="w-4 h-4"
-                    viewBox="0 0 20 20"
-                  >
-                    <path fill="#facc15" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
-                  </svg>
-                  <!-- estrella a la mitad para valores como 2.5 !! -->
-                  <svg
-                    v-else-if="i === Math.floor(farmacia.promedio) + 1 && farmacia.promedio % 1 >= 0.5"
-                    class="w-4 h-4"
-                    viewBox="0 0 20 20"
-                  >
-                    <defs>
-                      <linearGradient :id="`half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i}`" x1="0%" x2="100%" y1="0%" y2="0%">
-                        <stop offset="50%" stop-color="#facc15"/>
-                        <stop offset="50%" stop-color="#d1d5db"/>
-                      </linearGradient>
-                    </defs>
-                    <path
-                      :fill="`url(#half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i})`"
-                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"
-                    />
-                  </svg>
-                  <!-- estrella vacia para literal las que no tienen nada lol -->
-                  <svg
-                    v-else
-                    class="w-4 h-4"
-                    viewBox="0 0 20 20"
-                  >
-                    <path fill="#d1d5db" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
-                  </svg>
-                </template>
+        <div v-else>
+          <div v-if="promedioFarmacias.length === 0" class="text-center text-gray-500 py-10">
+            No hay datos disponibles
+          </div>
+          <ul v-else class="divide-y divide-gray-200">
+            <li v-for="farmacia in promedioFarmacias" :key="farmacia.nombreFarmacia" class="py-3 flex items-center justify-between">
+              <span class="font-medium text-gray-800">{{ farmacia.nombreFarmacia }}</span>
+              <span class="flex items-center gap-1">
+                <span class="text-yellow-500 font-bold">{{ (farmacia.promedio ?? 0).toFixed(1) }}</span>
+                <span class="flex">
+                  <template v-for="i in 5" :key="i">
+                    <!-- para que la estrella este llena (valores cerrados como 5.0 o 2.0 por ejemplop !) -->
+                    <svg
+                      v-if="i <= Math.floor(farmacia.promedio)"
+                      class="w-4 h-4"
+                      viewBox="0 0 20 20"
+                    >
+                      <path fill="#facc15" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
+                    </svg>
+                    <!-- estrella a la mitad para valores como 2.5 !! -->
+                    <svg
+                      v-else-if="i === Math.floor(farmacia.promedio) + 1 && farmacia.promedio % 1 >= 0.5"
+                      class="w-4 h-4"
+                      viewBox="0 0 20 20"
+                    >
+                      <defs>
+                        <linearGradient :id="`half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i}`" x1="0%" x2="100%" y1="0%" y2="0%">
+                          <stop offset="50%" stop-color="#facc15"/>
+                          <stop offset="50%" stop-color="#d1d5db"/>
+                        </linearGradient>
+                      </defs>
+                      <path
+                        :fill="`url(#half-grad-${farmacia.nombreFarmacia.replace(/\s+/g, '_')}-${i})`"
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"
+                      />
+                    </svg>
+                    <!-- estrella vacia para literal las que no tienen nada lol -->
+                    <svg
+                      v-else
+                      class="w-4 h-4"
+                      viewBox="0 0 20 20"
+                    >
+                      <path fill="#d1d5db" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/>
+                    </svg>
+                  </template>
+                </span>
               </span>
-            </span>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -192,14 +202,30 @@
         </div>
       </div>
     </div>
+
+    <!-- valoraciones -->
+    <div v-if="activeTab === 'valoraciones'" class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">Valoraciones por hora del día</h2>
+      <div class="mb-4 flex items-center gap-4">
+        <label class="font-medium text-gray-700">Selecciona un día:</label>
+        <input type="date" v-model="selectedDate" class="border rounded px-2 py-1" />
+      </div>
+      <div v-if="loadingOpinionesPorHora" class="flex justify-center items-center h-[200px]">
+        <p>Cargando datos...</p>
+      </div>
+      <div v-else>
+        <v-chart :option="opinionesPorHoraOptions" style="height: 400px;" />
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, reactive } from 'vue'
+import { computed, ref, onMounted, reactive, watch } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, PieChart } from 'echarts/charts'
+import { BarChart, PieChart, LineChart } from 'echarts/charts'
 import { LegendComponent, GridComponent, TooltipComponent, TitleComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 import { Badge } from "~/components/ui/badge";
@@ -207,6 +233,8 @@ import { Badge } from "~/components/ui/badge";
 // importar apis
 import { farmaciaService, repartidorService, pedidoService, productoService } from '@/api/services'
 import type { PedidoCruzaZonas } from '@/api/models';
+
+use([CanvasRenderer, BarChart, PieChart, LineChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
 
 // verificacion cliente nomas
 if (typeof window !== 'undefined') {
@@ -300,7 +328,7 @@ const mediosPagoUrgentesOptions = reactive({
       type: 'bar',
       data: [] as number[],
       itemStyle: {
-        color: '#fb7e00',
+        color: '#f87e02',
       },
     },
   ],
@@ -460,6 +488,83 @@ const getEstadoVariant = (estado: string) => {
       return "default";
   }
 };
+
+// query 6 - lab 3 !!
+const loadingOpinionesPorHora = ref(true);
+const opinionesPorHoraRaw = ref<{ [hora: string]: any[] }>({});
+const selectedDate = ref(new Date().toISOString().slice(0, 10));
+
+// filtrar opiniones por fecha seleccionada y agrupar por hora
+const opinionesPorHoraOptions: Ref<EChartsOption> = ref({
+  title: { text: 'Satisfacción promedio por hora', left: 'center' },
+  tooltip: {
+    trigger: 'axis',
+    formatter: (params: any) => {
+      const [line, bar] = params
+      return `
+        Hora: ${line.axisValue}<br>
+        Promedio de puntuación: <b>${line.data?.toFixed(2) ?? '-'}</b><br>
+        Cantidad de opiniones: <b>${bar.data ?? 0}</b>
+      `
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+    name: 'Hora del día'
+  },
+  yAxis: [
+    { type: 'value', name: 'Promedio', min: 0, max: 5 },
+    { type: 'value', name: 'Cantidad', min: 0 }
+  ],
+  series: []
+})
+
+// promedio de puntuacion y cantidad de opiniones por hora
+const opinionesPorHoraStats = computed(() => {
+  const promedios: number[] = Array(24).fill(0)
+  const cantidades: number[] = Array(24).fill(0)
+  Object.entries(opinionesPorHoraRaw.value).forEach(([hora, opiniones]) => {
+    const filtradas = opiniones.filter(op => op.fecha && op.fecha.startsWith(selectedDate.value))
+    cantidades[parseInt(hora, 10)] = filtradas.length
+    if (filtradas.length > 0) {
+      const suma = filtradas.reduce((acc, op) => acc + (op.puntuacion ?? 0), 0)
+      promedios[parseInt(hora, 10)] = suma / filtradas.length
+    }
+  })
+  return { promedios, cantidades }
+})
+
+// se actualiza el grafo
+watch([opinionesPorHoraStats, selectedDate], () => {
+  opinionesPorHoraOptions.value.series = [
+    {
+      name: 'Promedio de puntuación',
+      type: 'line',
+      data: opinionesPorHoraStats.value.promedios,
+      smooth: true,
+      itemStyle: { color: '#fb00e6' },
+      yAxisIndex: 0,
+      symbolSize: 12,
+      label: { show: false }
+    },
+    {
+      name: 'Cantidad de opiniones',
+      type: 'bar',
+      data: opinionesPorHoraStats.value.cantidades,
+      yAxisIndex: 1,
+      itemStyle: { color: '#ffffff', opacity: 0.3 },
+      barWidth: 10,
+      label: {
+        show: false
+      }
+    }
+  ]
+  opinionesPorHoraOptions.value.yAxis = [
+    { type: 'value', name: 'Promedio', min: 0, max: 5 },
+    { type: 'value', name: 'Cantidad', min: 0 }
+  ]
+}, { immediate: true })
 
 onMounted(async () => {
   try {
@@ -656,6 +761,15 @@ onMounted(async () => {
     promedioFarmacias.value = []
   } finally {
     loadingPromedioFarmacias.value = false
+  }
+
+  try {
+    loadingOpinionesPorHora.value = true
+    opinionesPorHoraRaw.value = await farmaciaService.getOpinionesPorHora()
+  } catch (error) {
+    opinionesPorHoraRaw.value = {}
+  } finally {
+    loadingOpinionesPorHora.value = false
   }
 })
 
