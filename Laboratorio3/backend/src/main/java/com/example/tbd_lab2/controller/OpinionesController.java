@@ -13,10 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +43,22 @@ public class OpinionesController {
             return ResponseEntity.ok().body(new MessageResponse("No existen opiniones para este usuario"));
         }
         return ResponseEntity.ok().body(opiniones);
+    }
+
+    @Operation(summary = "Crear una nueva opinión para un pedido", description = "Crea y guarda una nueva opinión de un cliente sobre un pedido específico en MongoDB.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "La opinión fue creada exitosamente.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = OpinionesClientesCollection.class))),
+            @ApiResponse(responseCode = "400", description = "Datos de la opinión inválidos.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponse.class)))
+    })
+    @PostMapping("/")
+    public ResponseEntity<?> createOpinion(@RequestBody OpinionesClientesCollection opinion) {
+        if (opinion.getPuntuacion() < 1 || opinion.getPuntuacion() > 5) {
+            return ResponseEntity.badRequest().body(new MessageResponse("La puntuación debe estar entre 1 y 5."));
+        }
+        OpinionesClientesCollection nuevaOpinion = opinionService.crearOpinion(opinion);
+        return ResponseEntity.ok(nuevaOpinion);
     }
 
     @Operation(summary = "[LAB 3] Obtener las opiniones de los pedidos entregados separados por las horas en cuando fueron entregados", description = "Implementación de query 6.- \"Agrupar opiniones por hora del día para analizar patrones de satisfacción.\" ")
