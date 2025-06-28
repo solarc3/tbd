@@ -3,6 +3,7 @@ package com.example.tbd_lab2.controller;
 import com.example.tbd_lab2.DTO.MessageResponse;
 import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
 import com.example.tbd_lab2.DTO.opinion.AgruparHoraResponse;
+import com.example.tbd_lab2.DTO.pedido.LogsCambioPedidosResponse;
 import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.services.OpinionService;
@@ -47,6 +48,12 @@ public class OpinionesController {
         return ResponseEntity.ok().body(opiniones);
     }
 
+    @Operation(summary = "[LAB 3] Obtener las opiniones de los pedidos entregados separados por las horas en cuando fueron entregados", description = "Implementación de query 6.- \"Agrupar opiniones por hora del día para analizar patrones de satisfacción.\" ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Un map, su llave es la hora de la entrega de todos los pedidos dentro de esta, todo lo que entrega este" +
+                    "response es un hashmap que tiene las opiniones divididos por horas, y las horas son las llaves para acceder a las opiniones mismas",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgruparHoraResponse.class)))
+    })
     @GetMapping("/opiniones-por-hora")
     public ResponseEntity<?> getOpinionesPorHora() {
         AgruparHoraResponse opiniones = opinionService.getOpinionesByHoras();

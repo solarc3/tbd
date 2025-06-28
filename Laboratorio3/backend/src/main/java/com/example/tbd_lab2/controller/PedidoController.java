@@ -2,10 +2,7 @@ package com.example.tbd_lab2.controller;
 
 import com.example.tbd_lab2.DTO.*;
 import com.example.tbd_lab2.DTO.cliente.ClienteLejanoDeFarmaciaResponse;
-import com.example.tbd_lab2.DTO.pedido.DetallePedidoRequest;
-import com.example.tbd_lab2.DTO.pedido.EstadoPedidoRequest;
-import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
-import com.example.tbd_lab2.DTO.pedido.RegistrarPedidoCompletoRequest;
+import com.example.tbd_lab2.DTO.pedido.*;
 import com.example.tbd_lab2.entities.DetallePedidoEntity;
 import com.example.tbd_lab2.entities.PedidoEntity;
 import com.example.tbd_lab2.services.DetallePedidoService;
@@ -21,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -102,6 +100,19 @@ public class PedidoController {
             return ResponseEntity.ok().body(new MessageResponse("No existen metodo de pago mas urgente "));
         }
         return ResponseEntity.ok(pago);
+    }
+
+
+    @Operation(summary = "[LAB 3] Obtener los pedidos cuyas actualizaciones hayan sido mas de 3 o más y en menos de 10 minutos", description = "Implementación de query 3.- \"Contar cuántos pedidos tienen más de 3 cambios de estado en menos de 10 minutos.\" ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Los logs del pedido en logsPedido, y el pedido en sí en pedidos, ambos comparten su index, es decir, el log en la posición 0 pertenece al pedido en el index 0 de pedidos",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LogsCambioPedidosResponse.class)))
+    })
+    @GetMapping("/logs/cambios-rapidos")
+    public ResponseEntity<?> getPedidosCambiosRapidos() {
+        LogsCambioPedidosResponse logs = pedidoService.getLogsPedidosByChangesHours();
+
+        return ResponseEntity.ok().body(Objects.requireNonNullElseGet(logs, () -> new MessageResponse("No existen opiniones...")));
     }
 
     @PostMapping("/{id_pedido}/entregar")
