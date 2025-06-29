@@ -40,5 +40,19 @@
     "fecha": "2025-06-23T09:05:00Z",
     "idCliente": 4,
     "idPedido": 5
+  },
+  {
+    "comentarios": "Demora, demora, DEMORA, demora...",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 5,
+    "idPedido": 6
+  },
+  {
+    "comentarios": "i am error",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 6,
+    "idPedido": 7
   }
 ]

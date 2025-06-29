@@ -38,6 +38,11 @@ public class PedidoService {
 
     public List<PedidoEntity> getPedidos() {return pedidoRepository.getPedidos(); }
 
+    public Long getUltimoIdPedido() {
+        List<PedidoEntity> pedidos = pedidoRepository.getPedidos();
+        return pedidos.get(pedidos.size() -1).getIdPedido();
+    }
+
     public Optional<PedidoEntity> getById(Long id) {
         return pedidoRepository.findById(id);
     }
@@ -155,4 +160,6 @@ public class PedidoService {
         response.setPedidos(pedidos);
         return response;
     }
+
+
 }

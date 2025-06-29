@@ -3,6 +3,7 @@ package com.example.tbd_lab2.controller;
 import com.example.tbd_lab2.DTO.MessageResponse;
 import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
 import com.example.tbd_lab2.DTO.opinion.AgruparHoraResponse;
+import com.example.tbd_lab2.DTO.opinion.OpinionRequest;
 import com.example.tbd_lab2.DTO.pedido.LogsCambioPedidosResponse;
 import com.example.tbd_lab2.DTO.pedido.PedidoCruzaZonasResponse;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
@@ -53,7 +54,7 @@ public class OpinionesController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponse.class)))
     })
     @PostMapping("/")
-    public ResponseEntity<?> createOpinion(@RequestBody OpinionesClientesCollection opinion) {
+    public ResponseEntity<?> createOpinion(@RequestBody OpinionRequest opinion) {
         if (opinion.getPuntuacion() < 1 || opinion.getPuntuacion() > 5) {
             return ResponseEntity.badRequest().body(new MessageResponse("La puntuación debe estar entre 1 y 5."));
         }

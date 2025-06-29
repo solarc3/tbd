@@ -2,6 +2,7 @@ package com.example.tbd_lab2.services;
 
 import com.example.tbd_lab2.DTO.farmacia.FarmaciaPromedioDTO;
 import com.example.tbd_lab2.DTO.opinion.AgruparHoraResponse;
+import com.example.tbd_lab2.DTO.opinion.OpinionRequest;
 import com.example.tbd_lab2.collections.OpinionesClientesCollection;
 import com.example.tbd_lab2.entities.FarmaciaEntity;
 import com.example.tbd_lab2.entities.PedidoEntity;
@@ -27,9 +28,14 @@ public class OpinionService {
     @Autowired
     private FarmaciaRepository farmaciaRepository;
 
-    public OpinionesClientesCollection crearOpinion(OpinionesClientesCollection opinion) {
-        opinion.setFecha(LocalDateTime.now());
-        return opinionesClientesRepository.save(opinion);
+    public OpinionesClientesCollection crearOpinion(OpinionRequest opinion) {
+        OpinionesClientesCollection opinionRetorno = new OpinionesClientesCollection();
+        opinionRetorno.setIdPedido(opinion.getIdPedido());
+        opinionRetorno.setComentarios(opinion.getComentario());
+        opinionRetorno.setFecha(LocalDateTime.now());
+        opinionRetorno.setPuntuacion(opinion.getPuntuacion());
+        opinionRetorno.setIdCliente(opinion.getIdCliente());
+        return opinionesClientesRepository.save(opinionRetorno);
     }
 
     public List<OpinionesClientesCollection> findAllOpiniones() {

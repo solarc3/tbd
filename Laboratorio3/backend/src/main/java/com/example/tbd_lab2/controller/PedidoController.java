@@ -152,7 +152,8 @@ public class PedidoController {
     public ResponseEntity<?> registrarPedidoCompleto(@RequestBody RegistrarPedidoCompletoRequest request) {
         boolean success = pedidoService.registrarPedidoCompleto(request);
         if (success) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Pedido registrado exitosamente."));
+            Long ultimoId = pedidoService.getUltimoIdPedido();
+            return ResponseEntity.status(HttpStatus.CREATED).body(ultimoId);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error al registrar el pedido completo."));
