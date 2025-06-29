@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/tabs'
 import farmaciaService from '@/api/services/farmaciaService'
 import { userService } from '@/api/services/userService'
+import { getRutasFrecuentes } from '@/api/services/repartidorService'
 import 'leaflet/dist/leaflet.css'
 import type {
   FarmaciaEntity,
@@ -15,6 +16,7 @@ import type {
   ClienteZonaCobertura,
   ClienteLejanoDeFarmacia,
   UserInfoResponse,
+  RepartidorRutasFrecuentesDTO,
 } from '@/api/models'
 
 const farmacias = ref<FarmaciaEntity[]>([])
@@ -31,9 +33,15 @@ const coberturaError = ref<string | null>(null)
 const radiusKm = ref(5)
 const clientesLejanos = ref<ClienteLejanoDeFarmacia[]>([])
 
+// Variables para rutas frecuentes
+const repartidoresRutas = ref<RepartidorRutasFrecuentesDTO[]>([])
+const selectedRepartidorId = ref<number | null>(null)
+const rutasError = ref<string | null>(null)
+
 const map1Container = ref<HTMLElement | null>(null)
 const map2Container = ref<HTMLElement | null>(null)
 const map3Container = ref<HTMLElement | null>(null)
+const map4Container = ref<HTMLElement | null>(null)
 const activeTab = ref('primero')
 
 let L: any;
@@ -41,9 +49,11 @@ let leafletPromise: Promise<any> | null = null;
 let map1: any = null
 let map2: any = null
 let map3: any = null
+let map4: any = null
 let markers1: any[] = []
 let markers2: any[] = []
 let markers3: any[] = []
+let markers4: any[] = []
 
 function loadLeaflet() {
   if (typeof window === 'undefined') {
@@ -119,6 +129,34 @@ function createUserIcon() {
   })
 }
 
+function createDeliveryIcon() {
+  return L.divIcon({
+    html: `<div style="
+      background: #10b981;
+      border: 2px solid #059669;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      position: relative;
+      z-index: 1000;
+    ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+    </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+    className: 'delivery-custom-icon'
+  })
+}
+
 async function initializeMap(container: HTMLElement, view: [number, number], zoom: number): Promise<any> {
   try {
     await loadLeaflet();
@@ -153,8 +191,8 @@ function clearMapLayers(map: any, markers: any[]) {
 onMounted(async () => {
   try {
     farmacias.value = await farmaciaService.getAllFarmacias()
-
     allUsers.value = await userService.getAllUsers()
+    repartidoresRutas.value = await getRutasFrecuentes()
   } catch (error) {
     console.error('Error fetching data:', error)
   }
@@ -189,6 +227,13 @@ watch(activeTab, async (newTab, oldTab) => {
           map3 = null;
         }
         break
+      case 'cuarto':
+        if (map4) {
+          clearMapLayers(map4, markers4)
+          map4.remove();
+          map4 = null;
+        }
+        break
     }
   }
 
@@ -204,6 +249,9 @@ watch(activeTab, async (newTab, oldTab) => {
     } else if (newTab === 'tercero' && !map3 && map3Container.value) {
       map3 = await initializeMap(map3Container.value, [-33.45, -70.65], 11)
       if(clientesLejanos.value.length > 0) fetchClientesLejanos();
+    } else if (newTab === 'cuarto' && !map4 && map4Container.value) {
+      map4 = await initializeMap(map4Container.value, [-33.45, -70.65], 12)
+      if(selectedRepartidorId.value) renderRutasFrecuentes();
     }
   }, 100)
 })
@@ -228,6 +276,12 @@ watch(selectedUserId, async (userId) => {
   }
   clienteId.value = userId;
   await checkZonaCobertura();
+})
+
+watch(selectedRepartidorId, () => {
+  if (selectedRepartidorId.value && map4) {
+    renderRutasFrecuentes();
+  }
 })
 
 async function renderEntregasCercanas() {
@@ -466,15 +520,124 @@ async function fetchClientesLejanos() {
     clientesLejanos.value = [];
   }
 }
+
+async function renderRutasFrecuentes() {
+  if (!map4 || !selectedRepartidorId.value) return;
+
+  clearMapLayers(map4, markers4);
+  rutasError.value = null;
+
+  const repartidor = repartidoresRutas.value.find(r => r.idRepartidor === selectedRepartidorId.value);
+  if (!repartidor || !repartidor.rutasFrecuentes || repartidor.rutasFrecuentes.length === 0) {
+    rutasError.value = 'No hay rutas frecuentes para este repartidor';
+    return;
+  }
+
+  // Encontrar la frecuencia máxima para normalizar el tamaño de los círculos
+  const maxFrecuencia = Math.max(...repartidor.rutasFrecuentes.map(r => r.frecuencia));
+  const minFrecuencia = Math.min(...repartidor.rutasFrecuentes.map(r => r.frecuencia));
+
+  // Crear un heatmap layer con los puntos
+  const heatmapPoints: any[] = [];
+
+  // Dibujar círculos para cada punto frecuente
+  repartidor.rutasFrecuentes.forEach((punto) => {
+    // Normalizar el radio basado en la frecuencia
+    const radioBase = 100;
+    const radioMax = 500;
+    const factorNormalizacion = (punto.frecuencia - minFrecuencia) / (maxFrecuencia - minFrecuencia || 1);
+    const radio = radioBase + (radioMax - radioBase) * factorNormalizacion;
+
+    // Color basado en frecuencia
+    const opacidad = 0.3 + 0.4 * factorNormalizacion;
+    const color = getColorByFrequency(factorNormalizacion);
+
+    const circle = L.circle([punto.lat, punto.lng], {
+      radius: radio,
+      color: color,
+      fillColor: color,
+      fillOpacity: opacidad,
+      weight: 2
+    }).addTo(map4);
+
+    circle.bindPopup(`
+      <b>Punto Frecuente</b><br>
+      Frecuencia: ${punto.frecuencia} veces<br>
+      Coordenadas: ${punto.lat.toFixed(4)}, ${punto.lng.toFixed(4)}
+    `);
+
+    markers4.push(circle);
+
+    // Agregar puntos para el heatmap
+    for (let i = 0; i < punto.frecuencia; i++) {
+      heatmapPoints.push([punto.lat, punto.lng]);
+    }
+  });
+
+  // Dibujar líneas conectando los puntos más frecuentes
+  const puntosFrecuentes = repartidor.rutasFrecuentes
+      .filter(p => p.frecuencia >= maxFrecuencia * 0.5)
+      .sort((a, b) => b.frecuencia - a.frecuencia);
+
+  if (puntosFrecuentes.length >= 2) {
+    // Conectar los puntos frecuentes en orden
+    const coordinates = puntosFrecuentes.map(p => [p.lat, p.lng]);
+    const polyline = L.polyline(coordinates, {
+      color: '#6366f1',
+      weight: 3,
+      opacity: 0.6,
+      dashArray: '10, 5'
+    }).addTo(map4);
+    markers4.push(polyline);
+  }
+
+  // Agregar marcadores especiales para los puntos más frecuentes
+  const topPuntos = repartidor.rutasFrecuentes
+      .sort((a, b) => b.frecuencia - a.frecuencia)
+      .slice(0, 5);
+
+  topPuntos.forEach((punto, index) => {
+    const marker = L.marker([punto.lat, punto.lng], {
+      icon: createDeliveryIcon(),
+      zIndexOffset: 1000 - index
+    })
+        .addTo(map4)
+        .bindPopup(`
+        <b>Top ${index + 1} Punto Más Frecuente</b><br>
+        <span style="color: #10b981; font-weight: bold;">
+        Frecuencia: ${punto.frecuencia} veces
+        </span><br>
+        Coordenadas: ${punto.lat.toFixed(4)}, ${punto.lng.toFixed(4)}
+      `);
+    markers4.push(marker);
+  });
+
+  // Centrar el mapa en todos los puntos
+  if (repartidor.rutasFrecuentes.length > 0) {
+    const bounds = L.latLngBounds(
+        repartidor.rutasFrecuentes.map(p => [p.lat, p.lng])
+    );
+    map4.fitBounds(bounds, { padding: [50, 50] });
+  }
+}
+
+function getColorByFrequency(factor: number): string {
+  // Gradiente de colores de menos frecuente (azul) a más frecuente (rojo)
+  if (factor < 0.25) return '#3b82f6'; // Azul
+  if (factor < 0.5) return '#10b981';  // Verde
+  if (factor < 0.75) return '#f59e0b'; // Naranja
+  return '#ef4444'; // Rojo
+}
 </script>
 
 <template>
   <div class="w-full p-6">
     <Tabs v-model="activeTab" default-value="primero" class="w-full">
-      <TabsList class="grid w-full grid-cols-3 h-10 bg-muted p-1 rounded-md">
+      <TabsList class="grid w-full grid-cols-4 h-10 bg-muted p-1 rounded-md">
         <TabsTrigger value="primero" class="rounded-sm">Farmacias</TabsTrigger>
         <TabsTrigger value="segundo" class="rounded-sm">Zona Cobertura</TabsTrigger>
         <TabsTrigger value="tercero" class="rounded-sm">Clientes Lejanos</TabsTrigger>
+        <TabsTrigger value="cuarto" class="rounded-sm">Rutas Frecuentes</TabsTrigger>
       </TabsList>
 
       <TabsContent value="primero" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
@@ -659,6 +822,86 @@ async function fetchClientesLejanos() {
           </div>
         </div>
       </TabsContent>
+
+      <TabsContent value="cuarto" class="mt-6 p-6 bg-background rounded-lg border shadow-sm">
+        <div class="space-y-4">
+          <div class="p-4 bg-muted/30 border rounded-lg">
+            <label class="block text-sm font-medium mb-2">Seleccione Repartidor:</label>
+            <select
+                v-model.number="selectedRepartidorId"
+                class="w-full border rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option :value="null" disabled>Seleccione un repartidor</option>
+              <option v-for="rep in repartidoresRutas" :key="rep.idRepartidor" :value="rep.idRepartidor">
+                {{ rep.nombreRepartidor }}
+              </option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-1">
+              <div v-if="selectedRepartidorId && !rutasError" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Análisis de Rutas</h3>
+
+                <div v-if="repartidoresRutas.find(r => r.idRepartidor === selectedRepartidorId)?.rutasFrecuentes?.length" class="space-y-3">
+                  <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p class="text-sm font-medium text-green-600">Puntos frecuentes</p>
+                    <p class="text-2xl font-bold text-green-700">
+                      {{ repartidoresRutas.find(r => r.idRepartidor === selectedRepartidorId)?.rutasFrecuentes?.length || 0 }}
+                    </p>
+                  </div>
+
+                  <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p class="text-sm font-medium text-blue-600">Frecuencia máxima</p>
+                    <p class="text-2xl font-bold text-blue-700">
+                      {{ Math.max(...(repartidoresRutas.find(r => r.idRepartidor === selectedRepartidorId)?.rutasFrecuentes?.map(r => r.frecuencia) || [0])) }}
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">veces en el mismo punto</p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <h4 class="font-medium text-sm text-muted-foreground">Top 5 Puntos Más Visitados</h4>
+                    <div class="space-y-2 max-h-[250px] overflow-y-auto pr-2">
+                      <div
+                          v-for="(punto, idx) in repartidoresRutas.find(r => r.idRepartidor === selectedRepartidorId)?.rutasFrecuentes?.sort((a, b) => b.frecuencia - a.frecuencia).slice(0, 5)"
+                          :key="idx"
+                          class="p-3 bg-background border rounded-lg hover:bg-muted/20 transition-colors"
+                      >
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm font-medium">#{{ idx + 1 }}</span>
+                          <span class="text-sm font-bold text-gray-600">{{ punto.frecuencia }} veces</span>
+                        </div>
+                        <p class="text-xs text-muted-foreground mt-1">
+                          {{ punto.lat.toFixed(4) }}, {{ punto.lng.toFixed(4) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p class="text-sm text-yellow-600">No hay datos de rutas para este repartidor</p>
+                </div>
+              </div>
+
+              <div v-else-if="rutasError" class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Estado</h3>
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p class="text-sm text-red-600">{{ rutasError }}</p>
+                </div>
+              </div>
+
+              <div v-else class="sticky top-0">
+                <h3 class="font-semibold mb-3 text-lg">Rutas de Repartidores</h3>
+              </div>
+            </div>
+
+            <div class="lg:col-span-3">
+              <div ref="map4Container" class="h-[400px] w-full rounded-lg overflow-hidden border" />
+            </div>
+          </div>
+        </div>
+      </TabsContent>
     </Tabs>
   </div>
 </template>
@@ -686,7 +929,8 @@ async function fetchClientesLejanos() {
 }
 
 :deep(.farmacia-custom-icon),
-:deep(.user-custom-icon) {
+:deep(.user-custom-icon),
+:deep(.delivery-custom-icon) {
   cursor: pointer !important;
   pointer-events: auto !important;
 }

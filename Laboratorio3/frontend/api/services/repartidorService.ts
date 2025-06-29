@@ -1,6 +1,5 @@
 import apiClient from '@/api/axios'
-import type { RepartidorDistanciaTotal } from "@/api/models";
-
+import type { RepartidorDistanciaTotal, RepartidorRutasFrecuentesDTO} from "@/api/models";
 interface RepartidorRendimiento {
   idRepartidor: number
   nombreRepartidor: string
@@ -54,5 +53,8 @@ class RepartidorService {
   }
 }
 
-
+export const getRutasFrecuentes = async (): Promise<RepartidorRutasFrecuentesDTO[]> => {
+  const response = await apiClient.get<RepartidorRutasFrecuentesDTO[]>('/repartidor/rutas-frecuentes')
+  return response.data
+}
 export default new RepartidorService()

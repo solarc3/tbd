@@ -126,3 +126,15 @@ export interface NavegacionSinCompraResponse {
 	nombreCliente: string;
 	historial: NavegacionLog[];
 }
+
+export interface RutaFrecuenteDTO {
+	lat: number;
+	lng: number;
+	frecuencia: number;
+}
+
+export interface RepartidorRutasFrecuentesDTO {
+	idRepartidor: number;
+	nombreRepartidor: string;
+	rutasFrecuentes: RutaFrecuenteDTO[];
+}
