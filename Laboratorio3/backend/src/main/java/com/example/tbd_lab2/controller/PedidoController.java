@@ -140,6 +140,7 @@ public class PedidoController {
     public ResponseEntity<?> cambiarEstado(@RequestBody EstadoPedidoRequest estadoPedidoRequest) {
         boolean updated = pedidoService.cambiarEstado(estadoPedidoRequest.getIdPedido(),
                     estadoPedidoRequest.getNuevoEstado());
+        pedidoService.cambiarEstadoMongo(estadoPedidoRequest.getIdPedido(),estadoPedidoRequest.getNuevoEstado());
         if (updated) {
             return ResponseEntity.ok().body(new MessageResponse("Estado cambiado"));
         }

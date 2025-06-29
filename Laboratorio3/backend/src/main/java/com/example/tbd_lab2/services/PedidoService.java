@@ -63,6 +63,28 @@ public class PedidoService {
     public boolean cambiarEstado(Long idPedido, String nuevoEstado) {
         return pedidoRepository.updateState(idPedido, nuevoEstado);
     }
+
+    public void cambiarEstadoMongo(Long idPedido, String nuevoEstado) {
+        if( logsPedidosRepository.findByIdPedido(idPedido).isPresent()){
+            LogsPedidosCollection log = logsPedidosRepository.findByIdPedido(idPedido).get();
+            LogsPedidosCollection.Evento evento = new LogsPedidosCollection.Evento();
+            evento.setEstado(nuevoEstado);
+            evento.setTimestamp(LocalDateTime.now());
+            log.getEventos().add(evento);
+            logsPedidosRepository.save(log);
+        }else{
+            LogsPedidosCollection log = new LogsPedidosCollection();
+            log.setIdPedido(idPedido);
+            LogsPedidosCollection.Evento evento = new LogsPedidosCollection.Evento();
+            List<LogsPedidosCollection.Evento> eventos = new ArrayList<>();
+            evento.setEstado(nuevoEstado);
+            evento.setTimestamp(LocalDateTime.now());
+            eventos.add(evento);
+            log.setEventos(eventos);
+            logsPedidosRepository.save(log);
+        }
+    }
+
     public boolean registrarPedidoCompleto(RegistrarPedidoCompletoRequest request) {
         if (request.getIdCliente() == null || request.getIdFarmacia() == null || request.getEsUrgente() == null)
             return false;
