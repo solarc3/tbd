@@ -1,8 +1,11 @@
 package com.example.tbd_lab2.services;
 
+import com.example.tbd_lab2.DTO.NavegacionSinCompraResponse;
 import com.example.tbd_lab2.collections.NavegacionLog;
 import com.example.tbd_lab2.DTO.NavegacionRequest;
+import com.example.tbd_lab2.entities.UserEntity;
 import com.example.tbd_lab2.repositories.NavegacionLogRepository;
+import com.example.tbd_lab2.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 
@@ -14,6 +17,7 @@ import java.util.List;
 public class NavegacionService {
 
     private final NavegacionLogRepository navegacionLogRepository;
+    private final UserRepository userRepository;
 
     public List<NavegacionLog> getAll() {
         return navegacionLogRepository.findAll();
@@ -27,5 +31,16 @@ public class NavegacionService {
         log.setTimestamp(Instant.now());
 
         navegacionLogRepository.save(log);
+    }
+
+    public List<NavegacionSinCompraResponse> getNavegacionSinCompras() {
+        return navegacionLogRepository.findNavegacionSinCompraPorSesion()
+                .stream()
+                .peek(nav -> {
+                    UserEntity user = userRepository.findById(nav.getIdCliente()).orElseThrow();
+                    String nombreCliente = user.getFirstName() + " " + user.getLastName();
+                    nav.setNombreCliente(nombreCliente);
+                })
+                .toList();
     }
 }
