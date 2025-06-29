@@ -112,3 +112,17 @@ export interface FarmaciaClosestDeliveryResponse {
 	ubicacionFarmacia: Ubicacion;
 	ubicacionUsuario: Ubicacion;
 }
+
+export interface NavegacionLog {
+	id: string;
+	clientId: number;
+	fromUrl: string;
+	toUrl: string;
+	timestamp: string; // iso
+}
+
+export interface NavegacionSinCompraResponse {
+	idCliente: number;
+	nombreCliente: string;
+	historial: NavegacionLog[];
+}

@@ -14,7 +14,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       from: from.fullPath,
       to: to.fullPath,
     };
-    apiClient.post('/log', payload).catch(error => {
+    apiClient.post('/navegacion', payload).catch(error => {
       console.error('Error logging navigation:', error);
     });
   }
