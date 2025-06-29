@@ -457,12 +457,12 @@ const verHistorialNavegacion = (cliente: NavegacionSinCompraResponse) => {
   showNavegacionModal.value = true;
 };
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
+const formatDate = (dateValue: string | number) => {
+  if (!dateValue) return "";
+  const timestampInMs = typeof dateValue === 'number' ? dateValue * 1000 : dateValue;
+  const date = new Date(timestampInMs);
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
-
 const getEstadoVariant = (estado: string) => {
   switch (estado) {
     case "ENTREGADO":
