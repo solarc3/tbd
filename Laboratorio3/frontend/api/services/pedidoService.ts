@@ -45,8 +45,9 @@ class PedidoService {
     return data
   }
 
-  async completarPedido(request: RegistrarPedidoRequest): Promise<void> {
-    await apiClient.post("/pedido/registrarcompleto", request)  
+  async completarPedido(request: RegistrarPedidoRequest): Promise<number> {
+    const { data } = await apiClient.post<number>("/pedido/registrarcompleto", request)
+    return data
   }
 
   async cambiarEstadoPedido(idPedido: number, nuevoEstado: string): Promise<boolean> {

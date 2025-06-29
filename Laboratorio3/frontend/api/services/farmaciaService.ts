@@ -97,13 +97,13 @@ class FarmaciaService {
 	  }
 	}
 
-	async createOpinion(opinion: { idProducto: number; puntuacion: number; comentario: string; idCliente: number }) {
-	  return apiClient.post('/opiniones/', {
-	    idCliente: opinion.idCliente,
-	    idProducto: opinion.idProducto,
-	    puntuacion: opinion.puntuacion,
-	    comentario: opinion.comentario
-	  })
+	async createOpinion(opinion: { idPedido: number; puntuacion: number; comentario: string; idCliente: number }) {
+		return apiClient.post('/opiniones/', {
+			idCliente: opinion.idCliente,
+			idPedido: opinion.idPedido,
+			puntuacion: opinion.puntuacion,
+			comentario: opinion.comentario
+		})
 	}
 
 	async getAllOpiniones(): Promise<any[]> {

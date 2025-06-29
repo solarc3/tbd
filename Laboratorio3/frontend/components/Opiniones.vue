@@ -6,24 +6,25 @@
         <button @click="close" class="text-gray-400 hover:text-gray-600">&times;</button>
       </div>
       <div v-if="!submitted">
-        <div v-for="producto in productos" :key="producto.idProducto" class="mb-4">
-          <div class="text-sm text-gray-700 mb-1">{{ producto.nombre }}</div>
-          <select v-model="opiniones[producto.idProducto].puntuacion" class="w-full mb-1 border rounded px-2 py-1">
+        <div class="mb-4">
+          <div class="text-sm text-gray-700 mb-1">Califica tu pedido</div>
+          <select v-model="opinion.puntuacion" class="w-full mb-1 border rounded px-2 py-1">
             <option disabled value="">Puntaje</option>
             <option v-for="n in 5" :key="n" :value="n">{{ n }} ⭐</option>
           </select>
           <input
-            v-model="opiniones[producto.idProducto].comentario"
-            type="text"
-            class="w-full border rounded px-2 py-1 text-sm"
-            placeholder="Comentario"
+              v-model="opinion.comentario"
+              type="text"
+              class="w-full border rounded px-2 py-1 text-sm"
+              placeholder="Comentario sobre tu pedido"
           />
         </div>
         <button
-          @click="enviarOpiniones"
-          class="w-full bg-custom text-white rounded py-2 mt-2 hover:bg-custom2 transition"
+            @click="enviarOpinion"
+            :disabled="!opinion.puntuacion"
+            class="w-full bg-custom text-white rounded py-2 mt-2 hover:bg-custom2 transition disabled:opacity-50"
         >
-          Enviar opiniones
+          Enviar opinión
         </button>
       </div>
       <div v-else class="text-green-600 text-center py-4">
@@ -39,35 +40,38 @@ import farmaciaService from '@/api/services/farmaciaService'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
-  productos: { idProducto: number; nombre: string }[]
+  idPedido: number
 }>()
 
 const authStore = useAuthStore()
 const visible = ref(true)
 const submitted = ref(false)
-const opiniones = reactive<{ [id: number]: { puntuacion: number | ''; comentario: string } }>(
-  Object.fromEntries(props.productos.map(p => [p.idProducto, { puntuacion: '', comentario: '' }]))
-)
+const opinion = reactive({
+  puntuacion: '' as number | '',
+  comentario: ''
+})
 
 function close() {
   visible.value = false
   localStorage.setItem('opinionesPopupClosed', '1')
 }
 
-async function enviarOpiniones() {
-  for (const id in opiniones) {
-    const { puntuacion, comentario } = opiniones[id]
-    if (puntuacion) {
-      await farmaciaService.createOpinion({
-        idProducto: Number(id),
-        puntuacion,
-        comentario,
-        idCliente: authStore.user?.id
-      })
-    }
+async function enviarOpinion() {
+  if (!opinion.puntuacion || !authStore.user?.id) return
+
+  try {
+    await farmaciaService.createOpinion({
+      idPedido: props.idPedido,
+      puntuacion: opinion.puntuacion,
+      comentario: opinion.comentario,
+      idCliente: authStore.user.id
+    })
+    submitted.value = true
+    setTimeout(close, 2000)
+  } catch (error) {
+    console.error('Error al enviar opinión:', error)
+    alert('Error al enviar la opinión. Intenta nuevamente.')
   }
-  submitted.value = true
-  setTimeout(close, 2000)
 }
 </script>
 
