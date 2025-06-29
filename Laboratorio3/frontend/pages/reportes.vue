@@ -218,6 +218,56 @@
       </div>
     </div>
 
+    <!-- buscador -->
+    <div v-if="activeTab === 'valoraciones'" class="space-y-6">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Búsqueda de Opiniones</h2>
+
+        <div class="mb-4 flex items-center gap-2">
+          <input
+            v-model="palabraClave"
+            placeholder="Buscar opiniones (ej: demora, error)"
+            class="border rounded px-2 py-1 flex-1"
+          />
+          <button
+            @click="buscarOpiniones"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded"
+          >
+            Buscar
+          </button>
+        </div>
+
+        <div v-if="todasLasOpiniones.length === 0" class="text-gray-500 text-center py-4">
+          Cargando opiniones...
+        </div>
+
+        <ul v-else class="divide-y divide-gray-200">
+          <li v-for="op in opinionesFiltradas" :key="op._id" class="py-4">
+            <div class="flex flex-col gap-2">
+              <div class="flex justify-between items-start">
+                <span class="text-sm text-gray-600">
+                  Cliente #{{ op.idCliente || 'N/A' }}
+                  {{ op.idPedido ? `- Pedido #${op.idPedido}` : '' }}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-500">
+                    {{ new Date(op.fecha).toLocaleDateString() }}
+                  </span>
+                  <span class="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
+                    <span class="text-yellow-600 font-bold mr-1">{{ op.puntuacion }}</span>
+                    <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <p class="text-gray-800">{{ op.comentarios }}</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -566,6 +616,27 @@ watch([opinionesPorHoraStats, selectedDate], () => {
   ]
 }, { immediate: true })
 
+// query 2 - lab 3 !!
+const palabraClave = ref('')
+const opinionesFiltradas = ref<any[]>([])
+const busquedaRealizada = ref(false)
+const todasLasOpiniones = ref<any[]>([])
+
+function buscarOpiniones() {
+  const palabras = palabraClave.value.toLowerCase().split(',').map(p => p.trim()).filter(Boolean)
+
+  if (palabras.length === 0) {
+    opinionesFiltradas.value = todasLasOpiniones.value
+  } else {
+    opinionesFiltradas.value = todasLasOpiniones.value.filter(op =>
+      palabras.some(palabra =>
+        op.comentarios?.toLowerCase().includes(palabra)
+      )
+    )
+  }
+  busquedaRealizada.value = true
+}
+
 onMounted(async () => {
   try {
     const pedidos = await pedidoService.getPedidosCruzaZonas(3)
@@ -770,6 +841,21 @@ onMounted(async () => {
     opinionesPorHoraRaw.value = {}
   } finally {
     loadingOpinionesPorHora.value = false
+  }
+
+  // query 2 - lab 3 !!
+  try {
+    const data = await farmaciaService.getAllOpiniones?.()
+    if (Array.isArray(data)) {
+      todasLasOpiniones.value = data
+      opinionesFiltradas.value = data
+    } else {
+      todasLasOpiniones.value = []
+      opinionesFiltradas.value = []
+    }
+  } catch {
+    todasLasOpiniones.value = []
+    opinionesFiltradas.value = []
   }
 })
 

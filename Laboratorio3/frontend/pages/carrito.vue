@@ -13,6 +13,7 @@ import { ShoppingCart, CheckCircle, CreditCard, Trash } from 'lucide-vue-next'
 import { useCartStore } from '@/stores/cartStore'
 import { pedidoService, farmaciaService } from "@/api/services";
 import type { FarmaciaEntity, RegistrarPedidoRequest } from "@/api/models";
+import { useOpiniones } from '@/stores/opiniones'
 
 // https://www.shadcn-vue.com/docs/components/stepper
 // https://www.shadcn-vue.com/docs/components/progress.html
@@ -108,6 +109,8 @@ const initializePrescriptionConfirmations = () => {
   });
 };
 
+const popupStore = useOpiniones()
+
 // Watch for changes in cart items to initialize new prescription items
 watch(() => cartItems.value, () => {
   initializePrescriptionConfirmations();
@@ -132,8 +135,11 @@ const fetchFarmacias = async () => {
 	}
 };
 
-// Function to handle order placement
 const placeOrder = async () => {
+  if (cartItems.value.length === 0) {
+    alert('El carrito está vacío.')
+    return
+  }
   const order : RegistrarPedidoRequest = {
     // mapear a ProductoPedidoRequest (id, cantidad, validada)
     productos: cartItems.value.map(item => ({
@@ -146,12 +152,21 @@ const placeOrder = async () => {
     idFarmacia: selectedFarmaciaId.value,
     idCliente: authStore.user?.id? authStore.user.id : null
   }
-  
-  console.log('Placing order:', order)
-  
-  // Call The API to place the order :)
+
   await pedidoService.completarPedido(order)
     .then(() => {
+      localStorage.setItem('productosRecientes', JSON.stringify(
+          cartItems.value.map(item => ({
+            idProducto: item.idProducto,
+            nombre: item.nombre
+          }))
+      ))
+      popupStore.mostrar(
+          cartItems.value.map(item => ({
+            idProducto: item.idProducto,
+            nombre: item.nombre
+          }))
+      )
       alert('¡Pedido completado con éxito!')
       cartStore.clearCart()
       router.push('/profile')
