@@ -1,0 +1,44 @@
+[
+  {
+    "clientId": 1,
+    "fromUrl": "/home",
+    "toUrl": "/search?q=aspirina",
+    "timestamp": "2025-06-20T13:55:00Z"
+  },
+  {
+    "clientId": 1,
+    "fromUrl": "/search?q=aspirina",
+    "toUrl": "/search?q=aspirina&filter=marca:bayer",
+    "timestamp": "2025-06-20T13:56:00Z"
+  },
+  {
+    "clientId": 1,
+    "fromUrl": "/search?q=aspirina&filter=marca:bayer",
+    "toUrl": "/products/producto_45",
+    "timestamp": "2025-06-20T13:57:00Z"
+  },
+  {
+    "clientId": 1,
+    "fromUrl": "/checkout",
+    "toUrl": "/purchase/success",
+    "timestamp": "2025-06-20T14:02:00Z"
+  },
+  {
+    "clientId": 1,
+    "fromUrl": "/checkout",
+    "toUrl": "/purchase/success",
+    "timestamp": "2025-06-20T14:02:00Z"
+  },
+  {
+    "clientId": 2,
+    "fromUrl": "/home",
+    "toUrl": "/search?q=paracetamol",
+    "timestamp": "2025-06-21T17:25:00Z"
+  },
+  {
+    "clientId": 2,
+    "fromUrl": "/search?q=paracetamol",
+    "toUrl": "/products/producto_82",
+    "timestamp": "2025-06-21T17:26:00Z"
+  }
+]

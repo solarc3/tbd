@@ -1,0 +1,58 @@
+[
+  {
+    "comentarios": "Excelente servicio, el pedido llegó muy rápido y en perfectas condiciones.",
+    "puntuacion": 5,
+    "fecha": "2025-06-20T14:30:00Z",
+    "idCliente": 1,
+    "idPedido": 1
+  },
+  {
+    "comentarios": "El repartidor fue muy amable, pero el producto no era exactamente lo que esperaba.",
+    "puntuacion": 3,
+    "fecha": "2025-06-21T18:00:00Z",
+    "idCliente": 3,
+    "idPedido": 2
+  },
+  {
+    "comentarios": "Tardó más de lo esperado en llegar. La farmacia debería mejorar sus tiempos de preparación.",
+    "puntuacion": 2,
+    "fecha": "2025-06-22T11:45:00Z",
+    "idCliente": 5,
+    "idPedido": 3
+  },
+  {
+    "comentarios": "Todo perfecto, como siempre. Muy recomendado.",
+    "puntuacion": 5,
+    "fecha": "2025-06-22T20:15:00Z",
+    "idCliente": 3,
+    "idPedido": 4
+  },
+  {
+    "comentarios": "Buena experiencia en general. El seguimiento del pedido fue muy útil.",
+    "puntuacion": 4,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 4,
+    "idPedido": 5
+  },
+  {
+    "comentarios": "Mala experiencia en general. El seguimiento del pedido fue muy útil.",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 4,
+    "idPedido": 5
+  },
+  {
+    "comentarios": "Demora, demora, DEMORA, demora...",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 5,
+    "idPedido": 6
+  },
+  {
+    "comentarios": "i am error",
+    "puntuacion": 1,
+    "fecha": "2025-06-23T09:05:00Z",
+    "idCliente": 6,
+    "idPedido": 7
+  }
+]

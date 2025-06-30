@@ -1,0 +1,26 @@
+[
+  {
+    "idPedido": 1,
+    "eventos": [
+      { "estado": "PENDIENTE", "timestamp": "2025-06-20T14:00:00Z" },
+      { "estado": "CONFIRMADO", "timestamp": "2025-06-20T14:05:00Z" },
+      { "estado": "ENTREGADO", "timestamp": "2025-06-20T14:07:00Z" }
+    ]
+  },
+  {
+    "idPedido": 2,
+    "eventos": [
+      { "estado": "PENDIENTE", "timestamp": "2025-06-21T17:30:00Z" },
+      { "estado": "CONFIRMADO", "timestamp": "2025-06-21T17:32:00Z" },
+      { "estado": "ENTREGADO", "timestamp": "2025-06-21T17:35:00Z" }
+    ]
+  },
+  {
+    "idPedido": 3,
+    "eventos": [
+      { "estado": "PENDIENTE", "timestamp": "2025-06-22T11:00:00Z" },
+      { "estado": "CONFIRMADO", "timestamp": "2025-06-22T11:10:00Z" },
+      { "estado": "ENTREGADO", "timestamp": "2025-06-22T11:30:00Z" }
+    ]
+  }
+]
